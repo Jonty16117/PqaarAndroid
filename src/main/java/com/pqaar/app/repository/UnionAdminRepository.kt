@@ -3,16 +3,21 @@ package com.pqaar.app.repository
 import android.annotation.SuppressLint
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.ServerTimestamp
 import com.pqaar.app.model.HistoryAuctionListItemDTO
 import com.pqaar.app.model.LiveAuctionListItem
+import com.pqaar.app.model.LiveRoutesListItem
 import com.pqaar.app.model.LiveTruckDataListItem
 import kotlinx.coroutines.tasks.await
+import java.text.DateFormat
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 @SuppressLint("StaticFieldLeak")
 object UnionAdminRepository {
@@ -20,6 +25,7 @@ object UnionAdminRepository {
     private lateinit var auth: FirebaseAuth
     private lateinit var firestoreDb: FirebaseFirestore
     private lateinit var firebaseDb: FirebaseDatabase
+    private var totalTrucksRequired = 0
 
     private var lastAuctionListDTO: ArrayList<Pair<String, HistoryAuctionListItemDTO>> = ArrayList()
     private var truckCheckArray: HashMap<String, Boolean> = HashMap()
@@ -83,7 +89,8 @@ object UnionAdminRepository {
          * we therefore sort this list just for safety.
          */
         lastAuctionListDTO = ArrayList(lastAuctionListDTO.sortedWith(compareBy {
-            it.first.toInt()}))
+            it.first.toInt()
+        }))
     }
 
     suspend fun getLiveTruckDataList(): Boolean {
@@ -189,8 +196,60 @@ object UnionAdminRepository {
         liveCombinedAuctionList = (lastMissedList + lastOpenLiveList + lastClosedLiveList) as ArrayList<LiveAuctionListItem>
     }
 
-    fun uploadRoutesList() {
+    suspend  fun uploadRoutesList(liveRoutesList: ArrayList<LiveRoutesListItem>) {
+        liveRoutesList.forEach{
+            totalTrucksRequired += it.req.toInt()
+        }
+        if (liveRoutesList.isNotEmpty()) {
+            firebaseDb
+                .reference
+                .child("LiveRoutesList")
+                .setValue(liveRoutesList)
+            Log.d(TAG, "Live routes list uploaded successfully!")
+        } else {
+            Log.e(TAG, "Live routes list is empty!")
+        }
+    }
 
+    /**
+     * There can be following type of auction status:
+     *
+     * Live -> When the auction is in progress
+     * (Timestamp -> Timestamp of when the auction will end)
+     *
+     * Scheduled -> When the auction is scheduled at a future point in date and time
+     * (Timestamp -> Timestamp of when the next auction will begin)
+     *
+     * NA -> When there is no live auction and none is scheduled
+     * (Timestamp -> Timestamp of when the last auction ended)
+     */
+    suspend fun setAuctionStatus(status: String, timestamp: String) {
+        if (status == "") {
+            firebaseDb
+                .reference
+                .child("LiveRoutesList")
+                .setValue(liveRoutesList)
+            Log.d(TAG, "Live routes list uploaded successfully!")
+        } else {
+            Log.e(TAG, "Live routes list is empty!")
+        }
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    @Throws(ParseException::class)
+    fun timestampToMillis(timestamp: String): Long {
+        val sdf = SimpleDateFormat("dd-M-yyyy hh:mm:ss")
+        val date = sdf.parse(timestamp)
+        val calendar = Calendar.getInstance()
+        calendar.time = date!!
+        return calendar.timeInMillis
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    fun millisToTimestamp(millis: Long): String {
+        val simple: DateFormat = SimpleDateFormat("dd MMM yyyy HH:mm:ss")
+        val result = Date(millis)
+        return (simple.format(result)).toString()
     }
 
     //checks if the truck status is in progress
