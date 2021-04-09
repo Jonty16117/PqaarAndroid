@@ -9,16 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import kotlinx.coroutines.*
-import androidx.fragment.app.FragmentTransaction
 import com.google.firebase.auth.FirebaseAuth
 import com.pqaar.app.R
-import com.pqaar.app.model.HistoryAuctionListItemDTO
-import com.pqaar.app.repository.UnionAdminRepository
+import com.pqaar.app.repositories.UnionAdminRepository
+import com.pqaar.app.utils.TimeConversions
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.cancelAndJoin
-import kotlin.system.measureNanoTime
 import kotlin.system.measureTimeMillis
 
 
@@ -55,33 +51,24 @@ class LoginUserFragment : Fragment() {
         var checkedPhoneNumber: String?
 
         GlobalScope.launch(Dispatchers.IO) {
-            var lastAuctionListDocument = ""
             val executionTime = measureTimeMillis {
-                lastAuctionListDocument = UnionAdminRepository.fetchLastAuctionListDocument()
-                UnionAdminRepository.getLastAuctionList(lastAuctionListDocument)
-                if(UnionAdminRepository.getLiveTruckDataList()) {
-                    UnionAdminRepository.separateOpenCloseLists()
-                    UnionAdminRepository.getLastMissedList()
-                    UnionAdminRepository.combineLists()
-                }
+                UnionAdminRepository.setAuctionStatus("Live")
+                UnionAdminRepository
+                    .setAuctionTimestamp(
+                    TimeConversions
+                        .TimestampToMillis("01-12-2021 22:02:20").toString())
             }
-            /**
-             * [LiveAuctionListItem(currentNo=, prevNo=0, truckNo=pb0, locked=true, src=, des=, timestamp=),
-             * LiveAuctionListItem(currentNo=, prevNo=1, truckNo=pb1, locked=true, src=, des=, timestamp=),
-             * LiveAuctionListItem(currentNo=, prevNo=2, truckNo=pb2, locked=true, src=, des=, timestamp=),
-             * LiveAuctionListItem(currentNo=, prevNo=3, truckNo=PB30XXXX, locked=true, src=, des=, timestamp=)]
-             */
+
             withContext(Dispatchers.Main){
+                val milli = TimeConversions.TimestampToMillis("01-12-2021 22:02:20")
                 Log.d(TAG, "ExecutionTime = $executionTime")
-                /*Toast.makeText(context,
-                    "lastAuctionListDocument = $lastAuctionListDocument",
-                    Toast.LENGTH_LONG).show()*/
-                Log.d(TAG, "liveCombinedAuctionList = ${UnionAdminRepository.liveCombinedAuctionList}")
-                Toast.makeText(
+                Log.d(TAG, "TimestampToMillis = $milli")
+                Log.d(TAG, "MillisToTimestamp = ${TimeConversions.MillisToTimestamp(milli)}")
+                /*Toast.makeText(
                     context,
                     "liveCombinedAuctionList = ${UnionAdminRepository.liveCombinedAuctionList}",
                     Toast.LENGTH_LONG
-                ).show()
+                ).show()*/
             }
         }
 
