@@ -1,0 +1,23 @@
+<resources>
+
+    <!--Themes-->
+    <style name="SplashScreenTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:background">@color/colorPrimaryDark</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <style name="AppThemeLight" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textCursorDrawable">@drawable/custom_text_cursor</item>
+    </style>
+
+    <style name="AppThemeDark" parent="AppThemeLight">
+        <item name="android:background">@color/colorPrimaryDark</item>
+    </style>
+
+    <!--Styles-->
+
+</resources>

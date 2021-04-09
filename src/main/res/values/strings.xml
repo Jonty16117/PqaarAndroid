@@ -1,0 +1,65 @@
+<resources>
+
+    <string name="app_name_punjabi">ਪਕਾਰ</string>
+
+
+    <string name="app_name">Pqaar</string>
+    <string name="welcome">WELCOME</string>
+    <string name="wecometexthighlightedtext">Pqaar made easy</string>
+    <string name="login">LOGIN</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="create_account">Do not have an account?</string>
+    <string name="register">Register</string>
+    <string name="truck_owner">Truck Owner</string>
+    <string name="union_admin">Union Admin</string>
+    <string name="mandi_admin">Mandi Admin</string>
+    <string name="enter_trucks">Fill Truck Details</string>
+    <string name="add_new_truck">Add New Truck</string>
+    <string name="trucks_added">Trucks Added</string>
+    <string name="trucks_added_count">5</string>
+    <string name="truck_number">Truck Number</string>
+    <string name="exit">Exit</string>
+    <string name="back">Back</string>
+    <string name="dashboard_current_status">Next Auction In</string>
+    <string name="trucks_booked">/6 On Bid</string>
+    <string name="dashboard_time">10:10:10</string>
+    <string name="history">History</string>
+    <string name="route_count">6</string>
+    <string name="routes">Routes</string>
+    <string name="bid_list">Bid List</string>
+    <string name="recents">Recents</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="date_title">Date</string>
+    <string name="date">29/08/2021</string>
+    <string name="timer">00:09</string>
+    <string name="previous_text">Previous</string>
+    <string name="previous_no">696</string>
+    <string name="bid_no_text">Bid no.</string>
+    <string name="allEnglishCharacters">abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
+    <string name="allDigits">0123456789</string>
+    <string name="truck_deliver_status_successfull">Deliver Successful</string>
+    <string name="starting_location">Starting Location</string>
+    <string name="destination">Destination</string>
+    <string name="pick_up_date">29/08/2021</string>
+    <string name="pick_up_time">14:43:21</string>
+    <string name="drop_date">29/08/2021</string>
+    <string name="drop_time">14:43:21</string>
+
+    <string name="prompt_username">Full name</string>
+    <string name="prompt_userid">Email/User id/Phone number</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="prompt_password2">Confirm Password</string>
+    <string name="prompt_phone">Phone number</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="title_activity_splash_screen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
