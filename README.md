@@ -1,2 +1,2 @@
 # MyPqaar
-Auction made easy
+Truck Auctions made easy
