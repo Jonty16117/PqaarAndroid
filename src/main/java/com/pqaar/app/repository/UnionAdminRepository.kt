@@ -224,7 +224,7 @@ object UnionAdminRepository {
      * (Timestamp -> Timestamp of when the last auction ended)
      */
     suspend fun setAuctionStatus(status: String, timestamp: String) {
-        if (status == "") {
+        /*if (status == "") {
             firebaseDb
                 .reference
                 .child("LiveRoutesList")
@@ -232,7 +232,7 @@ object UnionAdminRepository {
             Log.d(TAG, "Live routes list uploaded successfully!")
         } else {
             Log.e(TAG, "Live routes list is empty!")
-        }
+        }*/
     }
 
     @SuppressLint("SimpleDateFormat")
