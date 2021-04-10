@@ -1,4 +1,4 @@
-package com.pqaar.app.model
+ package com.pqaar.app.model
 
 /**
  * Data is a map type of property and should
@@ -9,5 +9,5 @@ package com.pqaar.app.model
  * CurrentListNo: String
  * Timestamp: String
  */
-data class LiveTruckDataListItem(val truckNo: String,
-                                 val data: HashMap<String, String>)
+data class LiveTruckDataListItem(var truckNo: String,
+                                 var data: HashMap<String, String>)

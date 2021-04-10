@@ -1,24 +1,19 @@
-package com.pqaar.app.ui
+package com.pqaar.app.ui.common
 
 import android.annotation.SuppressLint
-import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import com.google.android.gms.tasks.TaskExecutors
-import com.google.firebase.FirebaseException
-import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.pqaar.app.R
-import java.util.concurrent.TimeUnit
+import com.pqaar.app.ui.TruckOwner.TruckOwnerDashboardActivity
 
 
 class RegisterUserFragment : Fragment() {

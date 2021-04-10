@@ -1,4 +1,4 @@
-package com.pqaar.app.ui
+package com.pqaar.app.ui.common
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,11 +10,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.*
 import com.pqaar.app.R
+import com.pqaar.app.ui.TruckOwner.TruckOwnerDashboardActivity
 import java.util.concurrent.TimeUnit
 
 

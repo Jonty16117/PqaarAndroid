@@ -1,4 +1,4 @@
-package com.pqaar.app.ui
+package com.pqaar.app.ui.UnionAdmin
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

@@ -1,4 +1,4 @@
-package com.pqaar.app.ui
+package com.pqaar.app.ui.common
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

@@ -12,10 +12,10 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppThemeLight">
-        <activity android:name=".ui.UnionAdminDashboard"></activity>
-        <activity android:name=".ui.TruckOwnerDashboardActivity" />
+        <activity android:name=".ui.UnionAdmin.UnionAdminDashboard"></activity>
+        <activity android:name=".ui.TruckOwner.TruckOwnerDashboardActivity" />
         <activity
-            android:name=".ui.SplashScreen"
+            android:name=".ui.common.SplashScreen"
             android:theme="@style/SplashScreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,7 +23,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.LoginActivity" />
+        <activity android:name=".ui.common.LoginActivity" />
     </application>
 
 </manifest>

@@ -1,4 +1,4 @@
-package com.pqaar.app.ui
+package com.pqaar.app.ui.common
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,6 +12,7 @@ import kotlinx.coroutines.*
 import com.google.firebase.auth.FirebaseAuth
 import com.pqaar.app.R
 import com.pqaar.app.repositories.UnionAdminRepository
+import com.pqaar.app.ui.TruckOwner.TruckOwnerDashboardActivity
 import com.pqaar.app.utils.TimeConversions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -50,13 +51,17 @@ class LoginUserFragment : Fragment() {
         radioBtnTruckOwner = view.findViewById(R.id.radioBtnTruckOwner)
         var checkedPhoneNumber: String?
 
+
+        /**
+         * FOR TESTING
+         */
         GlobalScope.launch(Dispatchers.IO) {
             val executionTime = measureTimeMillis {
                 UnionAdminRepository.setAuctionStatus("Live")
                 UnionAdminRepository
                     .setAuctionTimestamp(
                     TimeConversions
-                        .TimestampToMillis("01-12-2021 22:02:20").toString())
+                        .TimestampToMillis("01-12-2021 22:02:20"))
             }
 
             withContext(Dispatchers.Main){
@@ -72,6 +77,10 @@ class LoginUserFragment : Fragment() {
             }
         }
 
+
+        /**
+         * NOT FOR TESTING
+         */
         btnLoginWithPhone.setOnClickListener {
             if (radioGroup.checkedRadioButtonId == -1) {
                 Toast.makeText(context, "Please Select User Type", Toast.LENGTH_LONG).show()

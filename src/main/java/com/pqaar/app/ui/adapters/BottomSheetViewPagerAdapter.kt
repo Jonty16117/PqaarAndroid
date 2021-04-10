@@ -1,13 +1,10 @@
 package com.pqaar.app.ui.adapters
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import androidx.lifecycle.Lifecycle
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.pqaar.app.ui.BidListFragment
-import com.pqaar.app.ui.RoutesFragment
+import com.pqaar.app.ui.TruckOwner.BidListFragment
+import com.pqaar.app.ui.common.RoutesFragment
 
 class BottomSheetViewPagerAdapter(fragmentManager: FragmentManager) :
     FragmentPagerAdapter(fragmentManager, FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {

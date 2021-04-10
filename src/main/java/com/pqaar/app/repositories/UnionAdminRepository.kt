@@ -2,17 +2,20 @@ package com.pqaar.app.repositories
 
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
+import com.google.firebase.database.ktx.getValue
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.pqaar.app.model.*
+import com.pqaar.app.repositories.CommonRepo.getLiveTruckDataList
+import com.pqaar.app.utils.RepositoryPaths.ADD_TRUCKS_REQUESTS
+import com.pqaar.app.utils.RepositoryPaths.AUCTION_LIST_DATA
+import com.pqaar.app.utils.RepositoryPaths.LIVE_ROUTES_LIST
+import com.pqaar.app.utils.RepositoryPaths.LIVE_TRUCK_DATA_LIST
+import com.pqaar.app.utils.RepositoryPaths.ROUTES_LIST_DATA
+import com.pqaar.app.utils.RepositoryPaths.USER_DATA
 import com.pqaar.app.utils.TimeConversions
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
@@ -22,32 +25,33 @@ import kotlin.collections.HashMap
 
 @SuppressLint("StaticFieldLeak")
 object UnionAdminRepository {
-    var TruckRequestsLive = MutableLiveData<ArrayList<TruckRequest>>()
-
     private const val TAG = "UnionAdminRepository"
-    private lateinit var auth: FirebaseAuth
-    private lateinit var firestoreDb: FirebaseFirestore
-    private lateinit var firebaseDb: FirebaseDatabase
-    private var totalTrucksRequired = 0
-    private var nextOpenAt: Int = -1
 
-    private var lastAuctionListDTO: ArrayList<Pair<String, HistoryAuctionListItemDTO>> = ArrayList()
+    private var firestoreDb = FirebaseFirestore.getInstance()
+    private var firebaseDb = FirebaseDatabase.getInstance()
+    private var currAuctionListSize = -1
+    var totalTrucksRequired = 0
+    var bidsClosed = 0
+    var nextOpenAt = -1
+    var initOpenSize = -1
+
+
+    private val truckRequestsLive = HashMap<String, AddTruckRequest>()
+    val TruckRequestsLive = MutableLiveData<HashMap<String, AddTruckRequest>>()
+
     private var truckCheckArray: HashMap<String, Boolean> = HashMap()
-    private var liveTruckDataList: HashMap<String, HashMap<String, String>> = HashMap()
+    private var liveRoutesList = MutableLiveData<ArrayList<LiveRoutesListItem>>()
+    private var lastAuctionListDTO: ArrayList<Pair<String, HistoryAuctionListItemDTO>> = ArrayList()
     private var lastOpenLiveList: ArrayList<LiveAuctionListItem> = ArrayList()
     private var lastClosedLiveList: ArrayList<LiveAuctionListItem> = ArrayList()
     private var lastMissedList: ArrayList<LiveAuctionListItem> = ArrayList()
-    private var liveRoutesList: ArrayList<LiveRoutesListItem> = ArrayList()
     var liveCombinedAuctionList: ArrayList<LiveAuctionListItem> = ArrayList()
 
 
     suspend fun fetchLastAuctionListDocument(): String {
-        auth = FirebaseAuth.getInstance()
-        firestoreDb = FirebaseFirestore.getInstance()
-
         var lastAuctionListDocument = ""
         firestoreDb
-            .collection("auction-lists")
+            .collection(AUCTION_LIST_DATA)
             .orderBy("Timestamp", Query.Direction.DESCENDING)
             .limit(1)
             .get().addOnCompleteListener { task ->
@@ -60,10 +64,10 @@ object UnionAdminRepository {
     }
 
     suspend fun getLastAuctionList(lastAuctionListDocument: String) {
-        lastAuctionListDTO = ArrayList<Pair<String, HistoryAuctionListItemDTO>>()
+        lastAuctionListDTO = ArrayList()
         var historyAuctionListItemDTO: HistoryAuctionListItemDTO
         firestoreDb
-            .collection("auction-lists")
+            .collection(AUCTION_LIST_DATA)
             .document(lastAuctionListDocument)
             .get()
             .addOnCompleteListener { task ->
@@ -98,28 +102,6 @@ object UnionAdminRepository {
         }))
     }
 
-    suspend fun getLiveTruckDataList(): Boolean {
-        firebaseDb = FirebaseDatabase.getInstance()
-
-        firebaseDb.reference.child("LiveTruckData").get().addOnSuccessListener {
-            Log.i("firebase", "Got data ${it.value}")
-            (it.value as HashMap<*, *>).forEach { entry ->
-                val tempHashMap = HashMap<String, String>()
-                (entry.value as HashMap<*, *>).forEach { innerEntry ->
-                    tempHashMap[innerEntry.key.toString()] = innerEntry.value.toString()
-                }
-                liveTruckDataList[entry.key.toString()] = tempHashMap
-            }
-        }.addOnFailureListener {
-            Log.e("firebase", "Error getting live truck data list", it)
-        }.await()
-        Log.i("firebase", "Got data $liveTruckDataList")
-        if (liveTruckDataList.isEmpty()) {
-            return false
-        }
-        return true
-    }
-
     fun separateOpenCloseLists() {
         lastOpenLiveList = ArrayList()
         lastClosedLiveList = ArrayList()
@@ -137,16 +119,16 @@ object UnionAdminRepository {
             ) {
                 lastClosedLiveList.add(
                     LiveAuctionListItem(
-                        "", listItem.first, listItem.second.truck_no,
-                        "true", "", ""
+                        prevNo = listItem.first,
+                        truckNo = listItem.second.truck_no
                     )
                 )
             }
             if (!truckInProgress(listItem.second.truck_no)) {
                 lastOpenLiveList.add(
                     LiveAuctionListItem(
-                        "", listItem.first, listItem.second.truck_no,
-                        "true", "", ""
+                        prevNo = listItem.first,
+                        truckNo = listItem.second.truck_no
                     )
                 )
             }
@@ -155,26 +137,29 @@ object UnionAdminRepository {
 
     fun getLastMissedList() {
         lastMissedList = ArrayList()
-        for (truck in liveTruckDataList.keys) {
-            /**
-             * if there is a truck which was not in the last auction
-             * and whose status is "not in progress", initialize it in the
-             * last missed list.
-             *
-             * Note: The timestamp added in the missed list here, is just to do sorting
-             * which is done in the next, step. But this timestamp's original motive
-             * is to store the timestamp information during the live auction.
-             */
-            if (!truckCheckArray.containsKey(truck) &&
-                !truckInProgress(truck)
-            ) {
-                lastMissedList.add(
-                    LiveAuctionListItem(
-                        "", liveTruckDataList[truck]!!["CurrentListNo"]!!,
-                        truck,
-                        "true", "", "", liveTruckDataList[truck]!!["Timestamp"]!!.toInt()
+        if (getLiveTruckDataList().value != null && getLiveTruckDataList().value!!.isEmpty()) {
+            for (truck in getLiveTruckDataList().value!!.keys) {
+                /**
+                 * if there is a truck which was not in the last auction
+                 * and whose status is "not in progress", initialize it in the
+                 * last missed list.
+                 *
+                 * Note: The timestamp added in the missed list here, is just to do sorting
+                 * which is done in the next, step. But this timestamp's original motive
+                 * is to store the timestamp information during the live auction.
+                 */
+                if (!truckCheckArray.containsKey(truck) &&
+                    !truckInProgress(truck)
+                ) {
+                    lastMissedList.add(
+                        LiveAuctionListItem(
+                            prevNo =
+                            (getLiveTruckDataList().value!!)[truck]!!.data["CurrentListNo"]!!,
+                            truckNo = truck,
+                            timestamp = (getLiveTruckDataList().value!!)[truck]!!.data["Timestamp"]!!
+                        )
                     )
-                )
+                }
             }
         }
 
@@ -196,20 +181,51 @@ object UnionAdminRepository {
             (lastMissedList + lastOpenLiveList + lastClosedLiveList) as ArrayList<LiveAuctionListItem>
     }
 
-    suspend fun uploadRoutesList(liveRoutesList: ArrayList<LiveRoutesListItem>) {
-        this.liveRoutesList = liveRoutesList
-        liveRoutesList.forEach {
+    suspend fun uploadRoutesList(RoutesListToUpload: ArrayList<LiveRoutesListItem>) {
+        RoutesListToUpload.forEach {
             totalTrucksRequired += it.req.toInt()
         }
-        if (liveRoutesList.isNotEmpty()) {
+        if (RoutesListToUpload.isNotEmpty()) {
             firebaseDb
                 .reference
                 .child("LiveRoutesList")
-                .setValue(liveRoutesList)
-            Log.d(TAG, "Live routes list uploaded successfully!")
+                .setValue(RoutesListToUpload).addOnSuccessListener {
+                    Log.d(TAG, "Live routes list uploaded successfully!")
+                }.await()
         } else {
             Log.e(TAG, "Live routes list is empty!")
         }
+    }
+
+    fun getLiveRoutesList() {
+        firebaseDb
+            .reference
+            .child(LIVE_ROUTES_LIST)
+            .addValueEventListener(
+                object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        Log.d(TAG, "Live routes is updated...fetching latest list!")
+                        val routeList = ArrayList<LiveRoutesListItem>()
+                        snapshot.children.forEach { routeNo ->
+                            val routeListItem = LiveRoutesListItem()
+                            routeNo.children.forEach { route ->
+                                when (route.key) {
+                                    "src" -> routeListItem.src = route.value.toString()
+                                    "des" -> routeListItem.des = route.value.toString()
+                                    "req" -> routeListItem.req = route.value.toString()
+                                    "got" -> routeListItem.got = route.value.toString()
+                                }
+                            }
+                            routeList.add(routeListItem)
+                        }
+                        liveRoutesList.postValue(routeList)
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        Log.w(TAG, "Failed to fetch new routes list")
+                    }
+                }
+            )
     }
 
     /**
@@ -225,7 +241,6 @@ object UnionAdminRepository {
      * (Timestamp -> Timestamp of when the last auction ended)
      */
     suspend fun setAuctionStatus(status: String) {
-        firebaseDb = FirebaseDatabase.getInstance()
         firebaseDb
             .reference
             .child("AuctionStatus")
@@ -238,7 +253,6 @@ object UnionAdminRepository {
     }
 
     suspend fun setAuctionTimestamp(timestamp: Long) {
-        firebaseDb = FirebaseDatabase.getInstance()
         firebaseDb
             .reference
             .child("AuctionStatus")
@@ -258,8 +272,10 @@ object UnionAdminRepository {
      */
     suspend fun initializeAuction(bidTimeInSec: Int, startTime: Long) {
         val initBidEndTime = (startTime + bidTimeInSec).toInt()
-        val initSize = totalTrucksRequired.coerceAtMost(liveCombinedAuctionList.size)
-        nextOpenAt = initSize + 1
+        initOpenSize = totalTrucksRequired.coerceAtMost(liveCombinedAuctionList.size)
+
+        nextOpenAt = initOpenSize + 1
+        currAuctionListSize = liveCombinedAuctionList.size
         val usersTruckCount = HashMap<String, Int>()
 
         liveCombinedAuctionList.forEach {
@@ -271,7 +287,8 @@ object UnionAdminRepository {
             }
         }
 
-        for (i in 0 until initSize) {
+        //see if a user has its truck listed in the current initialized list
+        for (i in 0 until initOpenSize) {
             liveCombinedAuctionList[i]
             if (usersTruckCount.containsKey(getTruckOwner(liveCombinedAuctionList[i].truckNo))) {
                 usersTruckCount[getTruckOwner(liveCombinedAuctionList[i].truckNo)] =
@@ -281,19 +298,22 @@ object UnionAdminRepository {
             }
         }
 
+        //if yes then increase its bid timestamp accordingly
+        //timestamp here contains the total duration a bid is supposed to stay unlocked after
+        //the start time
         liveCombinedAuctionList.forEach {
-            it.timestamp = initBidEndTime * usersTruckCount[getTruckOwner(it.truckNo)]!!
+            it.timestamp =
+                (initBidEndTime * usersTruckCount[getTruckOwner(it.truckNo)]!!).toString()
         }
 
         /**
          * Upload the initial live auction list with the timestamp set for first
-         * "initSize" items and rest of them has the timestamp set to -1
+         * "initOpenSize" items and rest of them has the timestamp set to -1
          */
         val LiveBidList = HashMap<Int, LiveAuctionListItem>()
         liveCombinedAuctionList.forEachIndexed { index, liveAuctionListItem ->
-            LiveBidList[index+1] = liveAuctionListItem
+            LiveBidList[index + 1] = liveAuctionListItem
         }
-        firebaseDb = FirebaseDatabase.getInstance()
         firebaseDb
             .reference
             .child("LiveBidList")
@@ -306,7 +326,6 @@ object UnionAdminRepository {
 
     suspend fun acceptBid(liveAuctionListItem: LiveAuctionListItem): Boolean {
         var accepted = false
-        firebaseDb = FirebaseDatabase.getInstance()
         firebaseDb
             .reference
             .child("LiveBidList")
@@ -322,26 +341,29 @@ object UnionAdminRepository {
 
     /**
      * Essentially set the timestamp for the bid item to allow them to request
-     * for bids acceptance
+     * for bids acceptance.
+     *
+     * NOTE: "unlockDuration" is to be passed as milliseconds in the form of
+     * long data type
      */
     @SuppressLint("SimpleDateFormat")
-    suspend fun unlockBid(truckNo: String, unlockDuration: Int): Boolean {
+    fun unlockBid(truckNo: String, unlockDuration: Long): Boolean {
         var accepted = false
-        firebaseDb = FirebaseDatabase.getInstance()
         firebaseDb
             .reference
             .child("LiveBidList")
             .child(truckNo)
-            .child("closed")
+            .child("locked")
             .setValue("false").addOnSuccessListener {
                 Log.d(TAG, "Locked set to false successfully!")
             }.addOnFailureListener {
                 Log.e(TAG, "Failed to set locked to false!")
-            }.await()
+            }
 
         val timeInMilli = TimeConversions.TimestampToMillis(
             SimpleDateFormat("dd-MM-yyyy hh:mm:ss")
-                .format(Calendar.getInstance().time)) + unlockDuration
+                .format(Calendar.getInstance().time)
+        ) + (unlockDuration)
         firebaseDb
             .reference
             .child("LiveBidList")
@@ -352,60 +374,79 @@ object UnionAdminRepository {
                 Log.d(TAG, "Unlock timestamp set successfully!")
             }.addOnFailureListener {
                 Log.e(TAG, "Failed to set unlock timestamp!")
-            }.await()
+            }
         return accepted
     }
 
-    suspend fun lockBid(truckNo: String): Boolean {
+    fun lockBid(truckNo: String): Boolean {
         var accepted = false
-        firebaseDb = FirebaseDatabase.getInstance()
         firebaseDb
             .reference
             .child("LiveBidList")
             .child(truckNo)
-            .child("closed")
+            .child("locked")
             .setValue("true").addOnSuccessListener {
                 accepted = true
                 Log.d(TAG, "Bid Locked successfully!")
             }.addOnFailureListener {
                 Log.e(TAG, "Failed to locked bid!")
-            }.await()
+            }
         return accepted
     }
 
-    suspend fun fetchTruckRequests() {
-        firebaseDb
-            .reference
-            .child("AddTruckRequests")
-            .addValueEventListener(
-                object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val reqList = ArrayList<TruckRequest>()
-                        snapshot.children.forEach{
-                            reqList.add(
-                                TruckRequest(it.key.toString(),it.value.toString())
-                            )
-                        }
-                        TruckRequestsLive.postValue(reqList)
-                    }
-                    override fun onCancelled(error: DatabaseError) {
-                        Log.w(TAG, "Failed to listen to truck add requests")
-                    }
-                }
-            )
+    fun fetchAddTruckRequests() {
+        val childEventListener = object : ChildEventListener {
+            override fun onChildAdded(dataSnapshot: DataSnapshot,
+                                      previousChildName: String?) {
+                Log.d(TAG, "onChildAdded:" + dataSnapshot.key!!)
+
+                // A new comment has been added, add it to the displayed list
+                val changedEntry = dataSnapshot.getValue<AddTruckRequest>()
+                truckRequestsLive[dataSnapshot.key.toString()] = changedEntry!!
+                TruckRequestsLive.value =truckRequestsLive
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
+                Log.d(TAG, "onChildChanged: ${dataSnapshot.key}")
+
+                val changedEntry = dataSnapshot.getValue<AddTruckRequest>()
+                truckRequestsLive[dataSnapshot.key.toString()] = changedEntry!!
+                TruckRequestsLive.value = truckRequestsLive
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+                Log.d(TAG, "onChildRemoved:" + dataSnapshot.key!!)
+
+                truckRequestsLive.remove(dataSnapshot.key.toString())
+                TruckRequestsLive.value = truckRequestsLive
+            }
+
+            override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
+                //no action
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.w(TAG, "Retrieving AddTrucksRequests Failed:onCancelled",
+                    databaseError.toException())
+            }
+        }
+        val ref = firebaseDb.reference.child(ADD_TRUCKS_REQUESTS)
+        ref.addChildEventListener(childEventListener)
     }
 
-    suspend fun addTruckToUser(truckRequest: TruckRequest) {
+    suspend fun addTruckToUser(truckRequest: AddTruckRequest) {
         //add truck to live truck data
-        val newEntry = mapOf<String, Any>(truckRequest.truckNo.toString() to mapOf(
-            "Status" to "UnAssigned",
-            "Owner" to truckRequest.uid.toString(),
-            "CurrentListNo" to "NA",
-            "Timestamp" to "NA"
-        ))
+        val newEntry = mapOf<String, Any>(
+            truckRequest.truckNo.toString() to mapOf(
+                "Status" to "UnAssigned",
+                "Owner" to truckRequest.uid.toString(),
+                "CurrentListNo" to "NA",
+                "Timestamp" to "NA"
+            )
+        )
         firebaseDb
             .reference
-            .child("LiveTruckData")
+            .child(LIVE_TRUCK_DATA_LIST)
             .updateChildren(newEntry).addOnSuccessListener {
                 Log.d(TAG, "Truck added to live truck data successfully!")
             }.addOnFailureListener {
@@ -414,16 +455,16 @@ object UnionAdminRepository {
 
         //add truck to user's main database
         firestoreDb
-            .collection("user-data")
+            .collection(USER_DATA)
             .document(truckRequest.uid)
             .update("Trucks", FieldValue.arrayUnion(truckRequest.truckNo)).await()
     }
 
-    suspend fun removeTruckFromUser(truckRequest: TruckRequest) {
+    suspend fun removeTruckFromUser(truckRequest: AddTruckRequest) {
         //remove truck to live truck data
         firebaseDb
             .reference
-            .child("LiveTruckData")
+            .child(LIVE_TRUCK_DATA_LIST)
             .child(truckRequest.truckNo)
             .setValue(null).addOnSuccessListener {
                 Log.d(TAG, "Truck removed from live truck data successfully!")
@@ -433,7 +474,7 @@ object UnionAdminRepository {
 
         //add truck to user's main database
         firestoreDb
-            .collection("user-data")
+            .collection(USER_DATA)
             .document(truckRequest.uid)
             .update("Trucks", FieldValue.arrayRemove(truckRequest.truckNo)).await()
     }
@@ -445,19 +486,21 @@ object UnionAdminRepository {
          * Uploading routes list to firestore database
          */
         val routeListToUpload = HashMap<Int, LiveRoutesListItem>()
-        liveRoutesList.forEachIndexed { index, liveRoutesListItem ->
-            routeListToUpload[index] = liveRoutesListItem
+        if (liveRoutesList.value!!.isNotEmpty()) {
+            liveRoutesList.value!!.forEachIndexed { index, liveRoutesListItem ->
+                routeListToUpload[index] = liveRoutesListItem
+            }
+            firestoreDb
+                .collection(ROUTES_LIST_DATA)
+                .document(closingTime.toString())
+                .set(routeListToUpload).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "routes-list-data recorded = $routeListToUpload")
+                    } else {
+                        Log.d(TAG, "routes-list-data  upload failed")
+                    }
+                }.await()
         }
-        firestoreDb
-            .collection("routes-list-data")
-            .document(closingTime.toString())
-            .set(routeListToUpload).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.d(TAG, "routes-list-data recorded = $routeListToUpload")
-                } else {
-                    Log.d(TAG, "routes-list-data  upload failed")
-                }
-            }.await()
 
 
         /**
@@ -471,7 +514,7 @@ object UnionAdminRepository {
             )
         }
         firestoreDb
-            .collection("auction-lists")
+            .collection(AUCTION_LIST_DATA)
             .document(closingTime.toString())
             .set(auctionListToUpload).addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -485,14 +528,11 @@ object UnionAdminRepository {
     }
 
     private inline fun getTruckOwner(truckNo: String): String {
-        return liveTruckDataList[truckNo]!!["Owner"]!!
+        return (getLiveTruckDataList().value!!)[truckNo]!!.data["Owner"]!!
     }
 
     //checks if the truck status is in progress
     private inline fun truckInProgress(truckNo: String): Boolean {
-        return liveTruckDataList[truckNo]!!["Status"] == "DelInProg"
+        return (getLiveTruckDataList().value!!)[truckNo]!!.data["Status"]!! == "DelInProg"
     }
 }
-
-
-

@@ -1,4 +1,4 @@
-package com.pqaar.app.ui
+package com.pqaar.app.ui.TruckOwner
 
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
