@@ -30,9 +30,9 @@ object UnionAdminRepository {
     private var firestoreDb = FirebaseFirestore.getInstance()
     private var firebaseDb = FirebaseDatabase.getInstance()
     private var currAuctionListSize = -1
-    var totalTrucksRequired = 0
-    var bidsClosed = 0
-    var nextOpenAt = -1
+    var TotalTrucksRequired = 0
+    var TotalTrucksClosed = 0
+    var nextOpenAt = -1 /* Based on 1 based indexing */
     var initOpenSize = -1
 
 
@@ -183,7 +183,7 @@ object UnionAdminRepository {
 
     suspend fun uploadRoutesList(RoutesListToUpload: ArrayList<LiveRoutesListItem>) {
         RoutesListToUpload.forEach {
-            totalTrucksRequired += it.req.toInt()
+            TotalTrucksRequired += it.req.toInt()
         }
         if (RoutesListToUpload.isNotEmpty()) {
             firebaseDb
@@ -270,9 +270,9 @@ object UnionAdminRepository {
      * more than one trucks in their initial auction list for the purpose
      * of giving them more time.
      */
-    suspend fun initializeAuction(bidTimeInSec: Int, startTime: Long) {
-        val initBidEndTime = (startTime + bidTimeInSec).toInt()
-        initOpenSize = totalTrucksRequired.coerceAtMost(liveCombinedAuctionList.size)
+    suspend fun initializeAuction(bidTime: Long, startTime: Long) {
+        val initBidEndTime = (startTime + bidTime).toInt()
+        initOpenSize = TotalTrucksRequired.coerceAtMost(liveCombinedAuctionList.size)
 
         nextOpenAt = initOpenSize + 1
         currAuctionListSize = liveCombinedAuctionList.size
@@ -525,6 +525,14 @@ object UnionAdminRepository {
                 }
             }.await()
         return closed
+    }
+
+    fun getTrucksLeft(): Int {
+        return TotalTrucksRequired - TotalTrucksClosed
+    }
+
+    fun nextBidAt(): Int {
+        return nextOpenAt
     }
 
     private inline fun getTruckOwner(truckNo: String): String {

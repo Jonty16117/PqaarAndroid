@@ -14,6 +14,7 @@ import com.pqaar.app.R
 import com.pqaar.app.repositories.UnionAdminRepository
 import com.pqaar.app.ui.TruckOwner.TruckOwnerDashboardActivity
 import com.pqaar.app.utils.TimeConversions
+import com.pqaar.app.viewmodels.UnionAdminViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlin.system.measureTimeMillis
@@ -55,6 +56,8 @@ class LoginUserFragment : Fragment() {
         /**
          * FOR TESTING
          */
+
+
         GlobalScope.launch(Dispatchers.IO) {
             val executionTime = measureTimeMillis {
                 UnionAdminRepository.setAuctionStatus("Live")
