@@ -1,9 +1,9 @@
 package com.pqaar.app.model
 
-data class LiveAuctionListItem(var currentNo: String = "",
-                               var prevNo: String = "",
-                               var truckNo: String = "",
-                               var locked: String = "true",
-                               var closed: String = "false",
-                               var routeId: String? = "",
-                               var timestamp: String = "")
+data class LiveAuctionListItem(var CurrNo: String = "",
+                               var PrevNo: String = "",
+                               var TruckNo: String = "",
+                               var Closed: String = "false",
+                               var EndTime: Long = -1,
+                               var Des: String = "",
+                               var Src: String = "")

@@ -31,6 +31,8 @@ class MandiAdminDashboard : AppCompatActivity() {
         textView19 = findViewById(R.id.textView19)
         textView20 = findViewById(R.id.textView20)
         button2 = findViewById(R.id.button2)
+
+        //model is an object of mandiadminviewmodel
         val model = ViewModelProviders.of(this)
             .get(MandiAdminViewModel::class.java)
 
