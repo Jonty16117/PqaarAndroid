@@ -13,6 +13,7 @@ import android.widget.Toast
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.*
 import com.pqaar.app.R
+import com.pqaar.app.ui.MandiAdmin.MandiAdminDashboard
 import com.pqaar.app.ui.TruckOwner.TruckOwnerDashboardActivity
 import java.util.concurrent.TimeUnit
 
@@ -77,10 +78,15 @@ class OtpVerificationFragment : Fragment() {
 
                 Log.e("Login : verificationId ", verificationId!!)
                 Log.e("Login : token ", token_)
+
                 startActivity(Intent(
                     context,
-                    TruckOwnerDashboardActivity::class.java)
-                    .apply {putExtra("null", "null")})
+                    MandiAdminDashboard::class.java
+                ).apply { putExtra("null", "null") })
+                /*startActivity(Intent(
+                        context,
+                        TruckOwnerDashboardActivity::class.java)
+                        .apply {putExtra("null", "null")})*/
 
             }
 

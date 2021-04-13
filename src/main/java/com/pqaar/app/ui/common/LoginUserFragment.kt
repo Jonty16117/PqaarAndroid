@@ -2,22 +2,16 @@ package com.pqaar.app.ui.common
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import kotlinx.coroutines.*
 import com.google.firebase.auth.FirebaseAuth
 import com.pqaar.app.R
-import com.pqaar.app.repositories.UnionAdminRepository
+import com.pqaar.app.ui.MandiAdmin.MandiAdminDashboard
 import com.pqaar.app.ui.TruckOwner.TruckOwnerDashboardActivity
-import com.pqaar.app.utils.TimeConversions
-import com.pqaar.app.viewmodels.UnionAdminViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlin.system.measureTimeMillis
+import com.pqaar.app.ui.UnionAdmin.UnionAdminDashboard
 
 
 class LoginUserFragment : Fragment() {
@@ -58,27 +52,7 @@ class LoginUserFragment : Fragment() {
          */
 
 
-        GlobalScope.launch(Dispatchers.IO) {
-            val executionTime = measureTimeMillis {
-                UnionAdminRepository.setAuctionStatus("Live")
-                UnionAdminRepository
-                    .setAuctionTimestamp(
-                    TimeConversions
-                        .TimestampToMillis("01-12-2021 22:02:20"))
-            }
 
-            withContext(Dispatchers.Main){
-                val milli = TimeConversions.TimestampToMillis("01-12-2021 22:02:20")
-                Log.d(TAG, "ExecutionTime = $executionTime")
-                Log.d(TAG, "TimestampToMillis = $milli")
-                Log.d(TAG, "MillisToTimestamp = ${TimeConversions.MillisToTimestamp(milli)}")
-                /*Toast.makeText(
-                    context,
-                    "liveCombinedAuctionList = ${UnionAdminRepository.liveCombinedAuctionList}",
-                    Toast.LENGTH_LONG
-                ).show()*/
-            }
-        }
 
 
         /**
@@ -107,7 +81,7 @@ class LoginUserFragment : Fragment() {
         btnlogin.setOnClickListener {
             startActivity(Intent(
                 context,
-                TruckOwnerDashboardActivity::class.java
+                UnionAdminDashboard::class.java
             ).apply { putExtra("null", "null") })
         }
 

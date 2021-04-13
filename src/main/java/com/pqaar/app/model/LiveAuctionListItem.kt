@@ -5,6 +5,5 @@ data class LiveAuctionListItem(var currentNo: String = "",
                                var truckNo: String = "",
                                var locked: String = "true",
                                var closed: String = "false",
-                               var src: String? = "",
-                               var des: String? = "",
+                               var routeId: String? = "",
                                var timestamp: String = "")

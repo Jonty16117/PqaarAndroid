@@ -12,7 +12,8 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppThemeLight">
-        <activity android:name=".ui.UnionAdmin.UnionAdminDashboard"></activity>
+        <activity android:name=".ui.MandiAdmin.MandiAdminDashboard"></activity>
+        <activity android:name=".ui.UnionAdmin.UnionAdminDashboard" />
         <activity android:name=".ui.TruckOwner.TruckOwnerDashboardActivity" />
         <activity
             android:name=".ui.common.SplashScreen"

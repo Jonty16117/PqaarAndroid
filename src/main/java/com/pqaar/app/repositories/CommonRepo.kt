@@ -12,24 +12,21 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.pqaar.app.model.LiveAuctionListItem
 import com.pqaar.app.model.LiveRoutesListItem
 import com.pqaar.app.model.LiveTruckDataListItem
-import com.pqaar.app.utils.RepositoryPaths.LIVE_AUCTION_LIST
-import com.pqaar.app.utils.RepositoryPaths.LIVE_ROUTES_LIST
-import com.pqaar.app.utils.RepositoryPaths.LIVE_TRUCK_DATA_LIST
+import com.pqaar.app.utils.DbPaths.LIVE_AUCTION_LIST
+import com.pqaar.app.utils.DbPaths.LIVE_ROUTES_LIST
+import com.pqaar.app.utils.DbPaths.LIVE_TRUCK_DATA_LIST
 
 @SuppressLint("StaticFieldLeak")
 object CommonRepo {
+    private var TAG = "CommonRepo"
     private var firestoreDb = FirebaseFirestore.getInstance()
     private var firebaseDb = FirebaseDatabase.getInstance()
-    private var TAG = "CommonRepo"
-
     private val liveAuctionList = HashMap<String, LiveAuctionListItem>()
-    private val LiveAuctionList = MutableLiveData<HashMap<String, LiveAuctionListItem>>()
-
     private val liveTruckDataList = HashMap<String, LiveTruckDataListItem>()
-    private val LiveTruckDataList = MutableLiveData<HashMap<String, LiveTruckDataListItem>>()
-
     private val liveRoutesList = HashMap<String, LiveRoutesListItem>()
-    private val LiveRoutesList = MutableLiveData<HashMap<String, LiveRoutesListItem>>()
+    val LiveAuctionList = MutableLiveData<HashMap<String, LiveAuctionListItem>>()
+    val LiveTruckDataList = MutableLiveData<HashMap<String, LiveTruckDataListItem>>()
+    val LiveRoutesList = MutableLiveData<HashMap<String, LiveRoutesListItem>>()
 
     fun fetchLiveAuctionList() {
         val childEventListener = object : ChildEventListener {
@@ -48,7 +45,7 @@ object CommonRepo {
 
                 val changedEntry = dataSnapshot.getValue<LiveAuctionListItem>()
                 liveAuctionList[changedEntry!!.currentNo] = changedEntry
-                LiveAuctionList.value = liveAuctionList
+                LiveAuctionList.value =
             }
 
             override fun onChildRemoved(dataSnapshot: DataSnapshot) {
@@ -76,26 +73,40 @@ object CommonRepo {
             override fun onChildAdded(dataSnapshot: DataSnapshot,
                                       previousChildName: String?) {
                 Log.d(TAG, "onChildAdded:" + dataSnapshot.key!!)
+                Log.d(TAG, "onChildAdded:" + dataSnapshot.value)
 
-                // A new comment has been added, add it to the displayed list
-                val changedEntry = dataSnapshot.getValue<LiveTruckDataListItem>()
-                liveTruckDataList[changedEntry!!.truckNo] = changedEntry
+                val changedEntry = dataSnapshot.value as HashMap<*, *>
+                changedEntry.forEach{
+                    liveTruckDataList[dataSnapshot.key!!] = LiveTruckDataListItem(
+                        dataSnapshot.key!!,
+                        hashMapOf(
+                            it.key.toString() to it.value.toString()
+                        )
+                    )
+                }
                 LiveTruckDataList.value = liveTruckDataList
             }
 
             override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
                 Log.d(TAG, "onChildChanged: ${dataSnapshot.key}")
+                Log.d(TAG, "onChildChanged: ${dataSnapshot.value}")
 
-                val changedEntry = dataSnapshot.getValue<LiveTruckDataListItem>()
-                liveTruckDataList[changedEntry!!.truckNo] = changedEntry
+                val changedEntry = dataSnapshot.value as HashMap<*, *>
+                changedEntry.forEach{
+                    liveTruckDataList[dataSnapshot.key!!] = LiveTruckDataListItem(
+                        dataSnapshot.key!!,
+                        hashMapOf(
+                            it.key.toString() to it.value.toString()
+                        )
+                    )
+                }
                 LiveTruckDataList.value = liveTruckDataList
             }
 
             override fun onChildRemoved(dataSnapshot: DataSnapshot) {
                 Log.d(TAG, "onChildRemoved:" + dataSnapshot.key!!)
 
-                val removedEntry = dataSnapshot.getValue<LiveTruckDataListItem>()
-                liveTruckDataList.remove(removedEntry!!.truckNo)
+                liveTruckDataList.remove(dataSnapshot.key!!)
                 LiveTruckDataList.value = liveTruckDataList
             }
 
@@ -149,20 +160,5 @@ object CommonRepo {
         }
         val ref = firebaseDb.reference.child(LIVE_ROUTES_LIST)
         ref.addChildEventListener(childEventListener)
-    }
-
-    /**
-     * Getters that can be used by more than one type of users after authentication
-     */
-    fun getLiveAuctionList(): MutableLiveData<HashMap<String, LiveAuctionListItem>> {
-        return LiveAuctionList
-    }
-
-    fun getLiveTruckDataList(): MutableLiveData<HashMap<String, LiveTruckDataListItem>> {
-        return LiveTruckDataList
-    }
-
-    fun getLiveRoutesList(): MutableLiveData<HashMap<String, LiveRoutesListItem>> {
-        return LiveRoutesList
     }
 }

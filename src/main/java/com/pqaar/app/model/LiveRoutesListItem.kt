@@ -1,8 +1,12 @@
 package com.pqaar.app.model
 
+/**
+ * Mandi:
+ *     Destination:
+ *         Requirement: <Trucks required>
+ *         Got: <Trucks filled>
+ *         Rate: <Rate of this route>
+ */
 data class LiveRoutesListItem(
-    var src: String = "",
-    var des: String = "",
-    var req: String = "",
-    var got: String = ""
+    var desData: HashMap<String, HashMap<String, String>>
 )

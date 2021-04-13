@@ -285,12 +285,12 @@
                 android:ems="10"
                 android:gravity="center_vertical"
                 android:hint="@string/prompt_phone"
-                android:inputType="phone"
-                android:maxLength="25"
+                android:maxLength="10"
                 android:paddingStart="10dp"
                 android:paddingLeft="10dp"
                 android:textSize="14sp"
-                tools:ignore="HardcodedText,RtlSymmetry" />
+                android:inputType="number"
+                tools:ignore="HardcodedText,RtlSymmetry,TextFields" />
 
             <android.widget.Button
                 android:id="@+id/btnRegisterWithPhone"

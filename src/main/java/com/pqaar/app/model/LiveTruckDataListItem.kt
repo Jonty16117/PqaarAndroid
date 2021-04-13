@@ -9,5 +9,5 @@
  * CurrentListNo: String
  * Timestamp: String
  */
-data class LiveTruckDataListItem(var truckNo: String,
-                                 var data: HashMap<String, String>)
+data class LiveTruckDataListItem(var truckNo: String = "",
+                                 var data: HashMap<String, String> = HashMap())

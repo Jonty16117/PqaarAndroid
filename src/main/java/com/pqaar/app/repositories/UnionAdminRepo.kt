@@ -5,17 +5,17 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.*
 import com.google.firebase.firestore.Query
 import com.pqaar.app.model.*
-import com.pqaar.app.repositories.CommonRepo.getLiveTruckDataList
-import com.pqaar.app.utils.RepositoryPaths.ADD_TRUCKS_REQUESTS
-import com.pqaar.app.utils.RepositoryPaths.AUCTION_LIST_DATA
-import com.pqaar.app.utils.RepositoryPaths.LIVE_ROUTES_LIST
-import com.pqaar.app.utils.RepositoryPaths.LIVE_TRUCK_DATA_LIST
-import com.pqaar.app.utils.RepositoryPaths.ROUTES_LIST_DATA
-import com.pqaar.app.utils.RepositoryPaths.USER_DATA
+import com.pqaar.app.utils.DbPaths
+import com.pqaar.app.utils.DbPaths.ADD_TRUCKS_REQUESTS
+import com.pqaar.app.utils.DbPaths.AUCTION_LIST_DATA
+import com.pqaar.app.utils.DbPaths.LIVE_ROUTES_LIST
+import com.pqaar.app.utils.DbPaths.LIVE_TRUCK_DATA_LIST
+import com.pqaar.app.utils.DbPaths.MANDI_ROUTES_LIST
+import com.pqaar.app.utils.DbPaths.ROUTES_LIST_DATA
+import com.pqaar.app.utils.DbPaths.USER_DATA
 import com.pqaar.app.utils.TimeConversions
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
@@ -24,7 +24,7 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 @SuppressLint("StaticFieldLeak")
-object UnionAdminRepository {
+object UnionAdminRepo {
     private const val TAG = "UnionAdminRepository"
 
     private var firestoreDb = FirebaseFirestore.getInstance()
@@ -35,6 +35,8 @@ object UnionAdminRepository {
     var nextOpenAt = -1 /* Based on 1 based indexing */
     var initOpenSize = -1
 
+    private val propRoutesList = HashMap<String, MutableMap<String, Any>>()
+    val PropRoutesList = MutableLiveData<HashMap<String, MutableMap<String, Any>>>()
 
     private val truckRequestsLive = HashMap<String, AddTruckRequest>()
     val TruckRequestsLive = MutableLiveData<HashMap<String, AddTruckRequest>>()
@@ -47,7 +49,79 @@ object UnionAdminRepository {
     private var lastMissedList: ArrayList<LiveAuctionListItem> = ArrayList()
     var liveCombinedAuctionList: ArrayList<LiveAuctionListItem> = ArrayList()
 
+    /**
+     * Fetches the proposed routes list from all the mandi admins
+     */
+    fun fetchLivePropRoutesList() {
+        val mandiCollec = firestoreDb.collection(MANDI_ROUTES_LIST)
+        mandiCollec.addSnapshotListener { snapshots, error ->
+            if (error != null) {
+                Log.w(TAG, "Failed to update the lastest proposed routes lists from" +
+                        "mandis")
+            } else {
+                snapshots!!.forEach{
+                    propRoutesList[it.id] = it.data
+                    Log.w(TAG, "Updated list for ${it.id} = ${it.data}")
+                }
+                PropRoutesList.value = propRoutesList
+            }
+        }
+    }
 
+    /**
+     * Union admin then uploads its version of live routes list, on which the final
+     * auction will take place
+     */
+    suspend fun uploadLiveRoutesList(routesListToUpload: HashMap<String, LiveRoutesListItem>) {
+        firebaseDb
+            .reference
+            .child(LIVE_ROUTES_LIST)
+            .setValue(routesListToUpload).addOnSuccessListener {
+                Log.d(TAG, "Live routes list uploaded successfully!")
+            }.addOnFailureListener {
+                Log.d(TAG, "Failed to upload Live Routes List!")
+            }.await()
+    }
+
+    /**
+     * There can be following type of auction status:
+     *
+     * Live -> When the auction is in progress
+     * (Timestamp -> Timestamp of when the auction will end)
+     *
+     * Scheduled -> When the auction is scheduled at a future point in date and time
+     * (Timestamp -> Timestamp of when the next auction will begin)
+     *
+     * NA -> When there is no live auction and none is scheduled
+     * (Timestamp -> Timestamp of when the last auction ended)
+     */
+    suspend fun setAuctionStatus(status: String) {
+        firebaseDb
+            .reference
+            .child("AuctionStatus")
+            .child("Status")
+            .setValue(status).addOnSuccessListener {
+                Log.d(TAG, "Auction Status updated successfully!")
+            }.addOnFailureListener {
+                Log.e(TAG, "Auction Status update failed!")
+            }.await()
+    }
+
+    suspend fun setAuctionTimestamp(timestamp: Long) {
+        firebaseDb
+            .reference
+            .child("AuctionStatus")
+            .child("Timestamp")
+            .setValue(timestamp.toString()).addOnSuccessListener {
+                Log.d(TAG, "Auction Timestamp updated successfully!")
+            }.addOnFailureListener {
+                Log.e(TAG, "Auction Timestamp update failed!")
+            }.await()
+    }
+
+    /**
+     * Functions for constructing live auction list
+     */
     suspend fun fetchLastAuctionListDocument(): String {
         var lastAuctionListDocument = ""
         firestoreDb
@@ -102,7 +176,7 @@ object UnionAdminRepository {
         }))
     }
 
-    fun separateOpenCloseLists() {
+    /*fun separateOpenCloseLists() {
         lastOpenLiveList = ArrayList()
         lastClosedLiveList = ArrayList()
 
@@ -110,9 +184,9 @@ object UnionAdminRepository {
         truckCheckArray = HashMap<String, Boolean>()
 
         for (listItem in lastAuctionListDTO) {
-            /**
+            *//**
              * if this bid was accepted in last auction, then put it in lastClosedLiveList
-             */
+             *//*
             truckCheckArray[listItem.second.truck_no] = true
             if ((listItem.second.bid_closed == "true") &&
                 (!truckInProgress(listItem.second.truck_no))
@@ -133,13 +207,13 @@ object UnionAdminRepository {
                 )
             }
         }
-    }
+    }*/
 
-    fun getLastMissedList() {
+    /*fun getLastMissedList() {
         lastMissedList = ArrayList()
         if (getLiveTruckDataList().value != null && getLiveTruckDataList().value!!.isEmpty()) {
             for (truck in getLiveTruckDataList().value!!.keys) {
-                /**
+                *//**
                  * if there is a truck which was not in the last auction
                  * and whose status is "not in progress", initialize it in the
                  * last missed list.
@@ -147,7 +221,7 @@ object UnionAdminRepository {
                  * Note: The timestamp added in the missed list here, is just to do sorting
                  * which is done in the next, step. But this timestamp's original motive
                  * is to store the timestamp information during the live auction.
-                 */
+                 *//*
                 if (!truckCheckArray.containsKey(truck) &&
                     !truckInProgress(truck)
                 ) {
@@ -163,12 +237,12 @@ object UnionAdminRepository {
             }
         }
 
-        /**
+        *//**
          * sort the newly generated missed list according
          * to the timestamp, in the ascending order
-         */
+         *//*
         lastMissedList = ArrayList(lastMissedList.sortedWith(compareBy { it.timestamp }))
-    }
+    }*/
 
     /**
      * Combine last closed, last open and last missed list in the following order:
@@ -181,6 +255,7 @@ object UnionAdminRepository {
             (lastMissedList + lastOpenLiveList + lastClosedLiveList) as ArrayList<LiveAuctionListItem>
     }
 
+/*
     suspend fun uploadRoutesList(RoutesListToUpload: ArrayList<LiveRoutesListItem>) {
         RoutesListToUpload.forEach {
             TotalTrucksRequired += it.req.toInt()
@@ -196,8 +271,9 @@ object UnionAdminRepository {
             Log.e(TAG, "Live routes list is empty!")
         }
     }
+*/
 
-    fun getLiveRoutesList() {
+    /*fun getLiveRoutesList() {
         firebaseDb
             .reference
             .child(LIVE_ROUTES_LIST)
@@ -226,43 +302,9 @@ object UnionAdminRepository {
                     }
                 }
             )
-    }
+    }*/
 
-    /**
-     * There can be following type of auction status:
-     *
-     * Live -> When the auction is in progress
-     * (Timestamp -> Timestamp of when the auction will end)
-     *
-     * Scheduled -> When the auction is scheduled at a future point in date and time
-     * (Timestamp -> Timestamp of when the next auction will begin)
-     *
-     * NA -> When there is no live auction and none is scheduled
-     * (Timestamp -> Timestamp of when the last auction ended)
-     */
-    suspend fun setAuctionStatus(status: String) {
-        firebaseDb
-            .reference
-            .child("AuctionStatus")
-            .child("Status")
-            .setValue(status).addOnSuccessListener {
-                Log.d(TAG, "Auction Status updated successfully!")
-            }.addOnFailureListener {
-                Log.e(TAG, "Auction Status update failed!")
-            }.await()
-    }
 
-    suspend fun setAuctionTimestamp(timestamp: Long) {
-        firebaseDb
-            .reference
-            .child("AuctionStatus")
-            .child("Timestamp")
-            .setValue(timestamp.toString()).addOnSuccessListener {
-                Log.d(TAG, "Auction Timestamp updated successfully!")
-            }.addOnFailureListener {
-                Log.e(TAG, "Auction Timestamp update failed!")
-            }.await()
-    }
 
     /**
      * This is the time allowed for each truck that are included in the initial
@@ -270,7 +312,7 @@ object UnionAdminRepository {
      * more than one trucks in their initial auction list for the purpose
      * of giving them more time.
      */
-    suspend fun initializeAuction(bidTime: Long, startTime: Long) {
+    /*suspend fun initializeAuction(bidTime: Long, startTime: Long) {
         val initBidEndTime = (startTime + bidTime).toInt()
         initOpenSize = TotalTrucksRequired.coerceAtMost(liveCombinedAuctionList.size)
 
@@ -306,10 +348,10 @@ object UnionAdminRepository {
                 (initBidEndTime * usersTruckCount[getTruckOwner(it.truckNo)]!!).toString()
         }
 
-        /**
+        *//**
          * Upload the initial live auction list with the timestamp set for first
          * "initOpenSize" items and rest of them has the timestamp set to -1
-         */
+         *//*
         val LiveBidList = HashMap<Int, LiveAuctionListItem>()
         liveCombinedAuctionList.forEachIndexed { index, liveAuctionListItem ->
             LiveBidList[index + 1] = liveAuctionListItem
@@ -323,7 +365,7 @@ object UnionAdminRepository {
                 Log.e(TAG, "Live Bid List upload failed!")
             }.await()
     }
-
+*/
     suspend fun acceptBid(liveAuctionListItem: LiveAuctionListItem): Boolean {
         var accepted = false
         firebaseDb
@@ -386,6 +428,38 @@ object UnionAdminRepository {
             .child(truckNo)
             .child("locked")
             .setValue("true").addOnSuccessListener {
+                accepted = true
+                Log.d(TAG, "Bid Locked successfully!")
+            }.addOnFailureListener {
+                Log.e(TAG, "Failed to locked bid!")
+            }
+        return accepted
+    }
+
+    fun rollBackBid(truckNo: String): Boolean {
+        var accepted = false
+        firebaseDb
+            .reference
+            .child("LiveBidList")
+            .child(truckNo)
+            .child("closed")
+            .setValue("false").addOnSuccessListener {
+                accepted = true
+                Log.d(TAG, "Bid Locked successfully!")
+            }.addOnFailureListener {
+                Log.e(TAG, "Failed to locked bid!")
+            }
+        return accepted
+    }
+
+    fun updateRouteItem(routeId: String, newGot: String): Boolean {
+        var accepted = false
+        firebaseDb
+            .reference
+            .child(LIVE_ROUTES_LIST)
+            .child(routeId)
+            .child("got")
+            .setValue(newGot).addOnSuccessListener {
                 accepted = true
                 Log.d(TAG, "Bid Locked successfully!")
             }.addOnFailureListener {
@@ -535,12 +609,12 @@ object UnionAdminRepository {
         return nextOpenAt
     }
 
-    private inline fun getTruckOwner(truckNo: String): String {
+    /*private fun getTruckOwner(truckNo: String): String {
         return (getLiveTruckDataList().value!!)[truckNo]!!.data["Owner"]!!
     }
 
     //checks if the truck status is in progress
-    private inline fun truckInProgress(truckNo: String): Boolean {
+    private fun truckInProgress(truckNo: String): Boolean {
         return (getLiveTruckDataList().value!!)[truckNo]!!.data["Status"]!! == "DelInProg"
-    }
+    }*/
 }
