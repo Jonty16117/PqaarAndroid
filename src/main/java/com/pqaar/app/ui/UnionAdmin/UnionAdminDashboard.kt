@@ -1,16 +1,20 @@
 package com.pqaar.app.ui.UnionAdmin
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.pqaar.app.R
 import com.pqaar.app.model.LiveRoutesListItem
+import com.pqaar.app.repositories.UnionAdminRepo
 import com.pqaar.app.utils.TimeConversions
+import com.pqaar.app.utils.TimeConversions.CurrDateTimeInMillis
 import com.pqaar.app.viewmodels.UnionAdminViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -28,6 +32,7 @@ class UnionAdminDashboard : AppCompatActivity() {
     private lateinit var textView20: TextView
     private lateinit var button2: Button
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_union_admin_dashboard)
@@ -42,19 +47,43 @@ class UnionAdminDashboard : AppCompatActivity() {
         val model = ViewModelProviders.of(this)
             .get(UnionAdminViewModel::class.java)
 
-        model.getLivePropRoutesList().observe(this, Observer {
-            textView14.text = it.toString()
+        model.getLivePropRoutesList().observe(this, {
+            textView14.text = "Live Proposed Routes List = ${it}"
         })
 
-        model.getLiveTruckDataList().observe(this, Observer {
-            textView15.text = it.toString()
+        model.getLiveTruckDataList().observe(this, {
+            textView15.text = "Live Truck Status List = ${it}"
         })
+
+        model.getAuctionStatus().observe(this, {
+            textView16.text = "Live Auction Status = ${it}"
+        })
+
+        model.getLiveRoutesList().observe(this, {
+            textView19.text = "Live Routes List = ${it}"
+        })
+
+        model.getAuctionsBonusTimeInfo().observe(this, {
+            textView20.text = "Live Bonus Time Status = ${it}"
+        })
+
+        model.setAuctionInfo("Live", CurrDateTimeInMillis() + 20000000)
+
+
 
         val demoList = ArrayList<LiveRoutesListItem>()
 
 
         button2.setOnClickListener {
-
+            if (model.getLiveTruckDataList().value.isNullOrEmpty()) {
+                Toast.makeText(
+                    this,
+                    "Please wait while the Live Truck Data is fetched",
+                    Toast.LENGTH_LONG
+                ).show()
+            } else {
+                model.initializeAuction(45000)
+            }
 
             /*GlobalScope.launch(Dispatchers.IO) {
                 val executionTime = measureTimeMillis {

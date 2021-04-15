@@ -12,6 +12,7 @@ object DbPaths {
     const val AUCTIONS_INFO = "AuctionsInfo"
     const val SCHEDULED_AUCTIONS = "ScheduledAuctions"
     const val LIVE_AUCTION_LIST = "LiveAuctionList"
+    const val AUCTION_BONUS_TIME_INFO = "AuctionBonusTimeInfo"
 
 
     /**

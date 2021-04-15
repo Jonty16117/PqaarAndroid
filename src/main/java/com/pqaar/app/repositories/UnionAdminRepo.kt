@@ -11,6 +11,7 @@ import com.pqaar.app.model.*
 import com.pqaar.app.utils.DbPaths
 import com.pqaar.app.utils.DbPaths.ADD_TRUCKS_REQUESTS
 import com.pqaar.app.utils.DbPaths.AUCTIONS_INFO
+import com.pqaar.app.utils.DbPaths.AUCTION_BONUS_TIME_INFO
 import com.pqaar.app.utils.DbPaths.AUCTION_LIST_DATA
 import com.pqaar.app.utils.DbPaths.LIVE_AUCTION_LIST
 import com.pqaar.app.utils.DbPaths.LIVE_ROUTES_LIST
@@ -20,6 +21,7 @@ import com.pqaar.app.utils.DbPaths.ROUTES_LIST_DATA
 import com.pqaar.app.utils.DbPaths.SCHEDULED_AUCTIONS
 import com.pqaar.app.utils.DbPaths.USER_DATA
 import com.pqaar.app.utils.TimeConversions
+import com.pqaar.app.utils.TimeConversions.CurrDateTimeInMillis
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
@@ -34,29 +36,26 @@ object UnionAdminRepo {
 
     private var firestoreDb = FirebaseFirestore.getInstance()
     private var firebaseDb = FirebaseDatabase.getInstance()
-    private var currAuctionListSize = -1
-    var TotalTrucksRequired = 0
-    var TotalTrucksClosed = 0
-    var nextOpenAt = -1 /* Based on 1 based indexing */
-    var initOpenSize = -1
 
-    private val propRoutesList = HashMap<String, MutableMap<String, Any>>()
+    private var propRoutesList = HashMap<String, MutableMap<String, Any>>()
     private val truckRequestsLive = HashMap<String, AddTruckRequest>()
-
+    private val liveAuctionList = HashMap<String, LiveAuctionListItem>()
+    private val liveTruckDataList = HashMap<String, LiveTruckDataListItem>()
+    private var liveRoutesList = HashMap<String, LiveRoutesListItem>()
+    private var lastAuctionListDTO: ArrayList<Pair<String, HistoryAuctionListItemDTO>> = ArrayList()
+    private lateinit var lastOpenLiveList: ArrayList<LiveAuctionListItem>
+    private lateinit var lastClosedLiveList: ArrayList<LiveAuctionListItem>
+    private lateinit var lastMissedList: ArrayList<LiveAuctionListItem>
+    private lateinit var truckCheckArray: HashMap<String, Boolean>
+    private lateinit var liveCombinedAuctionList: ArrayList<LiveAuctionListItem>
     val PropRoutesList = MutableLiveData<HashMap<String, MutableMap<String, Any>>>()
     val TruckRequestsLive = MutableLiveData<HashMap<String, AddTruckRequest>>()
-    val LiveAuctionStatus = MutableLiveData<String>()
-    val LiveAuctionTimestamp = MutableLiveData<Long>()
-
-    private val liveTruckDataList = HashMap<String, LiveTruckDataListItem>()
-    private var truckCheckArray: HashMap<String, Boolean> = HashMap()
-    private var liveRoutesList = MutableLiveData<ArrayList<LiveRoutesListItem>>()
-    private var lastAuctionListDTO: ArrayList<Pair<String, HistoryAuctionListItemDTO>> = ArrayList()
-    private var lastOpenLiveList: ArrayList<LiveAuctionListItem> = ArrayList()
-    private var lastClosedLiveList: ArrayList<LiveAuctionListItem> = ArrayList()
-    private var lastMissedList: ArrayList<LiveAuctionListItem> = ArrayList()
-    var liveCombinedAuctionList: ArrayList<LiveAuctionListItem> = ArrayList()
+    val LiveAuctionList = MutableLiveData<HashMap<String, LiveAuctionListItem>>()
     val LiveTruckDataList = MutableLiveData<HashMap<String, LiveTruckDataListItem>>()
+    val LiveRoutesList = MutableLiveData<HashMap<String, LiveRoutesListItem>>()
+    val LiveAuctionStatus = MutableLiveData<String>()
+    val LiveAuctionTimestamp = MutableLiveData<String>()
+    val LiveBonusTimeInfo = MutableLiveData<BonusTime>()
 
 
     /**
@@ -71,31 +70,78 @@ object UnionAdminRepo {
                             "mandis"
                 )
             } else {
+                /**
+                 * <snapshots>
+                 * MandiSrc:
+                 *     <snapshot>
+                 *     Des:
+                 *         Rate: <rate>
+                 *         Req: <req>
+                 *         Got: <got>
+                 * where snapshots represents MandiSrc
+                 *
+                 */
+                propRoutesList = HashMap()
                 snapshots!!.forEach {
                     propRoutesList[it.id] = it.data
                     Log.w(TAG, "Updated list for ${it.id} = ${it.data}")
                 }
-                PropRoutesList.value = propRoutesList
             }
+            PropRoutesList.value = propRoutesList
         }
     }
 
     /**
      * Union admin then uploads its version of live routes list, on which the final
-     * auction will take place
+     * auction will take place.
+     *
+     * Data model for routesListToUpload:
+     * Des1:
+     *     Rate: <rate>
+     *     Req: <requirement>
+     *     Got: <got>
      */
     suspend fun uploadLiveMandiRoutes(
         mandiSrc: String,
-        routesListToUpload: HashMap<String, LiveRoutesListItem>,
+        routesListToUpload: HashMap<String, HashMap<String, Int>>,
     ) {
-        val mandiCollec = firestoreDb.collection(LIVE_ROUTES_LIST)
+        val routes = ArrayList<Pair<String, Int>>()
+        routesListToUpload.forEach { route ->
+            route.value.forEach { value ->
+                routes.add(Pair(
+                    "${mandiSrc}-${route.key}-${value.key}", value.value
+                    )
+                )
+            }
+        }
+        val col = firestoreDb.collection(LIVE_ROUTES_LIST)
+        val batchedList = routes.chunked(CHUNKED_LIST_SIZE)
+        batchedList.forEachIndexed { index, item ->
+            firestoreDb.runBatch { batch ->
+                item.forEach {
+                    val doc = col.document(it.first)
+                    batch.set(doc, it.second)
+                }
+            }.addOnSuccessListener {
+                Log.w(TAG, "Batch upload successful for ${index} mandi documents!")
+            }.addOnSuccessListener {
+                Log.w(TAG, "Failed to upload a batch of ${index} mandi documents!")
+            }
+            delay(2000)
+        }
+
+
+        /**
+         * Discarded, because it was inefficient
+         */
+        /*val mandiCollec = firestoreDb.collection(LIVE_ROUTES_LIST)
             .document(mandiSrc)
         Log.d(TAG, "Uploading live routes for ${mandiSrc}...!")
         mandiCollec.set(routesListToUpload).addOnSuccessListener {
             Log.d(TAG, "Live routes for ${mandiSrc} uploaded successfully!")
         }.addOnFailureListener {
             Log.d(TAG, "Failed to upload live routes for ${mandiSrc}!")
-        }
+        }*/
     }
 
     /**
@@ -155,6 +201,7 @@ object UnionAdminRepo {
                 )
             }
         }
+        firebaseDb.setPersistenceEnabled(true)
         val ref = firebaseDb.reference.child(LIVE_TRUCK_DATA_LIST)
         ref.addChildEventListener(childEventListener)
     }
@@ -185,6 +232,7 @@ object UnionAdminRepo {
             .get()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful && task.result != null) {
+                    Log.w(TAG, "Fetched the last auction list named: ${lastAuctionListDocument}")
                     task.result!!.data!!.forEach { seqNo ->
                         if (seqNo.key != "Timestamp") {
                             historyAuctionListItemDTO = HistoryAuctionListItemDTO()
@@ -216,6 +264,9 @@ object UnionAdminRepo {
     }
 
     fun separateOpenCloseLists() {
+        lastClosedLiveList = ArrayList()
+        lastOpenLiveList = ArrayList()
+        truckCheckArray = HashMap()
         //to track which truck were in the last auction and which were not
         for (listItem in lastAuctionListDTO) {
             /**
@@ -289,28 +340,33 @@ object UnionAdminRepo {
         liveCombinedAuctionList = ArrayList()
         liveCombinedAuctionList =
             (lastMissedList + lastOpenLiveList + lastClosedLiveList) as ArrayList<LiveAuctionListItem>
+        Log.d(TAG, "Size of lastMissedList ${lastMissedList.size}, " +
+                "lastOpenLiveList: ${lastOpenLiveList.size}, " +
+                "lastClosedLiveList: ${lastClosedLiveList.size}")
     }
 
     fun setEndTimeInLiveAuctionList(perUserBidDurationInMillis: Long) {
         val auctionStartTime = LiveAuctionTimestamp.value!!.toLong()
         liveCombinedAuctionList.forEachIndexed { index, item ->
             item.EndTime = auctionStartTime + (perUserBidDurationInMillis * (index + 1))
+            item.CurrNo = (index + 1).toString()
         }
     }
 
     suspend fun uploadLiveAuctionList() {
         val col = firestoreDb.collection(LIVE_AUCTION_LIST)
         val batchedList = liveCombinedAuctionList.chunked(CHUNKED_LIST_SIZE)
+        Log.w(TAG, "Batch to upload: ${batchedList}")
         batchedList.forEachIndexed { index, ls ->
             firestoreDb.runBatch { batch ->
                 ls.forEach {
-                    val doc = col.document()
+                    var doc = col.document(it.CurrNo)
                     batch.set(doc, it)
                 }
             }.addOnSuccessListener {
-                Log.w(TAG, "Batch upload successful for ${index} documents!")
-            }.addOnSuccessListener {
-                Log.w(TAG, "Failed to upload a batch of ${index} documents!")
+                Log.w(TAG, "Batch ${index + 1} of size ${ls.size} uploaded successfully!")
+            }.addOnFailureListener {
+                Log.w(TAG, "Batch ${index + 1} of size ${ls.size} failed to upload!")
             }
             delay(2000)
         }
@@ -345,14 +401,14 @@ object UnionAdminRepo {
      * NA -> When there is no live auction and none is scheduled
      * (Timestamp -> Timestamp of when the last auction ended)
      */
-    fun uploadAuctionInfo(status: String, timestamp: Long) {
+    suspend fun uploadSchAuctionsInfo(status: String, timestamp: Long) {
+        val dataToUpload = hashMapOf(
+            "Status" to status,
+            "Timestamp" to timestamp
+        )
         firestoreDb.collection(AUCTIONS_INFO)
-            .document(SCHEDULED_AUCTIONS).set {
-                hashMapOf(
-                    "Status" to status,
-                    "Timestamp" to timestamp
-                )
-            }.addOnSuccessListener {
+            .document(SCHEDULED_AUCTIONS).set(dataToUpload)
+            .addOnSuccessListener {
                 Log.w(
                     TAG, "AuctionInfo updated successfully!"
                 )
@@ -360,188 +416,334 @@ object UnionAdminRepo {
                 Log.w(
                     TAG, "Failed to update AuctionInfo!"
                 )
+                println(it)
+            }.await()
+    }
+
+    fun uploadAuctionsBonusTimeInfo(startTime: String, endTime: String) {
+        firestoreDb.collection(AUCTIONS_INFO)
+            .document(AUCTION_BONUS_TIME_INFO).set {
+                hashMapOf(
+                    "StartTime" to startTime.toLong(),
+                    "EndTime" to endTime.toLong()
+                )
+            }.addOnSuccessListener {
+                Log.w(
+                    TAG, "AuctionsBonusTimeInfo updated successfully!"
+                )
+            }.addOnFailureListener {
+                Log.w(
+                    TAG, "Failed to update AuctionsBonusTimeInfo!"
+                )
             }
     }
 
-    fun fetchAuctionInfo() {
+    fun fetchSchAuctionsInfo() {
         firestoreDb.collection(AUCTIONS_INFO)
             .document(SCHEDULED_AUCTIONS).addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     LiveAuctionStatus.value = ""
-                    LiveAuctionTimestamp.value = 0L
+                    LiveAuctionTimestamp.value = ""
                     Log.w(
                         TAG, "Failed to fetch auction info!"
                     )
                 } else {
                     LiveAuctionStatus.value = snapshot!!.get("Status").toString()
-                    LiveAuctionTimestamp.value = snapshot.get("Timestamp").toString().toLong()
+                    LiveAuctionTimestamp.value = snapshot.get("Timestamp").toString()
                 }
             }
     }
 
+    fun fetchAuctionsBonusTimeInfo() {
+        firestoreDb.collection(AUCTIONS_INFO)
+            .document(AUCTION_BONUS_TIME_INFO).addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    Log.d(
+                        TAG, "Failed to fetch auction info!"
+                    )
+                } else {
+                    if (snapshot != null) {
+                        Log.d(
+                            TAG,
+                            "Fetched updated auction bonus time: ${snapshot.get("StartTime")}" +
+                                    ", ${snapshot.get("EndTime")}!"
+                        )
+                        Log.d(
+                            TAG, "Fetched updated auction bonus time: ${snapshot}!"
+                        )
+                        Log.d(
+                            TAG, "Fetched updated auction bonus time: ${snapshot.data}!"
+                        )
+                        val liveBonusTimeInfo = BonusTime()
+                        liveBonusTimeInfo.StartTime = snapshot.getLong("StartTime")!!
+                        liveBonusTimeInfo.EndTime = snapshot.getLong("EndTime")!!
+                        LiveBonusTimeInfo.value = liveBonusTimeInfo
+                    }
+                }
+            }
+    }
+
+    fun closeLiveAuctionListItem(dataSnapshot: DataSnapshot) {
+        val doc = firestoreDb.collection(LIVE_AUCTION_LIST).document(dataSnapshot.ref.toString())
+        doc.update("Closed", "true").addOnSuccessListener {
+            Log.d(TAG, "Bid closed!")
+        }.addOnFailureListener {
+            Log.d(TAG, "Failed to close bid!")
+        }
+    }
+
+    fun updateRouteItem(src: String, des: String, newGot: Int) {
+//        val dataToUpload = liveRoutesList
+//        dataToUpload[src]!!.desData[des]!!["Got"] = newGot.toString()
+        val docName = "${src}-${des}-Got"
+        val doc = firestoreDb.collection(LIVE_ROUTES_LIST).document(docName)
+        doc.set(hashMapOf("Value" to newGot)).addOnSuccessListener {
+            Log.d(TAG, "Route list for ${src} updated, ${newGot} trucks filled")
+        }.addOnFailureListener {
+            Log.d(TAG, "Failed to update live route list for ${src}")
+        }
+    }
 
     /**
-     * This is the time allowed for each truck that are included in the initial
-     * bid timer. usersTruckCount is to get all the truck owners who have
-     * more than one trucks in their initial auction list for the purpose
-     * of giving them more time.
+     * Check if the user has updated the routes
      */
-    /*suspend fun initializeAuction(bidTime: Long, startTime: Long) {
-        val initBidEndTime = (startTime + bidTime).toInt()
-        initOpenSize = TotalTrucksRequired.coerceAtMost(liveCombinedAuctionList.size)
-
-        nextOpenAt = initOpenSize + 1
-        currAuctionListSize = liveCombinedAuctionList.size
-        val usersTruckCount = HashMap<String, Int>()
-
-        liveCombinedAuctionList.forEach {
-            if (usersTruckCount.containsKey(getTruckOwner(it.truckNo))) {
-                usersTruckCount[getTruckOwner(it.truckNo)] =
-                    usersTruckCount[getTruckOwner(it.truckNo)]!! + 1
-            } else {
-                usersTruckCount[getTruckOwner(it.truckNo)] = 1
+    fun updateRoutesListOnBidClose(dataSnapshot: DataSnapshot) {
+        val changedEntry = dataSnapshot.getValue<LiveAuctionListItem>()
+        val src = changedEntry!!.Src
+        val des = changedEntry.Des
+        if ((src != "") && (des != "")) {
+            if (liveRoutesList.containsKey(src) &&
+                (liveRoutesList[src]!!.desData.containsKey(des))
+            ) {
+                if ((liveRoutesList[src]!!.desData[des]!!["Req"]!!.toInt() -
+                            liveRoutesList[src]!!.desData[des]!!["Got"]!!.toInt()) > 0
+                ) {
+                    updateRouteItem(src = src, des = des,
+                        newGot = liveRoutesList[src]!!.desData[des]!!["Got"]!!.toInt() + 1)
+                    val currTime = CurrDateTimeInMillis()
+                    if ((currTime >= LiveBonusTimeInfo.value!!.StartTime) &&
+                        (currTime < LiveBonusTimeInfo.value!!.EndTime)
+                    ) {
+                        // do nothing as this is the bonus time
+                    } else {
+                        //update live auction list item by closing this entry
+                        closeLiveAuctionListItem(dataSnapshot)
+                    }
+                }
             }
         }
-
-        //see if a user has its truck listed in the current initialized list
-        for (i in 0 until initOpenSize) {
-            liveCombinedAuctionList[i]
-            if (usersTruckCount.containsKey(getTruckOwner(liveCombinedAuctionList[i].truckNo))) {
-                usersTruckCount[getTruckOwner(liveCombinedAuctionList[i].truckNo)] =
-                    usersTruckCount[getTruckOwner(liveCombinedAuctionList[i].truckNo)]!! + 1
-            } else {
-                usersTruckCount[getTruckOwner(liveCombinedAuctionList[i].truckNo)] = 1
-            }
-        }
-
-        //if yes then increase its bid timestamp accordingly
-        //timestamp here contains the total duration a bid is supposed to stay unlocked after
-        //the start time
-        liveCombinedAuctionList.forEach {
-            it.timestamp =
-                (initBidEndTime * usersTruckCount[getTruckOwner(it.truckNo)]!!).toString()
-        }
-
-        */
-    /**
-     * Upload the initial live auction list with the timestamp set for first
-     * "initOpenSize" items and rest of them has the timestamp set to -1
-     *//*
-        val LiveBidList = HashMap<Int, LiveAuctionListItem>()
-        liveCombinedAuctionList.forEachIndexed { index, liveAuctionListItem ->
-            LiveBidList[index + 1] = liveAuctionListItem
-        }
-        firebaseDb
-            .reference
-            .child("LiveBidList")
-            .setValue(LiveBidList).addOnSuccessListener {
-                Log.d(TAG, "Live Bid List uploaded successfully!")
-            }.addOnFailureListener {
-                Log.e(TAG, "Live Bid List upload failed!")
-            }.await()
-    }
-*/
-    fun acceptBid(liveAuctionListItem: LiveAuctionListItem): Boolean {
-        var accepted = false
-        firebaseDb
-            .reference
-            .child("LiveBidList")
-            .child(liveAuctionListItem.CurrNo)
-            .setValue(liveAuctionListItem).addOnSuccessListener {
-                accepted = true
-                Log.d(TAG, "Bid Accepted successfully!")
-            }.addOnFailureListener {
-                Log.e(TAG, "Failed to accept bid!")
-            }
-        return accepted
     }
 
+    fun fetchLiveAuctionList() {
+        val childEventListener = object : ChildEventListener {
+            override fun onChildAdded(
+                dataSnapshot: DataSnapshot,
+                previousChildName: String?,
+            ) {
+                Log.d(TAG, "onChildAdded:" + dataSnapshot.key!!)
+
+                val changedEntry = dataSnapshot.getValue<LiveAuctionListItem>()
+                liveAuctionList[changedEntry!!.CurrNo] = changedEntry
+                LiveAuctionList.value = liveAuctionList
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
+                Log.d(TAG, "onChildChanged: ${dataSnapshot.key}")
+
+                val changedEntry = dataSnapshot.getValue<LiveAuctionListItem>()
+                liveAuctionList[changedEntry!!.CurrNo] = changedEntry
+                LiveAuctionList.value = liveAuctionList
+
+                updateRoutesListOnBidClose(dataSnapshot)
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+                Log.d(TAG, "onChildRemoved:" + dataSnapshot.key!!)
+
+                val removedEntry = dataSnapshot.getValue<LiveAuctionListItem>()
+                liveAuctionList.remove(removedEntry!!.CurrNo)
+                LiveAuctionList.value = liveAuctionList
+            }
+
+            override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
+                //no action
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.w(TAG,
+                    "Retrieving LiveAuctionList Failed:onCancelled",
+                    databaseError.toException())
+            }
+        }
+        val ref = firebaseDb.reference.child(LIVE_AUCTION_LIST)
+        ref.addChildEventListener(childEventListener)
+    }
+
+    fun fetchLiveRoutesList() {
+        val coll = firestoreDb.collection(LIVE_ROUTES_LIST)
+        coll.addSnapshotListener { routes, error ->
+            if (error != null) {
+                Log.w(
+                    TAG, "Failed to update the live routes list"
+                )
+            } else {
+                var src: String /*Mandi*/
+                var des: String /*Destination*/
+                var data: String /*Represents specifier for Rate, Requirement or Got*/
+                var value: String /*Contains the value of the specified specifier*/
+                var splittedWords: List<String>
+                routes!!.forEach {
+                    splittedWords = it.id.split("-")
+                    src = splittedWords[0]
+                    des = splittedWords[1]
+                    data = splittedWords[2]
+                    value = it.get("Value").toString()
+                    when (data) {
+                        "Rate" -> {
+                            if (liveRoutesList.contains(src)) {
+                                liveRoutesList[src]!!.desData[des]!![data] = value
+                            } else {
+                                liveRoutesList[src] = LiveRoutesListItem(
+                                    desData = hashMapOf(
+                                        des to hashMapOf(
+                                            "Req" to "",
+                                            "Got" to "",
+                                            "Rate" to value
+                                        )
+                                    )
+                                )
+                            }
+
+                        }
+                        "Req" -> {
+                            if (liveRoutesList.contains(src)) {
+                                liveRoutesList[src]!!.desData[des]!![data] = value
+                            } else {
+                                liveRoutesList[src] = LiveRoutesListItem(
+                                    desData = hashMapOf(
+                                        des to hashMapOf(
+                                            "Req" to value,
+                                            "Got" to ""                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           ,
+                                            "Rate" to ""
+                                        )
+                                    )
+                                )
+                            }
+                        }
+                        "Got" -> {""
+                            if (liveRoutesList.contains(src)) {
+                                liveRoutesList[src]!!.desData[des]!![data] = value
+                            } else {
+                                liveRoutesList[src] = LiveRoutesListItem(
+                                    desData = hashMapOf(
+                                        des to hashMapOf(
+                                            "Req" to "",
+                                            "Got" to value,
+                                            "Rate" to ""
+                                        )
+                                    )
+                                )
+                            }
+                        }
+                    }
+                    Log.w(TAG, "Updated list for ${it.id} = ${it.data}")
+                }
+            }
+            LiveRoutesList.value = liveRoutesList
+        }
+
+        /*val childEventListener = object : ChildEventListener {
+            override fun onChildAdded(
+                dataSnapshot: DataSnapshot,
+                previousChildName: String?,
+            ) {
+                Log.d(TAG, "onChildAdded:" + dataSnapshot.key!!)
+
+                val changedEntry = dataSnapshot.getValue<LiveRoutesListItem>()
+                liveRoutesList[dataSnapshot.key.toString()] = changedEntry!!
+                LiveRoutesList.value = liveRoutesList
+            }
+
+            override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
+                Log.d(TAG, "onChildChanged: ${dataSnapshot.key}")
+
+                val changedEntry = dataSnapshot.getValue<LiveRoutesListItem>()
+                liveRoutesList[dataSnapshot.key.toString()] = changedEntry!!
+                LiveRoutesList.value = liveRoutesList
+            }
+
+            override fun onChildRemoved(dataSnapshot: DataSnapshot) {
+                Log.d(TAG, "onChildRemoved:" + dataSnapshot.key!!)
+
+                //val removedEntry = dataSnapshot.getValue<LiveRoutesListItem>()
+                liveRoutesList.remove(dataSnapshot.key.toString())
+                LiveRoutesList.value = liveRoutesList
+            }
+
+            override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
+                //no action
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.w(TAG,
+                    "Retrieving LiveTruckData Failed:onCancelled",
+                    databaseError.toException())
+            }
+        }
+        val ref = firebaseDb.reference.child(LIVE_ROUTES_LIST)
+        ref.addChildEventListener(childEventListener)*/
+    }
+
+    fun saveLiveAuctionList() {
+        val dataToUpload = HashMap<String, HistoryAuctionListItemDTO>()
+        LiveAuctionList.value!!.forEach {
+            dataToUpload[it.key] = HistoryAuctionListItemDTO(truck_no = it.value.TruckNo,
+                bid_closed = it.value.Closed)
+        }
+        firestoreDb.collection(AUCTION_LIST_DATA)
+            .document(LiveAuctionTimestamp.value.toString())
+            .set(dataToUpload).addOnSuccessListener {
+                Log.d(TAG, "Live auction list saved successfully!")
+            }.addOnFailureListener {
+                Log.d(TAG, "Failed to save live auction list, please try again!")
+            }
+
+    }
+
+    suspend fun saveLiveRoutesList() {
+        val dataToUpload = HashMap<String, HistoryAuctionListItemDTO>()
+        LiveAuctionList.value!!.forEach {
+            dataToUpload[it.key] = HistoryAuctionListItemDTO(truck_no = it.value.TruckNo,
+                bid_closed = it.value.Closed)
+        }
+        firestoreDb.collection(AUCTION_LIST_DATA)
+            .document(LiveAuctionTimestamp.value.toString())
+            .set(dataToUpload).addOnSuccessListener {
+                Log.d(TAG, "Live auction list saved successfully!")
+            }.addOnFailureListener {
+                Log.d(TAG, "Failed to save live auction list, please try again!")
+            }
+        delay(1000)
+
+        //update timestamp
+        firestoreDb.collection(AUCTION_LIST_DATA)
+            .document(LiveAuctionTimestamp.value.toString())
+            .set(hashMapOf("Timestamp" to CurrDateTimeInMillis()))
+    }
+
+    private fun getTruckOwner(truckNo: String): String {
+        return liveTruckDataList[truckNo]!!.data["Owner"].toString()
+    }
+
+    //checks if the truck status is in progress
+    private fun truckInProgress(truckNo: String): Boolean {
+        return LiveTruckDataList.value!![truckNo]!!.data["Status"] == "DelInProg"
+    }
+
+
     /**
-     * Essentially set the timestamp for the bid item to allow them to request
-     * for bids acceptance.
-     *
-     * NOTE: "unlockDuration" is to be passed as milliseconds in the form of
-     * long data type
+     * Move to firestore
      */
-    fun unlockBid(truckNo: String, unlockDuration: Long): Boolean {
-        var accepted = false
-        firebaseDb
-            .reference
-            .child("LiveBidList")
-            .child(truckNo)
-            .child("locked")
-            .setValue("false").addOnSuccessListener {
-                Log.d(TAG, "Locked set to false successfully!")
-            }.addOnFailureListener {
-                Log.e(TAG, "Failed to set locked to false!")
-            }
-
-        val timeInMilli = TimeConversions.TimestampToMillis(
-            SimpleDateFormat("dd-MM-yyyy hh:mm:ss")
-                .format(Calendar.getInstance().time)
-        ) + (unlockDuration)
-        firebaseDb
-            .reference
-            .child("LiveBidList")
-            .child(truckNo)
-            .child("timestamp")
-            .setValue(timeInMilli).addOnSuccessListener {
-                accepted = true
-                Log.d(TAG, "Unlock timestamp set successfully!")
-            }.addOnFailureListener {
-                Log.e(TAG, "Failed to set unlock timestamp!")
-            }
-        return accepted
-    }
-
-    fun lockBid(truckNo: String): Boolean {
-        var accepted = false
-        firebaseDb
-            .reference
-            .child("LiveBidList")
-            .child(truckNo)
-            .child("locked")
-            .setValue("true").addOnSuccessListener {
-                accepted = true
-                Log.d(TAG, "Bid Locked successfully!")
-            }.addOnFailureListener {
-                Log.e(TAG, "Failed to locked bid!")
-            }
-        return accepted
-    }
-
-    fun rollBackBid(truckNo: String): Boolean {
-        var accepted = false
-        firebaseDb
-            .reference
-            .child("LiveBidList")
-            .child(truckNo)
-            .child("closed")
-            .setValue("false").addOnSuccessListener {
-                accepted = true
-                Log.d(TAG, "Bid Locked successfully!")
-            }.addOnFailureListener {
-                Log.e(TAG, "Failed to locked bid!")
-            }
-        return accepted
-    }
-
-    fun updateRouteItem(routeId: String, newGot: String): Boolean {
-        var accepted = false
-        firebaseDb
-            .reference
-            .child(LIVE_ROUTES_LIST)
-            .child(routeId)
-            .child("got")
-            .setValue(newGot).addOnSuccessListener {
-                accepted = true
-                Log.d(TAG, "Bid Locked successfully!")
-            }.addOnFailureListener {
-                Log.e(TAG, "Failed to locked bid!")
-            }
-        return accepted
-    }
-
     fun fetchAddTruckRequests() {
         val childEventListener = object : ChildEventListener {
             override fun onChildAdded(
@@ -586,6 +788,9 @@ object UnionAdminRepo {
         ref.addChildEventListener(childEventListener)
     }
 
+    /**
+     * Move to firestore
+     */
     suspend fun addTruckToUser(truckRequest: AddTruckRequest) {
         //add truck to live truck data
         val newEntry = mapOf<String, Any>(
@@ -612,6 +817,9 @@ object UnionAdminRepo {
             .update("Trucks", FieldValue.arrayUnion(truckRequest.truckNo)).await()
     }
 
+    /**
+     * Move to firestore
+     */
     suspend fun removeTruckFromUser(truckRequest: AddTruckRequest) {
         //remove truck to live truck data
         firebaseDb
@@ -630,121 +838,4 @@ object UnionAdminRepo {
             .document(truckRequest.uid)
             .update("Trucks", FieldValue.arrayRemove(truckRequest.truckNo)).await()
     }
-
-    suspend fun closeAuction(closingTime: Long): Boolean {
-        var closed = false
-
-        /**
-         * Uploading routes list to firestore database
-         */
-        val routeListToUpload = HashMap<Int, LiveRoutesListItem>()
-        if (liveRoutesList.value!!.isNotEmpty()) {
-            liveRoutesList.value!!.forEachIndexed { index, liveRoutesListItem ->
-                routeListToUpload[index] = liveRoutesListItem
-            }
-            firestoreDb
-                .collection(ROUTES_LIST_DATA)
-                .document(closingTime.toString())
-                .set(routeListToUpload).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Log.d(TAG, "routes-list-data recorded = $routeListToUpload")
-                    } else {
-                        Log.d(TAG, "routes-list-data  upload failed")
-                    }
-                }.await()
-        }
-
-
-        /**
-         * Uploading auction list to firestore database
-         */
-        val auctionListToUpload = HashMap<Int, Map<String, String>>()
-        liveCombinedAuctionList.forEachIndexed { index, liveAuctionListItem ->
-            auctionListToUpload[index] = mapOf(
-                "bid-closed" to liveAuctionListItem.Closed,
-                "truck-no" to liveAuctionListItem.TruckNo
-            )
-        }
-        firestoreDb
-            .collection(AUCTION_LIST_DATA)
-            .document(closingTime.toString())
-            .set(auctionListToUpload).addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.d(TAG, "auction-lists recorded = $auctionListToUpload")
-                    closed = true
-                } else {
-                    Log.d(TAG, "auction-lists  upload failed")
-                }
-            }.await()
-        return closed
-    }
-
-    fun getTrucksLeft(): Int {
-        return TotalTrucksRequired - TotalTrucksClosed
-    }
-
-    fun nextBidAt(): Int {
-        return nextOpenAt
-    }
-
-    private fun getTruckOwner(truckNo: String): String {
-        return liveTruckDataList[truckNo]!!.data["Owner"].toString()
-    }
-
-    //checks if the truck status is in progress
-    private fun truckInProgress(truckNo: String): Boolean {
-        return liveTruckDataList[truckNo]!!.data["Status"] == "DelInProg"
-    }
-
-
-    /*
-    suspend fun uploadRoutesList(RoutesListToUpload: ArrayList<LiveRoutesListItem>) {
-        RoutesListToUpload.forEach {
-            TotalTrucksRequired += it.req.toInt()
-        }
-        if (RoutesListToUpload.isNotEmpty()) {
-            firebaseDb
-                .reference
-                .child("LiveRoutesList")
-                .setValue(RoutesListToUpload).addOnSuccessListener {
-                    Log.d(TAG, "Live routes list uploaded successfully!")
-                }.await()
-        } else {
-            Log.e(TAG, "Live routes list is empty!")
-        }
-    }
-*/
-
-    /*fun getLiveRoutesList() {
-        firebaseDb
-            .reference
-            .child(LIVE_ROUTES_LIST)
-            .addValueEventListener(
-                object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        Log.d(TAG, "Live routes is updated...fetching latest list!")
-                        val routeList = ArrayList<LiveRoutesListItem>()
-                        snapshot.children.forEach { routeNo ->
-                            val routeListItem = LiveRoutesListItem()
-                            routeNo.children.forEach { route ->
-                                when (route.key) {
-                                    "src" -> routeListItem.src = route.value.toString()
-                                    "des" -> routeListItem.des = route.value.toString()
-                                    "req" -> routeListItem.req = route.value.toString()
-                                    "got" -> routeListItem.got = route.value.toString()
-                                }
-                            }
-                            routeList.add(routeListItem)
-                        }
-                        liveRoutesList.postValue(routeList)
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        Log.w(TAG, "Failed to fetch new routes list")
-                    }
-                }
-            )
-    }*/
-
-
 }

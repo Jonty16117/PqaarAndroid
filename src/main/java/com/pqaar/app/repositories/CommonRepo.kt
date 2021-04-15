@@ -19,88 +19,10 @@ import com.pqaar.app.utils.DbPaths.LIVE_TRUCK_DATA_LIST
 @SuppressLint("StaticFieldLeak")
 object CommonRepo {
     private var TAG = "CommonRepo"
-    private var firestoreDb = FirebaseFirestore.getInstance()
+    /*private var firestoreDb = FirebaseFirestore.getInstance()
     private var firebaseDb = FirebaseDatabase.getInstance()
     private val liveAuctionList = HashMap<String, LiveAuctionListItem>()
     private val liveRoutesList = HashMap<String, LiveRoutesListItem>()
-    val LiveAuctionList = MutableLiveData<HashMap<String, LiveAuctionListItem>>()
-    val LiveRoutesList = MutableLiveData<HashMap<String, LiveRoutesListItem>>()
+    */
 
-    fun fetchLiveAuctionList() {
-        val childEventListener = object : ChildEventListener {
-            override fun onChildAdded(dataSnapshot: DataSnapshot,
-                                      previousChildName: String?) {
-                Log.d(TAG, "onChildAdded:" + dataSnapshot.key!!)
-
-                val changedEntry = dataSnapshot.getValue<LiveAuctionListItem>()
-                liveAuctionList[changedEntry!!.CurrNo] = changedEntry
-                LiveAuctionList.value = liveAuctionList
-            }
-
-            override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                Log.d(TAG, "onChildChanged: ${dataSnapshot.key}")
-
-                val changedEntry = dataSnapshot.getValue<LiveAuctionListItem>()
-                liveAuctionList[changedEntry!!.CurrNo] = changedEntry
-                LiveAuctionList.value = liveAuctionList
-            }
-
-            override fun onChildRemoved(dataSnapshot: DataSnapshot) {
-                Log.d(TAG, "onChildRemoved:" + dataSnapshot.key!!)
-
-                val removedEntry = dataSnapshot.getValue<LiveAuctionListItem>()
-                liveAuctionList.remove(removedEntry!!.CurrNo)
-                LiveAuctionList.value = liveAuctionList
-            }
-
-            override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                //no action
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.w(TAG, "Retrieving LiveAuctionList Failed:onCancelled", databaseError.toException())
-            }
-        }
-        val ref = firebaseDb.reference.child(LIVE_AUCTION_LIST)
-        ref.addChildEventListener(childEventListener)
-    }
-
-    fun fetchLiveRoutesList() {
-        val childEventListener = object : ChildEventListener {
-            override fun onChildAdded(dataSnapshot: DataSnapshot,
-                                      previousChildName: String?) {
-                Log.d(TAG, "onChildAdded:" + dataSnapshot.key!!)
-
-                val changedEntry = dataSnapshot.getValue<LiveRoutesListItem>()
-                liveRoutesList[dataSnapshot.key.toString()] = changedEntry!!
-                LiveRoutesList.value = liveRoutesList
-            }
-
-            override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                Log.d(TAG, "onChildChanged: ${dataSnapshot.key}")
-
-                val changedEntry = dataSnapshot.getValue<LiveRoutesListItem>()
-                liveRoutesList[dataSnapshot.key.toString()] = changedEntry!!
-                LiveRoutesList.value = liveRoutesList
-            }
-
-            override fun onChildRemoved(dataSnapshot: DataSnapshot) {
-                Log.d(TAG, "onChildRemoved:" + dataSnapshot.key!!)
-
-                //val removedEntry = dataSnapshot.getValue<LiveRoutesListItem>()
-                liveRoutesList.remove(dataSnapshot.key.toString())
-                LiveRoutesList.value = liveRoutesList
-            }
-
-            override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                //no action
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.w(TAG, "Retrieving LiveTruckData Failed:onCancelled", databaseError.toException())
-            }
-        }
-        val ref = firebaseDb.reference.child(LIVE_ROUTES_LIST)
-        ref.addChildEventListener(childEventListener)
-    }
 }
