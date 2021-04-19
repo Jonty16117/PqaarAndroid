@@ -380,23 +380,6 @@ object UnionAdminRepo {
             }.await()
             delay(2000)
         }
-
-
-        /**
-         * To upload everything in a single document, but it led to a lot of network calls
-         * when any client updated this document. Because the whole document was downloaded
-         * again after every updated in any field
-         */
-        /*val dataToUpload = HashMap<String, LiveAuctionListItem>()
-        liveCombinedAuctionList.forEach {
-            dataToUpload[it.CurrNo] = it
-        }
-        val doc = firestoreDb.collection(LIVE_AUCTION_LIST).document(LIVE_AUCTION_LIST)
-        doc.set(dataToUpload).addOnSuccessListener {
-            Log.d(TAG, "Uploaded live auction list successfully!")
-        }.addOnFailureListener {
-            Log.d(TAG, "Failed to upload live auction list!")
-        }.await()*/
     }
 
     /**
@@ -528,10 +511,10 @@ object UnionAdminRepo {
         val src = changedEntry.Src!!.trim()
         val des = changedEntry.Des!!.trim()
         val closed = changedEntry.Closed!!.trim()
-        val startTime = if (changedEntry.StartTime == null) POSITIVE_INFINITY.toLong() else changedEntry.StartTime!!
+        val startTime =
+            if (changedEntry.StartTime == null) POSITIVE_INFINITY.toLong() else changedEntry.StartTime!!
 
         Log.d(TAG, "Checking live routes for: $changedEntry")
-        Log.d(TAG, "CurrTime: ${CurrDateTimeInMillis()}, StartTime: ${startTime}")
         if ((CurrDateTimeInMillis() > startTime) &&
             (closed == "false") && (src.isNotEmpty()) && (des.isNotEmpty())
         ) {
@@ -547,7 +530,6 @@ object UnionAdminRepo {
                 if ((liveRoutesList[src]!!.desData[des]!!["Req"]!!.toInt() -
                             liveRoutesList[src]!!.desData[des]!!["Got"]!!.toInt()) > 0
                 ) {
-                    Log.d(TAG, "Incoming request to close the bid from: ${changedEntry.TruckNo}")
                     updateRouteItem(src = src, des = des,
                         newGot = liveRoutesList[src]!!.desData[des]!!["Got"]!!.toInt() + 1)
                     val currTime = CurrDateTimeInMillis()
@@ -593,35 +575,26 @@ object UnionAdminRepo {
                 for (doc in snapshots!!.documentChanges) {
                     if (doc.document.id != "DummyDoc") {
                         val docData = doc.document
+                        liveAuctionList[doc.document.id] = LiveAuctionListItem(
+                            CurrNo = docData.data["currNo"].toString(),
+                            PrevNo = docData.data["prevNo"].toString(),
+                            TruckNo = docData.data["truckNo"].toString(),
+                            Closed = docData.data["closed"].toString(),
+                            StartTime = docData.getLong("startTime"),
+                            Des = docData.data["des"].toString(),
+                            Src = docData.data["src"].toString()
+                        )
                         when (doc.type) {
                             DocumentChange.Type.ADDED -> {
-                                liveAuctionList[docData.id] = LiveAuctionListItem(
-                                    CurrNo = docData.data["currNo"].toString(),
-                                    PrevNo = docData.data["prevNo"].toString(),
-                                    TruckNo = docData.data["truckNo"].toString(),
-                                    Closed = docData.data["closed"].toString(),
-                                    StartTime = docData.getLong("startTime"),
-                                    Des = docData.data["des"].toString(),
-                                    Src = docData.data["src"].toString()
-                                )
-                                Log.d(TAG, "Added new live auction list item: ${doc.document.data}")
+                                        Log.d(TAG,
+                                            "Added new live auction list item: ${doc.document.data}")
                             }
                             DocumentChange.Type.MODIFIED -> {
-                                liveAuctionList[doc.document.id] = LiveAuctionListItem(
-                                    CurrNo = docData.data["currNo"].toString(),
-                                    PrevNo = docData.data["prevNo"].toString(),
-                                    TruckNo = docData.data["truckNo"].toString(),
-                                    Closed = docData.data["closed"].toString(),
-                                    StartTime = docData.getLong("startTime"),
-                                    Des = docData.data["des"].toString(),
-                                    Src = docData.data["src"].toString()
-                                )
-
                                 GlobalScope.launch(Dispatchers.IO) {
                                     val executionTime = measureTimeMillis {
                                         val job = async {
                                             Log.d(TAG,
-                                                "before update routes: ${LiveAuctionList.value!!}")
+                                                "before update routes: ${LiveAuctionList.value!![doc.document.id]!!}")
                                             updateRoutesListOnBidClose(LiveAuctionList.value!![doc.document.id]!!)
                                         }
                                         job.await()
@@ -635,15 +608,16 @@ object UnionAdminRepo {
                             }
                             DocumentChange.Type.REMOVED -> {
                                 liveAuctionList.remove(doc.document.id)
-                                Log.d(TAG, "Removed live auction list item: ${doc.document.data}")
+                                Log.d(TAG,
+                                    "Removed live auction list item: ${doc.document.data}")
                             }
                         }
                     }
                 }
+                LiveAuctionList.value = liveAuctionList
             }
-            LiveAuctionList.value = liveAuctionList
             Log.w(
-                TAG, "Updated live auction list item: ${LiveAuctionList.value}")
+                TAG, "Updated live auction list: ${LiveAuctionList.value}")
         }
     }
 

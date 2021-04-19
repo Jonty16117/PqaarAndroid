@@ -144,31 +144,4 @@ class UnionAdminDashboard : AppCompatActivity() {
         }
     }
 
-    /*GlobalScope.launch(Dispatchers.IO) {
-                val executionTime = measureTimeMillis {
-                    *//*UnionAdminRepository.setAuctionStatus("Live")
-                    UnionAdminRepository
-                        .setAuctionTimestamp(
-                            TimeConversions
-                                .TimestampToMillis("01-12-2021 22:02:20")
-                        )*//*
-                    *//*model.scheduleNewAuctionList(demoList,
-                        CurrTimeInMillis() + 10000, 30000)*//*
-
-                }
-
-                withContext(Dispatchers.Main) {
-                    val milli = TimeConversions.TimestampToMillis("01-12-2021 22:02:20")
-                    Log.d(TAG, "ExecutionTime = $executionTime")
-                    Log.d(TAG, "TimestampToMillis = $milli")
-                    Log.d(TAG, "MillisToTimestamp = ${TimeConversions.MillisToTimestamp(milli)}")
-
-
-                    *//*Toast.makeText(
-                            context,
-                            "liveCombinedAuctionList = ${UnionAdminRepository.liveCombinedAuctionList}",
-                            Toast.LENGTH_LONG
-                        ).show()*//*
-                }
-            }*/
 }
