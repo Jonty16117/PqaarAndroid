@@ -30,7 +30,10 @@ class UnionAdminDashboard : AppCompatActivity() {
     private lateinit var textView16: TextView
     private lateinit var textView19: TextView
     private lateinit var textView20: TextView
-    private lateinit var button2: Button
+    private lateinit var textView21: TextView
+    private lateinit var initAuc: Button
+    private lateinit var monitorAuc: Button
+    private lateinit var closeAuc: Button
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +45,10 @@ class UnionAdminDashboard : AppCompatActivity() {
         textView16 = findViewById(R.id.textView16)
         textView19 = findViewById(R.id.textView19)
         textView20 = findViewById(R.id.textView20)
-        button2 = findViewById(R.id.button2)
+        textView21 = findViewById(R.id.textView21)
+        initAuc = findViewById(R.id.initAuc)
+        monitorAuc = findViewById(R.id.monitorAuc)
+        closeAuc = findViewById(R.id.closeAuc)
 
         val model = ViewModelProviders.of(this)
             .get(UnionAdminViewModel::class.java)
@@ -51,12 +57,31 @@ class UnionAdminDashboard : AppCompatActivity() {
             textView14.text = "Live Proposed Routes List = ${it}"
         })
 
+
         model.getLiveTruckDataList().observe(this, {
             textView15.text = "Live Truck Status List = ${it}"
         })
 
+        var liveAuctionStatus = " "
+        var liveAuctionStartTime = 0L
+        var liveAuctionEndTime = 0L
+
         model.getAuctionStatus().observe(this, {
-            textView16.text = "Live Auction Status = ${it}"
+            liveAuctionStatus = if (it == null) "NA" else it
+            textView16.text = "Live Auction Status: ${liveAuctionStatus}, " +
+                    "Start Time: ${liveAuctionStartTime}, End Time: ${liveAuctionEndTime}"
+        })
+
+        model.getAuctionStartTime().observe(this, {
+            liveAuctionStartTime = if (it == null) 0L else it
+            textView16.text = "Live Auction Status: ${liveAuctionStatus}, " +
+                    "Start Time: ${liveAuctionStartTime}, End Time: ${liveAuctionEndTime}"
+        })
+
+        model.getAuctionEndTime().observe(this, {
+            liveAuctionEndTime = if (it == null) 0L else it
+            textView16.text = "Live Auction Status: ${liveAuctionStatus}, " +
+                    "Start Time: ${liveAuctionStartTime}, End Time: ${liveAuctionEndTime}"
         })
 
         model.getLiveRoutesList().observe(this, {
@@ -67,14 +92,25 @@ class UnionAdminDashboard : AppCompatActivity() {
             textView20.text = "Live Bonus Time Status = ${it}"
         })
 
-        model.setAuctionInfo("Live", CurrDateTimeInMillis() + 20000000)
+        model.getLiveAuctionList().observe(this, {
+            textView21.text = "Live Auction List = ${it}"
+        })
 
+        model.scheduleAuction(CurrDateTimeInMillis())
 
+        model.addMandiRoutes(
+            mandiSrc = "a",
+            routesListToUpload = hashMapOf(
+                "b" to
+                        hashMapOf(
+                            "Req" to 35,
+                            "Got" to 0,
+                            "Rate" to 6969,
+                        )))
 
         val demoList = ArrayList<LiveRoutesListItem>()
 
-
-        button2.setOnClickListener {
+        initAuc.setOnClickListener {
             if (model.getLiveTruckDataList().value.isNullOrEmpty()) {
                 Toast.makeText(
                     this,
@@ -82,10 +118,33 @@ class UnionAdminDashboard : AppCompatActivity() {
                     Toast.LENGTH_LONG
                 ).show()
             } else {
-                model.initializeAuction(45000)
+                model.scheduleAuction(CurrDateTimeInMillis())
+                Toast.makeText(
+                    this,
+                    "New auction scheduled, now initializing it...",
+                    Toast.LENGTH_LONG
+                ).show()
+                var perUserBidDurationInMillis = 25000L
+                model.initializeAuction(
+                    status = "Scheduled",
+                    startTime = liveAuctionStartTime,
+                    perUserBidDurationInMillis = perUserBidDurationInMillis)
+                Toast.makeText(
+                    this,
+                    "New auction initialized!",
+                    Toast.LENGTH_LONG
+                ).show()
             }
+        }
+        monitorAuc.setOnClickListener {
+            model.monitorAuction()
+        }
+        closeAuc.setOnClickListener {
+            model.closeAuction()
+        }
+    }
 
-            /*GlobalScope.launch(Dispatchers.IO) {
+    /*GlobalScope.launch(Dispatchers.IO) {
                 val executionTime = measureTimeMillis {
                     *//*UnionAdminRepository.setAuctionStatus("Live")
                     UnionAdminRepository
@@ -112,6 +171,4 @@ class UnionAdminDashboard : AppCompatActivity() {
                         ).show()*//*
                 }
             }*/
-        }
-    }
 }

@@ -36,7 +36,7 @@ class MandiAdminDashboard : AppCompatActivity() {
         val model = ViewModelProviders.of(this)
             .get(MandiAdminViewModel::class.java)
 
-        val demoList = ArrayList<PropRoutesListItem>()
+        /*val demoList = ArrayList<PropRoutesListItem>()
 
         demoList.add(PropRoutesListItem("fci1", "10"))
         demoList.add(PropRoutesListItem("fci2", "10"))
@@ -44,6 +44,6 @@ class MandiAdminDashboard : AppCompatActivity() {
         demoList.add(PropRoutesListItem("fci4", "10"))
         demoList.add(PropRoutesListItem("fci5", "10"))
 
-        model.AddRoutes(demoList)
+        model.AddRoutes(demoList)*/
     }
 }

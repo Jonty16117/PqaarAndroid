@@ -1,20 +1,23 @@
 package com.pqaar.app.viewmodels
 
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.pqaar.app.model.BonusTime
 import com.pqaar.app.model.LiveAuctionListItem
 import com.pqaar.app.model.LiveRoutesListItem
 import com.pqaar.app.model.LiveTruckDataListItem
+import com.pqaar.app.repositories.UnionAdminRepo.LiveAuctionEndTime
 import com.pqaar.app.repositories.UnionAdminRepo.LiveAuctionList
+import com.pqaar.app.repositories.UnionAdminRepo.LiveAuctionStartTime
 import com.pqaar.app.repositories.UnionAdminRepo.LiveAuctionStatus
-import com.pqaar.app.repositories.UnionAdminRepo.LiveAuctionTimestamp
 import com.pqaar.app.repositories.UnionAdminRepo.LiveBonusTimeInfo
 import com.pqaar.app.repositories.UnionAdminRepo.LiveRoutesList
 import com.pqaar.app.repositories.UnionAdminRepo.LiveTruckDataList
 import com.pqaar.app.repositories.UnionAdminRepo.PropRoutesList
+import com.pqaar.app.repositories.UnionAdminRepo.clearLiveAuctionList
+import com.pqaar.app.repositories.UnionAdminRepo.clearLiveAuctionListDebug
+import com.pqaar.app.repositories.UnionAdminRepo.clearLiveRoutesList
 import com.pqaar.app.repositories.UnionAdminRepo.combineLists
 import com.pqaar.app.repositories.UnionAdminRepo.fetchAuctionsBonusTimeInfo
 import com.pqaar.app.repositories.UnionAdminRepo.fetchLastAuctionListDocument
@@ -25,15 +28,15 @@ import com.pqaar.app.repositories.UnionAdminRepo.fetchLiveTruckDataList
 import com.pqaar.app.repositories.UnionAdminRepo.fetchSchAuctionsInfo
 import com.pqaar.app.repositories.UnionAdminRepo.getLastAuctionList
 import com.pqaar.app.repositories.UnionAdminRepo.getLastMissedList
+import com.pqaar.app.repositories.UnionAdminRepo.liveCombinedAuctionList
 import com.pqaar.app.repositories.UnionAdminRepo.saveLiveAuctionList
 import com.pqaar.app.repositories.UnionAdminRepo.saveLiveRoutesList
 import com.pqaar.app.repositories.UnionAdminRepo.separateOpenCloseLists
-import com.pqaar.app.repositories.UnionAdminRepo.setEndTimeInLiveAuctionList
+import com.pqaar.app.repositories.UnionAdminRepo.setStartTimeInLiveAuctionList
 import com.pqaar.app.repositories.UnionAdminRepo.uploadAuctionsBonusTimeInfo
 import com.pqaar.app.repositories.UnionAdminRepo.uploadLiveAuctionList
 import com.pqaar.app.repositories.UnionAdminRepo.uploadLiveMandiRoutes
 import com.pqaar.app.repositories.UnionAdminRepo.uploadSchAuctionsInfo
-import com.pqaar.app.utils.TimeConversions.CurrDateTimeInMillis
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -74,6 +77,7 @@ class UnionAdminViewModel : ViewModel() {
                 fetchLiveTruckDataList()
                 fetchSchAuctionsInfo()
                 fetchLiveRoutesList()
+                fetchLiveAuctionList()
                 fetchAuctionsBonusTimeInfo()
             }
             withContext(Dispatchers.Main) {
@@ -85,10 +89,14 @@ class UnionAdminViewModel : ViewModel() {
     /**
      *Update status and timestamp for next auction
      */
-    fun setAuctionInfo(status: String, timestamp: Long) {
+    fun scheduleAuction(startTime: Long) {
+        val status = "Scheduled"
+//        LiveAuctionStatus.value = status
+//        LiveAuctionStartTime.value = startTime
+
         GlobalScope.launch(Dispatchers.IO) {
             val executionTime = measureTimeMillis {
-                uploadSchAuctionsInfo(status, timestamp)
+                uploadSchAuctionsInfo(status, startTime, 0)
             }
             withContext(Dispatchers.Main) {
                 Log.d(TAG, "ExecutionTime = $executionTime")
@@ -122,18 +130,36 @@ class UnionAdminViewModel : ViewModel() {
      * Step 6) Set bid duration allowed for each truck owner
      * Step 7) Upload the live auction list
      */
-    fun initializeAuction(perUserBidDurationInMillis: Long) {
+    fun initializeAuction(
+        status: String, startTime: Long,
+        perUserBidDurationInMillis: Long,
+    ) {
+        var endTime: Long
         GlobalScope.launch(Dispatchers.IO) {
-
-
             val executionTime = measureTimeMillis {
                 val lastAuctionDoc = fetchLastAuctionListDocument()
                 getLastAuctionList(lastAuctionDoc)
+                Log.d(TAG, "Fetched last auction list")
                 separateOpenCloseLists()
+                Log.d(TAG, "Separated open and close lists")
                 getLastMissedList()
+                Log.d(TAG, "Fetched last missed auction list")
                 combineLists()
-                setEndTimeInLiveAuctionList(perUserBidDurationInMillis)
+                Log.d(TAG, "Combined all three lists")
+                endTime = startTime + (liveCombinedAuctionList.size * perUserBidDurationInMillis)
+                getAuctionEndTime().postValue(endTime)
+                setStartTimeInLiveAuctionList(startTime, perUserBidDurationInMillis)
+                Log.d(TAG, "Start time is set for each entry in live auction list")
                 uploadLiveAuctionList()
+                Log.d(TAG, "Uploaded final live auction lists")
+                fetchLiveAuctionList()
+                Log.d(TAG, "Fetched live auction list")
+                uploadSchAuctionsInfo(
+                    status = status,
+                    startTime = startTime,
+                    endTime = endTime
+                )
+                Log.d(TAG, "Auction timing scheduled at ${startTime}")
             }
             withContext(Dispatchers.Main) {
                 Log.d(TAG, "ExecutionTime = $executionTime")
@@ -150,6 +176,11 @@ class UnionAdminViewModel : ViewModel() {
         //update live routes list when a truck user adds his route
         GlobalScope.launch(Dispatchers.IO) {
             val executionTime = measureTimeMillis {
+                uploadSchAuctionsInfo(
+                    status = "Live",
+                    startTime = LiveAuctionStartTime.value!!,
+                    endTime = LiveAuctionEndTime.value!!
+                )
                 fetchLiveAuctionList()
             }
             withContext(Dispatchers.Main) {
@@ -171,9 +202,15 @@ class UnionAdminViewModel : ViewModel() {
     fun closeAuction() {
         GlobalScope.launch(Dispatchers.IO) {
             val executionTime = measureTimeMillis {
-                uploadSchAuctionsInfo("Finished", CurrDateTimeInMillis())
+                uploadSchAuctionsInfo(
+                    "Finished",
+                    LiveAuctionStartTime.value!!,
+                    LiveAuctionEndTime.value!!
+                )
                 saveLiveAuctionList()
                 saveLiveRoutesList()
+                clearLiveAuctionList()
+                clearLiveRoutesList()
             }
             withContext(Dispatchers.Main) {
                 Log.d(TAG, "ExecutionTime = $executionTime")
@@ -181,6 +218,17 @@ class UnionAdminViewModel : ViewModel() {
         }
     }
 
+    fun forceClearLiveAuctionList() {
+        GlobalScope.launch(Dispatchers.IO) {
+            val executionTime = measureTimeMillis {
+                clearLiveAuctionListDebug()
+            }
+            withContext(Dispatchers.Main) {
+                Log.d(TAG, "ExecutionTime = $executionTime")
+            }
+        }
+
+    }
 
     /**
      * Live data getters
@@ -201,8 +249,12 @@ class UnionAdminViewModel : ViewModel() {
         return LiveBonusTimeInfo
     }
 
-    fun getAuctionTimestamp(): MutableLiveData<String> {
-        return LiveAuctionTimestamp
+    fun getAuctionStartTime(): MutableLiveData<Long> {
+        return LiveAuctionStartTime
+    }
+
+    fun getAuctionEndTime(): MutableLiveData<Long> {
+        return LiveAuctionEndTime
     }
 
     fun getLiveRoutesList(): MutableLiveData<HashMap<String, LiveRoutesListItem>> {
@@ -212,6 +264,10 @@ class UnionAdminViewModel : ViewModel() {
     fun getLiveAuctionList(): MutableLiveData<HashMap<String, LiveAuctionListItem>> {
         return LiveAuctionList
     }
+
+    /**
+     * ---------------------------OVER-----------------------------------------------
+     */
 
 
     /**

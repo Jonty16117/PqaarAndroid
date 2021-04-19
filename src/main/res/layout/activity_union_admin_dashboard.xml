@@ -9,7 +9,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="25dp">
 
         <TextView
             android:id="@+id/textView14"
@@ -80,18 +81,62 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView19" />
 
+        <TextView
+            android:id="@+id/textView21"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:text="TextView"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="15sp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView20" />
+
         <android.widget.Button
-            android:id="@+id/button2"
+            android:id="@+id/initAuc"
             android:layout_width="158dp"
             android:layout_height="54dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
             android:layout_marginTop="25dp"
             android:background="@drawable/custom_button_background"
             android:text="Initialize Auction"
             android:textColor="@drawable/custom_button_text_color"
             android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView21"
+            tools:ignore="HardcodedText" />
+
+        <android.widget.Button
+            android:id="@+id/monitorAuc"
+            android:layout_width="158dp"
+            android:layout_height="54dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:background="@drawable/custom_button_background"
+            android:text="Monitor Auction"
+            android:textColor="@drawable/custom_button_text_color"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView21"
+            tools:ignore="HardcodedText" />
+
+        <android.widget.Button
+            android:id="@+id/closeAuc"
+            android:layout_width="158dp"
+            android:layout_height="54dp"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/custom_button_background"
+            android:text="Close Auction"
+            android:textColor="@drawable/custom_button_text_color"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView20"
+            app:layout_constraintTop_toBottomOf="@id/initAuc"
             tools:ignore="HardcodedText" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,7 +6,7 @@ object DbPaths {
      */
     const val USER_DATA = "user-data"
     const val LIVE_ROUTES_LIST = "LiveRoutesList"
-    const val ROUTES_LIST_DATA = "routes-list-data"
+    const val ROUTES_LIST_DATA = "LiveRoutesListRecords"
     const val AUCTION_LIST_DATA = "auction-lists"
     const val MANDI_ROUTES_LIST = "MandiRoutesList"
     const val AUCTIONS_INFO = "AuctionsInfo"
