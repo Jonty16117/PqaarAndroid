@@ -14,6 +14,16 @@ object DbPaths {
     const val LIVE_AUCTION_LIST = "LiveAuctionList"
     const val AUCTION_BONUS_TIME_INFO = "AuctionBonusTimeInfo"
 
+    /**
+     * Firestore field keys
+     */
+    const val TRUCKS = "Trucks"
+    const val FIRST_NAME = "firstName"
+    const val LAST_NAME = "lastName"
+    const val PHONE_NO = "phoneNo"
+    const val USER_TYPE = "userType"
+
+
 
     /**
      * Firebase paths
