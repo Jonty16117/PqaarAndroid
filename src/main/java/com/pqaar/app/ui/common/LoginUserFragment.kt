@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.pqaar.app.R
 import com.pqaar.app.ui.MandiAdmin.MandiAdminDashboard
 import com.pqaar.app.ui.TruckOwner.TruckOwnerDashboardActivity
+import com.pqaar.app.ui.TruckOwner.TruckOwnerDashboardTest
 import com.pqaar.app.ui.UnionAdmin.UnionAdminDashboard
 
 
@@ -62,7 +63,7 @@ class LoginUserFragment : Fragment() {
             if (radioGroup.checkedRadioButtonId == -1) {
                 Toast.makeText(context, "Please Select User Type", Toast.LENGTH_LONG).show()
             } else {
-                checkedPhoneNumber = getDataFromText()
+                checkedPhoneNumber = getPhoneNoFromEditText()
                 if (checkedPhoneNumber != null) {
                     val dataBundle = Bundle()
                     dataBundle.putString("inputTextPhoneNo", checkedPhoneNumber)
@@ -79,10 +80,26 @@ class LoginUserFragment : Fragment() {
         }
 
         btnlogin.setOnClickListener {
-            startActivity(Intent(
-                context,
-                UnionAdminDashboard::class.java
-            ).apply { putExtra("null", "null") })
+            when (getUserType()) {
+                "mandi-admin" -> {
+
+                }
+                "union-admin" -> {
+                    startActivity(Intent(
+                        context,
+                        UnionAdminDashboard::class.java
+                    ).apply { putExtra("null", "null") })
+                }
+                "truck-owner" -> {
+                    startActivity(Intent(
+                        context,
+                        TruckOwnerDashboardTest::class.java
+                    ).apply { putExtra("null", "null") })
+                }
+                else -> {
+                    Toast.makeText(context, "Please Select User Type", Toast.LENGTH_LONG).show()
+                }
+            }
         }
 
         btnregister.setOnClickListener {
@@ -96,7 +113,7 @@ class LoginUserFragment : Fragment() {
         return view
     }
 
-    private fun getDataFromText(): String? {
+    private fun getPhoneNoFromEditText(): String? {
         return if (textInputPhone.text.trim().isEmpty() ||
             textInputPhone.text.trim().length != 10
         ) {

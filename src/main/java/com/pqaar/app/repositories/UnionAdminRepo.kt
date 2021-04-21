@@ -191,7 +191,6 @@ object UnionAdminRepo {
             }
         }
 
-        firebaseDb.setPersistenceEnabled(true)
         val ref = firebaseDb.reference.child(LIVE_TRUCK_DATA_LIST)
         ref.addChildEventListener(childEventListener)
     }
@@ -475,9 +474,10 @@ object UnionAdminRepo {
                         Log.d(
                             TAG, "Fetched updated auction bonus time: ${snapshot.data}!"
                         )
-                        val liveBonusTimeInfo = BonusTime()
-                        liveBonusTimeInfo.StartTime = snapshot.getLong("StartTime")!!
-                        liveBonusTimeInfo.EndTime = snapshot.getLong("EndTime")!!
+                        val liveBonusTimeInfo = BonusTime(
+                            StartTime = snapshot.getLong("StartTime")!!,
+                            EndTime = snapshot.getLong("EndTime")!!
+                        )
                         LiveBonusTimeInfo.value = liveBonusTimeInfo
                     }
                 }

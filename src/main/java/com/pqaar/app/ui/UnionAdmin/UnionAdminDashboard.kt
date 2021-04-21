@@ -96,17 +96,8 @@ class UnionAdminDashboard : AppCompatActivity() {
             textView21.text = "Live Auction List = ${it}"
         })
 
-        model.scheduleAuction(CurrDateTimeInMillis())
 
-        model.addMandiRoutes(
-            mandiSrc = "a",
-            routesListToUpload = hashMapOf(
-                "b" to
-                        hashMapOf(
-                            "Req" to 35,
-                            "Got" to 0,
-                            "Rate" to 6969,
-                        )))
+
 
         val demoList = ArrayList<LiveRoutesListItem>()
 
@@ -118,6 +109,16 @@ class UnionAdminDashboard : AppCompatActivity() {
                     Toast.LENGTH_LONG
                 ).show()
             } else {
+                model.scheduleAuction(CurrDateTimeInMillis())
+                model.addMandiRoutes(
+                    mandiSrc = "a",
+                    routesListToUpload = hashMapOf(
+                        "b" to
+                                hashMapOf(
+                                    "Req" to 35,
+                                    "Got" to 0,
+                                    "Rate" to 6969,
+                                )))
                 model.scheduleAuction(CurrDateTimeInMillis())
                 Toast.makeText(
                     this,
