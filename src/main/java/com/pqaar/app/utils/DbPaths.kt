@@ -23,20 +23,24 @@ object DbPaths {
     const val PHONE_NO = "phoneNo"
     const val USER_TYPE = "userType"
 
-
+    /**
+     * Firebase storage paths
+     */
+    const val TRUCK_RC = "TruckRC"
 
     /**
      * Firebase paths
      */
     const val LIVE_TRUCK_DATA_LIST = "LiveTruckData"
-    const val ADD_TRUCKS_REQUESTS = "AddTruckRequests"
+    const val TRUCKS_REQUESTS = "TruckRequests"
+
     /**
      * Firebase child paths
      */
     const val STATUS = "Status"
     const val DEL_IN_PROG = "DelInProg"
     const val DEL_PASS = "DelPass"
-
-
+    const val ADD_REQUESTS = "AddRequests"
+    const val DEL_REQUESTS = "DelRequests"
     const val DEL_FAIL = "DelFail"
 }

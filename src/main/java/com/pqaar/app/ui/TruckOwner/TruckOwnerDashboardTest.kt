@@ -1,5 +1,6 @@
 package com.pqaar.app.ui.TruckOwner
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +11,8 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProviders
 import com.pqaar.app.R
 import com.pqaar.app.repositories.UnionAdminRepo
+import com.pqaar.app.ui.UnionAdmin.UnionAdminDashboard
+import com.pqaar.app.ui.common.RegisterUserFragment
 import com.pqaar.app.utils.TimeConversions
 import com.pqaar.app.viewmodels.TruckOwnerViewModel
 import com.squareup.okhttp.Dispatcher
@@ -33,6 +36,7 @@ class TruckOwnerDashboardTest : AppCompatActivity() {
         val src = findViewById<EditText>(R.id.src)
         val des = findViewById<EditText>(R.id.des)
         val closeAucTO = findViewById<Button>(R.id.closeAucTO)
+        val manage_trucks = findViewById<Button>(R.id.manage_trucks)
 
         val model = ViewModelProviders.of(this)
             .get(TruckOwnerViewModel::class.java)
@@ -87,6 +91,13 @@ class TruckOwnerDashboardTest : AppCompatActivity() {
                 }
             }
 
+        }
+
+        manage_trucks.setOnClickListener {
+            startActivity(Intent(
+                activity,
+                ManageTrucksTest::class.java
+            ).apply { putExtra("null", "null") })
         }
     }
 }

@@ -146,6 +146,7 @@
             app:layout_constraintTop_toBottomOf="@+id/liveAuctionList" />
 
         <android.widget.Button
+            android:textColor="@drawable/custom_button_text_color"
             android:id="@+id/closeAucTO"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -156,6 +157,19 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/src" />
+
+        <android.widget.Button
+            android:textColor="@drawable/custom_button_text_color"
+            android:id="@+id/manage_trucks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:background="@drawable/custom_button_background"
+            android:padding="10dp"
+            android:text="Manage Trucks"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/closeAucTO" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

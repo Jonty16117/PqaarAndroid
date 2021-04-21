@@ -59,7 +59,6 @@ object TruckOwnerRepo {
     val LiveAuctionEndTime = MutableLiveData<Long>()
     val LiveBonusTimeInfo = MutableLiveData<BonusTime>()
 
-
     suspend fun fetchTruckOwner() {
         val testUid = "DemoUserTO"
         firestoreDb.collection(USER_DATA)
@@ -338,4 +337,5 @@ object TruckOwnerRepo {
                 }
             }
     }
+
 }

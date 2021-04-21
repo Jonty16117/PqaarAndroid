@@ -9,7 +9,6 @@ import com.google.firebase.firestore.*
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.toObject
 import com.pqaar.app.model.*
-import com.pqaar.app.utils.DbPaths.ADD_TRUCKS_REQUESTS
 import com.pqaar.app.utils.DbPaths.AUCTIONS_INFO
 import com.pqaar.app.utils.DbPaths.AUCTION_BONUS_TIME_INFO
 import com.pqaar.app.utils.DbPaths.AUCTION_LIST_DATA
@@ -857,7 +856,7 @@ object UnionAdminRepo {
     /**
      * Move to firestore
      */
-    fun fetchAddTruckRequests() {
+    /*fun fetchAddTruckRequests() {
         val childEventListener = object : ChildEventListener {
             override fun onChildAdded(
                 dataSnapshot: DataSnapshot,
@@ -900,11 +899,11 @@ object UnionAdminRepo {
         val ref = firebaseDb.reference.child(ADD_TRUCKS_REQUESTS)
         ref.addChildEventListener(childEventListener)
     }
-
+*/
     /**
      * Move to firestore
      */
-    suspend fun addTruckToUser(truckRequest: AddTruckRequest) {
+    /*suspend fun addTruckToUser(truckRequest: AddTruckRequest) {
         //add truck to live truck data
         val newEntry = mapOf<String, Any>(
             truckRequest.truckNo.toString() to mapOf(
@@ -929,10 +928,11 @@ object UnionAdminRepo {
             .document(truckRequest.uid)
             .update("Trucks", FieldValue.arrayUnion(truckRequest.truckNo)).await()
     }
-
+*/
     /**
      * Move to firestore
      */
+/*
     suspend fun removeTruckFromUser(truckRequest: AddTruckRequest) {
         //remove truck to live truck data
         firebaseDb
@@ -951,4 +951,5 @@ object UnionAdminRepo {
             .document(truckRequest.uid)
             .update("Trucks", FieldValue.arrayRemove(truckRequest.truckNo)).await()
     }
+*/
 }
