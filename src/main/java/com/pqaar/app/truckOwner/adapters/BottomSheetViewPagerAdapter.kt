@@ -4,7 +4,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.pqaar.app.truckOwner.view.BidListFragment
-import com.pqaar.app.common.RoutesFragment
+import com.pqaar.app.truckOwner.view.RoutesFragment
 
 class BottomSheetViewPagerAdapter(fragmentManager: FragmentManager) :
     FragmentPagerAdapter(fragmentManager, FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent"
-    tools:context=".common.RoutesFragment">
+    tools:context=".truckOwner.view.RoutesFragment">
 
     <TextView
         android:id="@+id/textView13"

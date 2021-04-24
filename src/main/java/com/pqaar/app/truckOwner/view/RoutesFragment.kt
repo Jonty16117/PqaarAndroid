@@ -1,4 +1,4 @@
-package com.pqaar.app.common
+package com.pqaar.app.truckOwner.view
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
