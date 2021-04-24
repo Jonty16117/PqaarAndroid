@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    tools:context=".ui.TruckOwner.TruckOwnerDashboardActivity">
+    tools:context=".truckOwner.view.TruckOwnerDashboardActivity">
 
     <androidx.constraintlayout.motion.widget.MotionLayout
         android:id="@+id/motion_layout"
@@ -239,7 +239,6 @@
                 android:scrollbarSize="0dp"
                 android:scrollbars="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/history" />
 

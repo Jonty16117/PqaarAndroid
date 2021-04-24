@@ -12,12 +12,24 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textCursorDrawable">@drawable/custom_text_cursor</item>
+        <item name="alertDialogTheme">@style/CustomAlertDialog</item>
     </style>
 
     <style name="AppThemeDark" parent="Theme.MaterialComponents.DayNight.NoActionBar">
     </style>
 
     <!--Styles-->
+    <style name="CustomAlertDialog" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+    </style>
+    <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+    </style>
+    <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+    </style>
+
     <style name="BaseText">
         <item name="fontFamily">sans-serif</item>
         <item name="android:layout_width">wrap_content</item>

@@ -13,13 +13,13 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppThemeLight">
-        <activity android:name=".ui.TruckOwner.TruckOwnerDashboardTest" />
-        <activity android:name=".ui.TruckOwner.ManageTrucksTest" />
-        <activity android:name=".ui.MandiAdmin.MandiAdminDashboard" />
-        <activity android:name=".ui.UnionAdmin.UnionAdminDashboard" />
-        <activity android:name=".ui.TruckOwner.TruckOwnerDashboardActivity" />
+        <activity android:name=".truckOwner.view.TruckOwnerDashboardTest" />
+        <activity android:name=".truckOwner.view.ManageTrucksTest" />
+        <activity android:name=".mandiAdmin.view.MandiAdminDashboard" />
+        <activity android:name=".unionAdmin.view.UnionAdminDashboard" />
+        <activity android:name=".truckOwner.view.TruckOwnerDashboardActivity" />
         <activity
-            android:name=".ui.common.SplashScreen"
+            android:name="com.pqaar.app.common.SplashScreen"
             android:theme="@style/SplashScreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,7 +27,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.common.LoginActivity" />
+        <activity android:name="com.pqaar.app.common.LoginActivity" />
     </application>
 
 </manifest>

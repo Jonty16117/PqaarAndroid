@@ -2,6 +2,9 @@
 
     <string name="app_name_punjabi">ਪਕਾਰ</string>
 
+    <!--  MandiAdminDashboard  -->
+    <string name="mandi">Mandi</string>
+    <string name="live_routes">Routes Live</string>
 
     <string name="app_name">Pqaar</string>
     <string name="welcome">WELCOME</string>

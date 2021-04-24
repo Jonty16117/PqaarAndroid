@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent"
-    tools:context=".ui.TruckOwner.BidListFragment">
+    tools:context=".truckOwner.view.BidListFragment">
 
     <TextView
         android:id="@+id/textView13"
