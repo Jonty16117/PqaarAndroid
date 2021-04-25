@@ -76,12 +76,11 @@ class MandiAdminDashboard : AppCompatActivity() {
 
         model.getRoutesHistory().observe(this, {
             title_text.text = it[0].Routes.size.toString()
-            Log.d(TAG, "Updated routes list: ${it.toString()}")
+            Log.d(TAG, "Updated routes list: ${it}")
             adapterList.forEach { adapter -> concatAdapter.removeAdapter(adapter) }
             adapterList.clear()
             it.forEachIndexed { index, inner_it ->
                 adapterList.add(MandiAdminRoutesHistoryAdapter(inner_it))
-//                adapterList[index].notifyDataSetChanged()
             }
             adapterList.forEach { adapter -> concatAdapter.addAdapter(adapter) }
             concatAdapter.notifyDataSetChanged()

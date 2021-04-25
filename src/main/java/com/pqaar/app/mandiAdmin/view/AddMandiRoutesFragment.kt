@@ -164,7 +164,7 @@ class AddMandiRoutesFragment : Fragment() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RoutesViewHolder {
             return RoutesViewHolder(
                 LayoutInflater.from(context)
-                    .inflate((R.layout.madni_admin_routes_history_sub_item), parent,
+                    .inflate((R.layout.mandi_admin_routes_history_sub_item), parent,
                         false))
         }
 

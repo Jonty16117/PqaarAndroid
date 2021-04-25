@@ -7,6 +7,7 @@ import com.google.firebase.database.*
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.Query
 import com.pqaar.app.model.*
+import com.pqaar.app.truckOwner.repository.TruckOwnerRepo
 import com.pqaar.app.utils.DbPaths.AUCTIONS_INFO
 import com.pqaar.app.utils.DbPaths.AUCTION_BONUS_TIME_INFO
 import com.pqaar.app.utils.DbPaths.AUCTION_LIST_DATA
@@ -33,22 +34,24 @@ object UnionAdminRepo {
     private var firestoreDb = FirebaseFirestore.getInstance()
     private var firebaseDb = FirebaseDatabase.getInstance()
 
-    private var propRoutesList = HashMap<String, MutableMap<String, Any>>()
+//    private var propRoutesList = HashMap<String, MutableMap<String, Any>>()
+    private var propRoutesList = ArrayList<LivePropRoutesListItem>()
     private val truckRequestsLive = HashMap<String, AddTruckRequest>()
     private var liveAuctionList = HashMap<String, LiveAuctionListItem>()
     private val liveTruckDataList = HashMap<String, LiveTruckDataListItem>()
-    private var liveRoutesList = HashMap<String, LiveRoutesListItem>()
+    private var liveRoutesList = HashMap<String, LiveRoutesListItemDTO>()
     private var lastAuctionListDTO: ArrayList<Pair<String, HistoryAuctionListItemDTO>> = ArrayList()
     private lateinit var lastOpenLiveList: ArrayList<LiveAuctionListItem>
     private lateinit var lastClosedLiveList: ArrayList<LiveAuctionListItem>
     private lateinit var lastMissedList: ArrayList<LiveAuctionListItem>
     private lateinit var truckCheckArray: HashMap<String, Boolean>
     lateinit var liveCombinedAuctionList: ArrayList<LiveAuctionListItem>
-    val PropRoutesList = MutableLiveData<HashMap<String, MutableMap<String, Any>>>()
+//    val PropRoutesList = MutableLiveData<HashMap<String, MutableMap<String, Any>>>()
+    val PropRoutesList = MutableLiveData<ArrayList<LivePropRoutesListItem>>()
     val TruckRequestsLive = MutableLiveData<HashMap<String, AddTruckRequest>>()
     val LiveAuctionList = MutableLiveData<HashMap<String, LiveAuctionListItem>>()
     val LiveTruckDataList = MutableLiveData<HashMap<String, LiveTruckDataListItem>>()
-    val LiveRoutesList = MutableLiveData<HashMap<String, LiveRoutesListItem>>()
+    val LiveRoutesList = MutableLiveData<HashMap<String, LiveRoutesListItemDTO>>()
     val LiveAuctionStatus = MutableLiveData<String>()
     val LiveAuctionStartTime = MutableLiveData<Long>()
     val LiveAuctionEndTime = MutableLiveData<Long>()
@@ -61,7 +64,6 @@ object UnionAdminRepo {
     fun fetchLivePropRoutesList() {
         firestoreDb
             .collection(MANDI_ROUTES_LIST)
-            .whereEqualTo("Status", "Live")
             .addSnapshotListener { snapshots, error ->
             if (error != null) {
                 Log.w(
@@ -80,13 +82,32 @@ object UnionAdminRepo {
                  * where snapshots represents MandiSrc
                  *
                  */
-                propRoutesList = HashMap()
+                propRoutesList = ArrayList()
                 snapshots!!.forEach {
-                    propRoutesList[it.id] = it.data
-                    Log.w(TAG, "Updated list for ${it.id} = ${it.data}")
+                    if (it.id != "DummyDoc") {
+                        val mandiPropList = LivePropRoutesListItem()
+                        //get the entry from the mandi which has the status live on it
+                        it.data.forEach { mandiRoutesData ->
+                            Log.d(TAG,"mandiroutesdata: ${mandiRoutesData}")
+                            val mandiRoutesDataValue = mandiRoutesData.value as HashMap<*, *>
+                            if(mandiRoutesDataValue["Status"] == "Live") {
+                                mandiPropList.Timestamp = mandiRoutesDataValue["Timestamp"].toString().toLong()
+                                mandiPropList.Mandi = it.id
+                                val routes = ArrayList<Pair<String, Int>>()
+                                mandiRoutesDataValue.forEach { route ->
+                                    if (route.key.toString() != "Status" && route.key.toString() != "Timestamp") {
+                                        routes.add(Pair(route.key.toString(), route.value.toString().toInt()))
+                                    }
+                                }
+                                mandiPropList.Routes = routes
+                            }
+                        }
+                        propRoutesList.add(mandiPropList)
+                    }
                 }
+                Log.w(TAG, "Updated proposed routes list ${propRoutesList}")
+                PropRoutesList.postValue(propRoutesList)
             }
-            PropRoutesList.value = propRoutesList
         }
     }
 
@@ -517,19 +538,23 @@ object UnionAdminRepo {
         ) {
             Log.d(TAG, "Incoming request to close the bid from mandi: " +
                     "${src} to ${des}")
-            Log.d(TAG, "Live mandis: ${LiveRoutesList.value!!.keys}")
+            Log.d(TAG, "Live mandis: ${liveRoutesList.keys}")
+
+            //check if src(mandi) and des(godown) exists in the live routes list
             if (liveRoutesList.containsKey(src) &&
                 (liveRoutesList[src]!!.desData.containsKey(des))
             ) {
-                Log.d(TAG, "req: ${liveRoutesList[src]!!.desData[des]!!["Req"]!!.toInt()}" +
-                        "got: ${liveRoutesList[src]!!.desData[des]!!["Got"]!!.toInt()}")
+                val req = liveRoutesList[src]!!.desData[des]!!["Req"]!!.toInt()
+                val got = liveRoutesList[src]!!.desData[des]!!["Got"]!!.toInt()
+                Log.d(TAG, "req: ${req}, got: ${got}")
 
-                if ((liveRoutesList[src]!!.desData[des]!!["Req"]!!.toInt() -
-                            liveRoutesList[src]!!.desData[des]!!["Got"]!!.toInt()) > 0
-                ) {
+                //check if the bidd route is still available in the live route list
+                if ((req - got) > 0) {
                     updateRouteItem(src = src, des = des,
-                        newGot = liveRoutesList[src]!!.desData[des]!!["Got"]!!.toInt() + 1)
+                        newGot = got + 1)
                     val currTime = CurrDateTimeInMillis()
+
+                    //check to see if the current request falls in bonus time
                     if ((currTime >= LiveBonusTimeInfo.value!!.StartTime) &&
                         (currTime < LiveBonusTimeInfo.value!!.EndTime)
                     ) {
@@ -541,7 +566,7 @@ object UnionAdminRepo {
                                 " for: ${changedEntry}")
                         StartTimerForLiveAuctionListItem(changedEntry)
                     } else {
-                        //update live auction list item by closing this entry
+                        //if not, then update live auction list item by closing this entry
                         closeLiveAuctionListItem(changedEntry)
                     }
                 }
@@ -591,8 +616,8 @@ object UnionAdminRepo {
                                     val executionTime = measureTimeMillis {
                                         val job = async {
                                             Log.d(TAG,
-                                                "before update routes: ${LiveAuctionList.value!![doc.document.id]!!}")
-                                            updateRoutesListOnBidClose(LiveAuctionList.value!![doc.document.id]!!)
+                                                "before update routes: ${liveAuctionList[doc.document.id]!!}")
+                                            updateRoutesListOnBidClose(liveAuctionList[doc.document.id]!!)
                                         }
                                         job.await()
                                     }
@@ -634,6 +659,77 @@ object UnionAdminRepo {
                 routes!!.forEach {
                     if (it.id != "DummyDoc") {
                         splittedWords = it.id.split("-")
+                        src = splittedWords[0].replace('_', ' ')
+                        des = splittedWords[1].replace('_', ' ')
+                        data = splittedWords[2]
+                        value = it.get("Value").toString()
+                        updateLiveRouteList(src, des, data, value)
+                        Log.w(TAG, "Updated list for ${it.id} = ${it.data}")
+                    }
+                }
+                Log.d(TAG, "Fully updated live routes list ${liveRoutesList}")
+                LiveRoutesList.value = liveRoutesList
+            }
+        }
+    }
+
+    private fun getDesDataDTO(data: String, value: String): HashMap<String, String> {
+        val desData = HashMap<String, String>()
+        when (data) {
+            "Req" -> {
+                desData["Req"] = value
+                desData["Got"] = "0"
+                desData["Rate"] = "0"
+            }
+            "Got" -> {
+                desData["Req"] = "0"
+                desData["Got"] = value
+                desData["Rate"] = "0"
+            }
+            "Rate" -> {
+                desData["Req"] = "0"
+                desData["Got"] = "0"
+                desData["Rate"] = value
+            }
+        }
+        return desData
+    }
+
+    private fun updateLiveRouteList(src: String, des: String, data: String, value: String) {
+        if (liveRoutesList.containsKey(src)) {
+            //check if this mandi destination has already been added
+            if (liveRoutesList[src]!!.desData.containsKey(des)) {
+                liveRoutesList[src]!!.desData[des]!![data] = value
+            } else {
+                liveRoutesList[src]!!.desData[des] = getDesDataDTO(data, value)
+            }
+        } else {
+            liveRoutesList[src] = LiveRoutesListItemDTO(
+                desData = hashMapOf(
+                    des to getDesDataDTO(data, value)
+                )
+            )
+        }
+    }
+
+
+
+    /*fun fetchLiveRoutesList() {
+        val coll = firestoreDb.collection(LIVE_ROUTES_LIST)
+        coll.addSnapshotListener { routes, error ->
+            if (error != null) {
+                Log.w(
+                    TAG, "Failed to update the live routes list"
+                )
+            } else {
+                var src: String *//*Mandi*//*
+                var des: String *//*Destination*//*
+                var data: String *//*Represents specifier for Rate, Requirement or Got*//*
+                var value: String *//*Contains the value of the specified specifier*//*
+                var splittedWords: List<String>
+                routes!!.forEach {
+                    if (it.id != "DummyDoc") {
+                        splittedWords = it.id.split("-")
                         src = splittedWords[0]
                         des = splittedWords[1]
                         data = splittedWords[2]
@@ -643,7 +739,7 @@ object UnionAdminRepo {
                                 if (liveRoutesList.containsKey(src)) {
                                     liveRoutesList[src]!!.desData[des]!![data] = value
                                 } else {
-                                    liveRoutesList[src] = LiveRoutesListItem(
+                                    liveRoutesList[src] = LiveRoutesListItemDTO(
                                         desData = hashMapOf(
                                             des to hashMapOf(
                                                 "Req" to "",
@@ -659,7 +755,7 @@ object UnionAdminRepo {
                                 if (liveRoutesList.containsKey(src)) {
                                     liveRoutesList[src]!!.desData[des]!![data] = value
                                 } else {
-                                    liveRoutesList[src] = LiveRoutesListItem(
+                                    liveRoutesList[src] = LiveRoutesListItemDTO(
                                         desData = hashMapOf(
                                             des to hashMapOf(
                                                 "Req" to value,
@@ -674,7 +770,7 @@ object UnionAdminRepo {
                                 if (liveRoutesList.containsKey(src)) {
                                     liveRoutesList[src]!!.desData[des]!![data] = value
                                 } else {
-                                    liveRoutesList[src] = LiveRoutesListItem(
+                                    liveRoutesList[src] = LiveRoutesListItemDTO(
                                         desData = hashMapOf(
                                             des to hashMapOf(
                                                 "Req" to "",
@@ -692,7 +788,7 @@ object UnionAdminRepo {
             }
             LiveRoutesList.value = liveRoutesList
         }
-    }
+    }*/
 
     suspend fun saveLiveAuctionList() {
         val dataToUpload = HashMap<String, HistoryAuctionListItemDTO>()

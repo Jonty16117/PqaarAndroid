@@ -19,10 +19,7 @@ import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.fetchLiveRoutesList
 import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.fetchLiveTruckDataList
 import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.fetchSchAuctionsInfo
 import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.fetchTruckOwner
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlin.system.measureTimeMillis
 
 class TruckOwnerViewModel : ViewModel() {
@@ -45,7 +42,11 @@ class TruckOwnerViewModel : ViewModel() {
     }
 
     suspend fun bookRoute(truckNo: String, src: String, des: String) {
-        closeBid(truckNo, src, des)
+        GlobalScope.launch(Dispatchers.IO) {
+            val job = async { closeBid(truckNo, src, des) }
+            job.await()
+        }
+
     }
 
     suspend fun refreshTruckOwnerData() {
@@ -100,7 +101,7 @@ class TruckOwnerViewModel : ViewModel() {
         return LiveBonusTimeInfo
     }
 
-    fun getLiveRoutesList(): MutableLiveData<HashMap<String, LiveRoutesListItem>> {
+    fun getLiveRoutesList(): MutableLiveData<HashMap<String, LiveRoutesListItemDTO>> {
         return LiveRoutesList
     }
 

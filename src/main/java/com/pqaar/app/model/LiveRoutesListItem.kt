@@ -1,21 +1,6 @@
 package com.pqaar.app.model
 
-/**
- * Mandi:
- *     <LiveRoutesListItem>
- *     Destination:
- *         Req: <Trucks required>
- *         Got: <Trucks filled>
- *         Rate: <Rate of this route>
- */
+data class LiveRoutesListItem(val Mandi: String, val Routes: ArrayList<RouteDestination>) {
+    data class RouteDestination(var Des: String, var Req: Int, var Got: Int, var Rate: Int)
+}
 
-data class LiveRoutesListItem(
-    var desData: HashMap<String, HashMap<String, String>> = HashMap()
-)
-
-/*data class LiveRoutesListItem(
-    var des: String = "",
-    var rate: Int = -1,
-    var req: Int = -1,
-    var got: Int = -1,
-    )*/

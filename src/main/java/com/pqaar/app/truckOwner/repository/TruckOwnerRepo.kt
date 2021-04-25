@@ -42,12 +42,12 @@ object TruckOwnerRepo {
     private val auth = FirebaseAuth.getInstance()
 
     private var truckOwnerLiveData = TruckOwner()
-    private var liveRoutesList = HashMap<String, LiveRoutesListItem>()
+    private var liveRoutesList = HashMap<String, LiveRoutesListItemDTO>()
     private var liveAuctionList = HashMap<String, LiveAuctionListItem>()
     private val liveTruckDataList = HashMap<String, LiveTruckDataListItem>()
 
     val TruckOwnerLiveData = MutableLiveData<TruckOwner>()
-    val LiveRoutesList = MutableLiveData<HashMap<String, LiveRoutesListItem>>()
+    val LiveRoutesList = MutableLiveData<HashMap<String, LiveRoutesListItemDTO>>()
     val LiveAuctionList = MutableLiveData<HashMap<String, LiveAuctionListItem>>()
     val LiveTruckDataList = MutableLiveData<HashMap<String, LiveTruckDataListItem>>()
     val LiveAuctionStatus = MutableLiveData<String>()
@@ -91,63 +91,56 @@ object TruckOwnerRepo {
                 routes!!.forEach {
                     if (it.id != "DummyDoc") {
                         splittedWords = it.id.split("-")
-                        src = splittedWords[0]
-                        des = splittedWords[1]
+                        src = splittedWords[0].replace('_', ' ')
+                        des = splittedWords[1].replace('_', ' ')
                         data = splittedWords[2]
                         value = it.get("Value").toString()
-                        when (data) {
-                            "Rate" -> {
-                                if (liveRoutesList.containsKey(src)) {
-                                    liveRoutesList[src]!!.desData[des]!![data] = value
-                                } else {
-                                    liveRoutesList[src] = LiveRoutesListItem(
-                                        desData = hashMapOf(
-                                            des to hashMapOf(
-                                                "Req" to "",
-                                                "Got" to "",
-                                                "Rate" to value
-                                            )
-                                        )
-                                    )
-                                }
-
-                            }
-                            "Req" -> {
-                                if (liveRoutesList.containsKey(src)) {
-                                    liveRoutesList[src]!!.desData[des]!![data] = value
-                                } else {
-                                    liveRoutesList[src] = LiveRoutesListItem(
-                                        desData = hashMapOf(
-                                            des to hashMapOf(
-                                                "Req" to value,
-                                                "Got" to "",
-                                                "Rate" to ""
-                                            )
-                                        )
-                                    )
-                                }
-                            }
-                            "Got" -> {
-                                if (liveRoutesList.containsKey(src)) {
-                                    liveRoutesList[src]!!.desData[des]!![data] = value
-                                } else {
-                                    liveRoutesList[src] = LiveRoutesListItem(
-                                        desData = hashMapOf(
-                                            des to hashMapOf(
-                                                "Req" to "",
-                                                "Got" to value,
-                                                "Rate" to ""
-                                            )
-                                        )
-                                    )
-                                }
-                            }
-                        }
+                        updateLiveRouteList(src, des, data, value)
                         Log.w(TAG, "Updated list for ${it.id} = ${it.data}")
                     }
                 }
+                Log.d(TAG, "Fully updated live routes list ${liveRoutesList}")
+                LiveRoutesList.value = liveRoutesList
             }
-            LiveRoutesList.value = liveRoutesList
+        }
+    }
+
+    private fun getDesDataDTO(data: String, value: String): HashMap<String, String> {
+        val desData = HashMap<String, String>()
+        when (data) {
+            "Req" -> {
+                desData["Req"] = value
+                desData["Got"] = "0"
+                desData["Rate"] = "0"
+            }
+            "Got" -> {
+                desData["Req"] = "0"
+                desData["Got"] = value
+                desData["Rate"] = "0"
+            }
+            "Rate" -> {
+                desData["Req"] = "0"
+                desData["Got"] = "0"
+                desData["Rate"] = value
+            }
+        }
+        return desData
+    }
+
+    private fun updateLiveRouteList(src: String, des: String, data: String, value: String) {
+        if (liveRoutesList.containsKey(src)) {
+            //check if this mandi destination has already been added
+            if (liveRoutesList[src]!!.desData.containsKey(des)) {
+                liveRoutesList[src]!!.desData[des]!![data] = value
+            } else {
+                liveRoutesList[src]!!.desData[des] = getDesDataDTO(data, value)
+            }
+        } else {
+            liveRoutesList[src] = LiveRoutesListItemDTO(
+                desData = hashMapOf(
+                    des to getDesDataDTO(data, value)
+                )
+            )
         }
     }
 
@@ -182,7 +175,9 @@ object TruckOwnerRepo {
 
     suspend fun closeBid(truckNo: String, src: String, des: String) {
         val dataToUpdate = hashMapOf<String, Any>("src" to src, "des" to des)
-        val currListNo = LiveTruckDataList.value!![truckNo]!!.data["CurrentListNo"]
+        Log.d(TAG, "Request to close the bid for truck ${truckNo}")
+        Log.d(TAG, "livetruckdatalist in close bid fun: ${liveTruckDataList}")
+        val currListNo = liveTruckDataList[truckNo]!!.data["CurrentListNo"]
         Log.d(TAG, "Closing the bid for ${truckNo} at list no ${currListNo}")
         firestoreDb.collection(LIVE_AUCTION_LIST)
             .document(currListNo!!)
@@ -198,9 +193,8 @@ object TruckOwnerRepo {
     }
 
     fun fetchLiveTruckDataList() {
-        if (TruckOwnerLiveData.value != null) {
-
-            TruckOwnerLiveData.value!!.Trucks.forEach{ truck ->
+        if (truckOwnerLiveData.Trucks.isNotEmpty()) {
+            truckOwnerLiveData.Trucks.forEach{ truck ->
                 val childEventListener = object : ChildEventListener {
                     override fun onChildAdded(
                         dataSnapshot: DataSnapshot,

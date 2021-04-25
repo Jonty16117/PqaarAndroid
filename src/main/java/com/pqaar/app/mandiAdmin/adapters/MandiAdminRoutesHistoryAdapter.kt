@@ -26,12 +26,12 @@ class MandiAdminRoutesHistoryAdapter(private var groupedItem: MandiRoutesHistory
         return when (viewType) {
             VIEW_TYPE_HEADER -> {
                 ViewHolder.HeaderViewHolder(
-                    layoutInflater.inflate(R.layout.madni_admin_routes_history_item, parent, false)
+                    layoutInflater.inflate(R.layout.mandi_admin_routes_history_item, parent, false)
                 )
             }
             else -> {
                 ViewHolder.ItemViewHolder(
-                    layoutInflater.inflate(R.layout.madni_admin_routes_history_sub_item,
+                    layoutInflater.inflate(R.layout.mandi_admin_routes_history_sub_item,
                         parent,
                         false)
                 )
@@ -66,9 +66,9 @@ class MandiAdminRoutesHistoryAdapter(private var groupedItem: MandiRoutesHistory
         }
     }
 
-    fun setItems(newData: MandiRoutesHistoryItem) {
+    /*fun setItems(newData: MandiRoutesHistoryItem) {
         groupedItem = newData
-    }
+    }*/
 
     private fun onHeaderClicked() = object : View.OnClickListener {
         override fun onClick(view: View?) {

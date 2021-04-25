@@ -8,7 +8,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProviders
 import com.pqaar.app.R
-import com.pqaar.app.model.LiveRoutesListItem
+import com.pqaar.app.model.LiveRoutesListItemDTO
 import com.pqaar.app.utils.TimeConversions.CurrDateTimeInMillis
 import com.pqaar.app.unionAdmin.viewModel.UnionAdminViewModel
 
@@ -89,7 +89,7 @@ class UnionAdminDashboard : AppCompatActivity() {
 
 
 
-        val demoList = ArrayList<LiveRoutesListItem>()
+        val demoList = ArrayList<LiveRoutesListItemDTO>()
 
         initAuc.setOnClickListener {
             if (model.getLiveTruckDataList().value.isNullOrEmpty()) {

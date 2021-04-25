@@ -3,10 +3,7 @@ package com.pqaar.app.unionAdmin.viewModel
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.pqaar.app.model.BonusTime
-import com.pqaar.app.model.LiveAuctionListItem
-import com.pqaar.app.model.LiveRoutesListItem
-import com.pqaar.app.model.LiveTruckDataListItem
+import com.pqaar.app.model.*
 import com.pqaar.app.unionAdmin.repository.UnionAdminRepo.LiveAuctionEndTime
 import com.pqaar.app.unionAdmin.repository.UnionAdminRepo.LiveAuctionList
 import com.pqaar.app.unionAdmin.repository.UnionAdminRepo.LiveAuctionStartTime
@@ -233,7 +230,7 @@ class UnionAdminViewModel : ViewModel() {
     /**
      * Live data getters
      */
-    fun getLivePropRoutesList(): MutableLiveData<HashMap<String, MutableMap<String, Any>>> {
+    fun getLivePropRoutesList(): MutableLiveData<ArrayList<LivePropRoutesListItem>> {
         return PropRoutesList
     }
 
@@ -257,7 +254,7 @@ class UnionAdminViewModel : ViewModel() {
         return LiveAuctionEndTime
     }
 
-    fun getLiveRoutesList(): MutableLiveData<HashMap<String, LiveRoutesListItem>> {
+    fun getLiveRoutesList(): MutableLiveData<HashMap<String, LiveRoutesListItemDTO>> {
         return LiveRoutesList
     }
 

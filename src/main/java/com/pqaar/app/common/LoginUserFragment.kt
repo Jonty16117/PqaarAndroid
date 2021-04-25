@@ -10,6 +10,7 @@ import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
 import com.pqaar.app.R
 import com.pqaar.app.mandiAdmin.view.MandiAdminDashboard
+import com.pqaar.app.truckOwner.view.TruckOwnerDashboardActivity
 import com.pqaar.app.truckOwner.view.TruckOwnerDashboardTest
 import com.pqaar.app.unionAdmin.view.UnionAdminDashboard
 
@@ -95,7 +96,7 @@ class LoginUserFragment : Fragment() {
                 "truck-owner" -> {
                     startActivity(Intent(
                         context,
-                        TruckOwnerDashboardTest::class.java
+                        TruckOwnerDashboardActivity::class.java
                     ).apply { putExtra("null", "null") })
                 }
                 else -> {
