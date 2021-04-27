@@ -10,6 +10,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.pqaar.app.model.*
+import com.pqaar.app.unionAdmin.repository.UnionAdminRepo
 import com.pqaar.app.utils.DbPaths
 import com.pqaar.app.utils.DbPaths.FIRST_NAME
 import com.pqaar.app.utils.DbPaths.LAST_NAME
@@ -44,12 +45,12 @@ object TruckOwnerRepo {
     private var truckOwnerLiveData = TruckOwner()
     private var liveRoutesList = HashMap<String, LiveRoutesListItemDTO>()
     private var liveAuctionList = HashMap<String, LiveAuctionListItem>()
-    private val liveTruckDataList = HashMap<String, LiveTruckDataListItem>()
+    private val liveTruckDataList = HashMap<String, TruckHistory>()
 
     val TruckOwnerLiveData = MutableLiveData<TruckOwner>()
     val LiveRoutesList = MutableLiveData<HashMap<String, LiveRoutesListItemDTO>>()
     val LiveAuctionList = MutableLiveData<HashMap<String, LiveAuctionListItem>>()
-    val LiveTruckDataList = MutableLiveData<HashMap<String, LiveTruckDataListItem>>()
+    val LiveTruckDataList = MutableLiveData<HashMap<String, TruckHistory>>()
     val LiveAuctionStatus = MutableLiveData<String>()
     val LiveAuctionStartTime = MutableLiveData<Long>()
     val LiveAuctionEndTime = MutableLiveData<Long>()
@@ -166,7 +167,7 @@ object TruckOwnerRepo {
                         )
                     }
                 }
-                LiveAuctionList.value = liveAuctionList
+                LiveAuctionList.postValue(liveAuctionList)
             }
             Log.w(
                 TAG, "Updated live auction list: ${LiveAuctionList.value}")
@@ -177,10 +178,10 @@ object TruckOwnerRepo {
         val dataToUpdate = hashMapOf<String, Any>("src" to src, "des" to des)
         Log.d(TAG, "Request to close the bid for truck ${truckNo}")
         Log.d(TAG, "livetruckdatalist in close bid fun: ${liveTruckDataList}")
-        val currListNo = liveTruckDataList[truckNo]!!.data["CurrentListNo"]
+        val currListNo = liveTruckDataList[truckNo]!!.CurrentListNo
         Log.d(TAG, "Closing the bid for ${truckNo} at list no ${currListNo}")
         firestoreDb.collection(LIVE_AUCTION_LIST)
-            .document(currListNo!!)
+            .document(currListNo)
             .update(dataToUpdate)
             .addOnSuccessListener {
                 Log.d(TAG, "Request to close the bid for truck ${truckNo} " +
@@ -195,6 +196,7 @@ object TruckOwnerRepo {
     fun fetchLiveTruckDataList() {
         if (truckOwnerLiveData.Trucks.isNotEmpty()) {
             truckOwnerLiveData.Trucks.forEach{ truck ->
+
                 val childEventListener = object : ChildEventListener {
                     override fun onChildAdded(
                         dataSnapshot: DataSnapshot,
@@ -202,27 +204,44 @@ object TruckOwnerRepo {
                     ) {
                         Log.d(TAG, "Updated truck ${dataSnapshot.key.toString()} " +
                                 "status: ${dataSnapshot}")
+                        //if the current list does not have any entry for this truck, then initialize
+                        //this truck by making its entry in the list
                         if (!liveTruckDataList.containsKey(truck)) {
-                            liveTruckDataList[truck] = LiveTruckDataListItem(truckNo = truck)
+                            liveTruckDataList[truck] = TruckHistory(TruckNo = truck)
+//                            liveTruckDataList[truck] = LiveTruckDataListItemDTO(truckNo = truck)
                         }
+
                         when (dataSnapshot.key.toString()) {
                             "CurrentListNo" -> {
                                 liveTruckDataList[truck]!!
-                                    .data["CurrentListNo"] = dataSnapshot.value.toString()
+                                    .CurrentListNo = dataSnapshot.value.toString()
                             }
                             "Owner" -> {
                                 liveTruckDataList[truck]!!
-                                    .data["Owner"] = dataSnapshot.value.toString()
+                                    .Owner = dataSnapshot.value.toString()
                             }
                             "Status" -> {
                                 liveTruckDataList[truck]!!
-                                    .data["Status"] = dataSnapshot.value.toString()
+                                    .Status = dataSnapshot.value.toString()
                             }
                             "Timestamp" -> {
                                 liveTruckDataList[truck]!!
-                                    .data["Timestamp"] = dataSnapshot.value.toString()
+                                    .Timestamp = dataSnapshot.value.toString()
+                            }
+                            "Source" -> {
+                                val oldRouteValue = liveTruckDataList[truck]!!.Route
+                                val newRouteValue = Pair(dataSnapshot.value.toString(), oldRouteValue.second)
+                                liveTruckDataList[truck]!!
+                                    .Route = newRouteValue
+                            }
+                            "Destination" -> {
+                                val oldRouteValue = liveTruckDataList[truck]!!.Route
+                                val newRouteValue = Pair(oldRouteValue.first, dataSnapshot.value.toString())
+                                liveTruckDataList[truck]!!
+                                    .Route = newRouteValue
                             }
                         }
+
                         LiveTruckDataList.value = liveTruckDataList
                     }
 
@@ -230,26 +249,41 @@ object TruckOwnerRepo {
                         Log.d(TAG, "Truck Status updated: ${dataSnapshot.value}")
 
                         if (!liveTruckDataList.containsKey(truck)) {
-                            liveTruckDataList[truck] = LiveTruckDataListItem(truckNo = truck)
+                            liveTruckDataList[truck] = TruckHistory(TruckNo = truck)
+//                            liveTruckDataList[truck] = LiveTruckDataListItemDTO(truckNo = truck)
                         }
+
                         when (dataSnapshot.key.toString()) {
                             "CurrentListNo" -> {
                                 liveTruckDataList[truck]!!
-                                    .data["CurrentListNo"] = dataSnapshot.value.toString()
+                                    .CurrentListNo = dataSnapshot.value.toString()
                             }
                             "Owner" -> {
                                 liveTruckDataList[truck]!!
-                                    .data["Owner"] = dataSnapshot.value.toString()
+                                    .Owner = dataSnapshot.value.toString()
                             }
                             "Status" -> {
                                 liveTruckDataList[truck]!!
-                                    .data["Status"] = dataSnapshot.value.toString()
+                                    .Status = dataSnapshot.value.toString()
                             }
                             "Timestamp" -> {
                                 liveTruckDataList[truck]!!
-                                    .data["Timestamp"] = dataSnapshot.value.toString()
+                                    .Timestamp = dataSnapshot.value.toString()
+                            }
+                            "Source" -> {
+                                val oldRouteValue = liveTruckDataList[truck]!!.Route
+                                val newRouteValue = Pair(dataSnapshot.value.toString(), oldRouteValue.second)
+                                liveTruckDataList[truck]!!
+                                    .Route = newRouteValue
+                            }
+                            "Destination" -> {
+                                val oldRouteValue = liveTruckDataList[truck]!!.Route
+                                val newRouteValue = Pair(oldRouteValue.first, dataSnapshot.value.toString())
+                                liveTruckDataList[truck]!!
+                                    .Route = newRouteValue
                             }
                         }
+
                         LiveTruckDataList.value = liveTruckDataList
                     }
 
@@ -271,7 +305,7 @@ object TruckOwnerRepo {
                         )
                     }
                 }
-                Log.w(TAG, "Updated live truck data list")
+                Log.w(TAG, "Updated live truck data list: ${liveTruckDataList}")
                 firebaseDb.reference
                     .child(LIVE_TRUCK_DATA_LIST)
                     .child(truck.trim())
@@ -279,6 +313,7 @@ object TruckOwnerRepo {
             }
         }
     }
+
 
     fun fetchSchAuctionsInfo() {
         firestoreDb.collection(DbPaths.AUCTIONS_INFO)

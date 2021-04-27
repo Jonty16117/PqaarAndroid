@@ -17,15 +17,23 @@
             android:id="@+id/textView13"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/custom_tab_bg"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
-            android:text="@string/routes"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="Live Routes List"
+            android:textAllCaps="true"
             android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="normal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText,UnusedAttribute" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"

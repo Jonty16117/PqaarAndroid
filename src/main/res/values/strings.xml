@@ -36,7 +36,7 @@
     <string name="date_title">Date</string>
     <string name="date">29/08/2021</string>
     <string name="timer">00:09</string>
-    <string name="previous_text">Previous</string>
+    <string name="previous_text">Previous:</string>
     <string name="previous_no">696</string>
     <string name="bid_no_text">Bid no.</string>
     <string name="allEnglishCharacters">abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ</string>

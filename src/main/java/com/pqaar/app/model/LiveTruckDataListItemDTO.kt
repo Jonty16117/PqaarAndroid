@@ -8,6 +8,8 @@
  * Owner: String
  * CurrentListNo: String
  * Timestamp: String
+ * Source: String
+ * Destination: String
  */
-data class LiveTruckDataListItem(var truckNo: String = "",
-                                 var data: HashMap<String, String> = HashMap())
+data class LiveTruckDataListItemDTO(var truckNo: String = "",
+                                    var data: HashMap<String, String> = HashMap())

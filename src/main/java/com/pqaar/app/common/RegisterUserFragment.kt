@@ -13,7 +13,7 @@ import com.google.firebase.auth.*
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.pqaar.app.R
-import com.pqaar.app.truckOwner.view.TruckOwnerDashboardActivity
+import com.pqaar.app.truckOwner.view.TruckOwnerDashboard
 
 
 class RegisterUserFragment : Fragment() {
@@ -129,7 +129,7 @@ class RegisterUserFragment : Fragment() {
                     startActivity(
                         Intent(
                             context,
-                            TruckOwnerDashboardActivity::class.java
+                            TruckOwnerDashboard::class.java
                         )
                             .apply { putExtra("null", "null") })
                 } else {

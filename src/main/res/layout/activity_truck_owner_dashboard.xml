@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    tools:context=".truckOwner.view.TruckOwnerDashboardActivity">
+    tools:context=".truckOwner.view.TruckOwnerDashboard">
 
     <androidx.constraintlayout.motion.widget.MotionLayout
         android:id="@+id/motion_layout"
@@ -17,7 +17,7 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/header"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="wrap_content"
             android:padding="0dp"
             app:cardBackgroundColor="@color/colorPrimaryDark"
             app:cardCornerRadius="20dp"
@@ -30,7 +30,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -73,8 +73,8 @@
                     android:gravity="bottom"
                     android:text="@string/dashboard_current_status"
                     app:layout_constraintBottom_toTopOf="@+id/title_text"
-                    app:layout_constraintEnd_toEndOf="@+id/title_text"
-                    app:layout_constraintStart_toStartOf="@+id/title_text"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
@@ -85,26 +85,36 @@
                     android:background="@android:color/transparent"
                     android:gravity="center"
                     android:text="@string/dashboard_time"
-                    app:layout_constraintBottom_toTopOf="@+id/guideline4"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/title_text2" />
+
+                <View
+                    android:id="@+id/divider13"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?android:attr/listDivider"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/title_text" />
 
                 <TextView
                     android:id="@+id/title_text4"
                     style="@style/HeadingTextDark"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginLeft="32dp"
                     android:background="@android:color/transparent"
                     android:gravity="center"
                     android:text="@string/route_count"
                     android:textColor="@color/lightPurple"
                     android:textSize="35sp"
+                    app:layout_constraintEnd_toStartOf="@+id/title_text3"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/guideline4" />
+                    app:layout_constraintTop_toBottomOf="@+id/divider13" />
 
                 <TextView
                     android:id="@+id/title_text5"
@@ -117,7 +127,10 @@
                     android:textColor="@color/lightPurple"
                     android:textSize="35sp"
                     app:layout_constraintEnd_toStartOf="@+id/title_text6"
-                    app:layout_constraintTop_toTopOf="@+id/guideline4" />
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="@+id/guideline5"
+                    app:layout_constraintTop_toBottomOf="@+id/divider13" />
 
                 <TextView
                     android:id="@+id/title_text8"
@@ -129,8 +142,12 @@
                     android:text="@string/route_count"
                     android:textColor="@color/lightPurple"
                     android:textSize="35sp"
-                    app:layout_constraintEnd_toStartOf="@+id/guideline5"
-                    app:layout_constraintTop_toTopOf="@+id/guideline4" />
+                    app:layout_constraintEnd_toStartOf="@+id/title_text9"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toEndOf="@+id/title_text3"
+                    app:layout_constraintStart_toStartOf="@+id/guideline4"
+                    app:layout_constraintTop_toBottomOf="@+id/divider13" />
 
                 <TextView
                     android:id="@+id/title_text3"
@@ -146,14 +163,16 @@
                     android:textColor="@color/lightPurple"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="@+id/title_text4"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline4"
+                    app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/title_text4" />
 
                 <TextView
                     android:id="@+id/title_text6"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="32dp"
-                    android:layout_marginRight="32dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginLeft="2dp"
                     android:layout_marginBottom="8dp"
                     android:background="@android:color/transparent"
                     android:fontFamily="sans-serif-thin"
@@ -162,7 +181,9 @@
                     android:textColor="@color/lightPurple"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="@+id/title_text5"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toEndOf="@+id/title_text5" />
 
                 <TextView
                     android:id="@+id/title_text9"
@@ -178,18 +199,9 @@
                     android:textColor="@color/lightPurple"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="@+id/title_text8"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline5"
+                    app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toEndOf="@+id/title_text8" />
-
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/guideline4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintGuide_begin="102dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guideline5"
@@ -199,7 +211,31 @@
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintGuide_begin="176dp"
+                    app:layout_constraintGuide_percent="0.66"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="200dp"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintGuide_percent="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="200dp"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintGuide_percent="0.33"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -210,19 +246,20 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/header">
 
             <TextView
-                android:id="@+id/history"
+                android:id="@+id/my_trucks"
                 style="@style/SmallHeadingDarkBold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:background="@android:color/transparent"
-                android:text="@string/history"
+                android:text="My Trucks"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -231,16 +268,20 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/historyRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:layout_marginTop="16dp"
                 android:background="@android:color/transparent"
                 android:orientation="vertical"
-                android:paddingBottom="100dp"
+                android:paddingBottom="30dp"
                 android:scrollbarSize="0dp"
                 android:scrollbars="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/history" />
+                app:layout_constraintTop_toBottomOf="@id/my_trucks"
+                tools:listitem="@layout/history_truck_item">
+
+            </androidx.recyclerview.widget.RecyclerView>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -256,13 +297,6 @@
         app:behavior_peekHeight="50dp"
         app:layout_behavior="@string/bottom_sheet_behavior"
         tools:ignore="UnusedAttribute">
-
-        <!--<com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@android:color/transparent" />-->
 
     </com.pqaar.app.utils.BottomSheetViewPager>
 

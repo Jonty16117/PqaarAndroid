@@ -1,4 +1,4 @@
-package com.pqaar.app.truckOwner.adapters
+ package com.pqaar.app.truckOwner.adapters
 
 import android.app.Activity
 import android.util.Log
@@ -137,6 +137,14 @@ class RouteListAdapter(
             alertDialogSpinner.onItemSelectedListener = this
 
             alertDialogYesBtn.setOnClickListener {
+                //last check before sending the request bid request
+                if(liveRoutesListItem.Routes[position].Got >=
+                    liveRoutesListItem.Routes[position].Got) {
+                    alertDialogBox.dismiss()
+                    Snackbar.make(fragment.view!!, "All routes for this mandi are full!",
+                        Snackbar.LENGTH_LONG).show()
+                }
+
                 GlobalScope.launch(Dispatchers.IO) {
                     val job = async {
                         model.bookRoute(
@@ -154,6 +162,7 @@ class RouteListAdapter(
                 alertDialogBox.dismiss()
             }
             alertDialogBox.show()
+
         }
 
     /**
@@ -241,7 +250,7 @@ class RouteListAdapter(
                 rate.text = rateText
                 progressBar.progress = ((route.Got.toFloat() / route.Req.toFloat()) * 100).toInt()
 
-                if (route.Got != route.Req) {
+                if (route.Got < route.Req) {
                     itemView.setOnClickListener {
                         onClickListener.onClick(it)
                     }

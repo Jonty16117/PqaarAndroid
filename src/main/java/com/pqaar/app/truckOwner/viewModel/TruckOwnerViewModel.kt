@@ -81,7 +81,7 @@ class TruckOwnerViewModel : ViewModel() {
         return TruckOwnerLiveData
     }
 
-    fun getLiveTruckDataList(): MutableLiveData<HashMap<String, LiveTruckDataListItem>> {
+    fun getLiveTruckDataList(): MutableLiveData<HashMap<String, TruckHistory>> {
         return LiveTruckDataList
     }
 

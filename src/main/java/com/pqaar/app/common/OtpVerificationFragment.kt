@@ -14,7 +14,7 @@ import com.google.firebase.FirebaseException
 import com.google.firebase.auth.*
 import com.pqaar.app.R
 import com.pqaar.app.mandiAdmin.view.MandiAdminDashboard
-import com.pqaar.app.truckOwner.view.TruckOwnerDashboardActivity
+import com.pqaar.app.truckOwner.view.TruckOwnerDashboard
 import java.util.concurrent.TimeUnit
 
 
@@ -113,7 +113,7 @@ class OtpVerificationFragment : Fragment() {
             ) { task ->
                 if (task.isSuccessful) {
                     val user = task.result?.user
-                    startActivity(Intent(activity, TruckOwnerDashboardActivity::class.java))
+                    startActivity(Intent(activity, TruckOwnerDashboard::class.java))
 
                 } else {
                     if (task.exception is FirebaseAuthInvalidCredentialsException) {

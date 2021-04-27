@@ -1,33 +1,27 @@
 package com.pqaar.app.truckOwner.view
 
-import android.app.Activity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pqaar.app.R
-import com.pqaar.app.mandiAdmin.adapters.MandiAdminRoutesHistoryAdapter
-import com.pqaar.app.mandiAdmin.viewModel.MandiAdminViewModel
 import com.pqaar.app.model.LiveRoutesListItem
 import com.pqaar.app.model.LiveRoutesListItemDTO
 import com.pqaar.app.truckOwner.adapters.RouteListAdapter
 import com.pqaar.app.truckOwner.viewModel.TruckOwnerViewModel
-import com.squareup.okhttp.Route
 
 class RoutesFragment : Fragment() {
 
     private var liveRoutesList = ArrayList<LiveRoutesListItem>()
-    private val adapterList = ArrayList<RouteListAdapter>()
+    private var adapterList = ArrayList<RouteListAdapter>()
     private lateinit var alertDialogBox: AlertDialog
 
     private lateinit var alertDialogMandi: TextView
@@ -40,7 +34,7 @@ class RoutesFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        return inflater.inflate(R.layout.fragment_routes, container, false)
+        return inflater.inflate(R.layout.fragment_live_routes_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -59,15 +53,13 @@ class RoutesFragment : Fragment() {
         model.getLiveRoutesList().observe(this, {
             refreshLiveRoutesList(it)
             adapterList.forEach { adapter -> concatAdapter.removeAdapter(adapter) }
-            adapterList.clear()
+            adapterList = ArrayList()
             liveRoutesList.forEachIndexed { index, liveRoutesListItem ->
                 adapterList.add(RouteListAdapter(liveRoutesListItem, index, requireActivity(), this))
             }
             adapterList.forEach { adapter -> concatAdapter.addAdapter(adapter) }
             concatAdapter.notifyDataSetChanged()
         })
-
-
     }
 
     private fun refreshLiveRoutesList(liveRoutesListDTO: HashMap<String, LiveRoutesListItemDTO>) {
@@ -88,30 +80,4 @@ class RoutesFragment : Fragment() {
             ))
         }
     }
-
-    /*private fun onChildClicked() = object : View.OnClickListener {
-        override fun onClick(view: View?) {
-            alertDialogBox.show()
-        }
-    }*/
-
-    /*private fun inflateAlertBoxDialog() {
-        val alertDialogBoxBuilder = AlertDialog.Builder(requireActivity())
-        val alertDialogBoxView = LayoutInflater.from(requireActivity())
-            .inflate(R.layout.close_bid_alert_dialog_box, null)
-        alertDialogBox = alertDialogBoxBuilder.create()
-        alertDialogBox.setCancelable(false)
-        alertDialogBox.setView(alertDialogBoxView)
-
-        alertDialogMandi = alertDialogBoxView.findViewById<TextView>(R.id.textView36)
-        alertDialogGodown = alertDialogBoxView.findViewById<TextView>(R.id.textView26)
-        alertDialogTruckNo = alertDialogBoxView.findViewById<TextView>(R.id.textView30)
-        alertDialogYesBtn = alertDialogBoxView.findViewById<Button>(R.id.button5)
-        alertDialogNoBtn = alertDialogBoxView.findViewById<Button>(R.id.button6)
-
-        alertDialogNoBtn.setOnClickListener {
-            alertDialogBox.dismiss()
-        }
-
-    }*/
 }

@@ -15,7 +15,7 @@
         <Constraint
             android:id="@+id/header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintTop_toTopOf="parent"
             motion:layout_constraintStart_toStartOf="parent" />
@@ -29,12 +29,5 @@
             motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintStart_toStartOf="parent"
             motion:layout_constraintBottom_toTopOf="parent" />
-        <Constraint
-            android:id="@+id/recyclerView"
-            motion:layout_constraintEnd_toEndOf="parent"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            motion:layout_constraintTop_toBottomOf="@+id/header"
-            motion:layout_constraintStart_toStartOf="parent" />
     </ConstraintSet>
 </MotionScene>

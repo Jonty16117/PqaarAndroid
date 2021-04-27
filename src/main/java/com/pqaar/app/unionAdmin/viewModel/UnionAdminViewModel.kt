@@ -234,7 +234,7 @@ class UnionAdminViewModel : ViewModel() {
         return PropRoutesList
     }
 
-    fun getLiveTruckDataList(): MutableLiveData<HashMap<String, LiveTruckDataListItem>> {
+    fun getLiveTruckDataList(): MutableLiveData<HashMap<String, LiveTruckDataListItemDTO>> {
         return LiveTruckDataList
     }
 

@@ -118,7 +118,7 @@ class UnionAdminDashboard : AppCompatActivity() {
                 var perUserBidDurationInMillis = 25000L
                 model.initializeAuction(
                     status = "Scheduled",
-                    startTime = liveAuctionStartTime,
+                    startTime = CurrDateTimeInMillis(),
                     perUserBidDurationInMillis = perUserBidDurationInMillis)
                 Toast.makeText(
                     this,

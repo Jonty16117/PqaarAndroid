@@ -7,7 +7,6 @@ import com.google.firebase.database.*
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.Query
 import com.pqaar.app.model.*
-import com.pqaar.app.truckOwner.repository.TruckOwnerRepo
 import com.pqaar.app.utils.DbPaths.AUCTIONS_INFO
 import com.pqaar.app.utils.DbPaths.AUCTION_BONUS_TIME_INFO
 import com.pqaar.app.utils.DbPaths.AUCTION_LIST_DATA
@@ -38,7 +37,7 @@ object UnionAdminRepo {
     private var propRoutesList = ArrayList<LivePropRoutesListItem>()
     private val truckRequestsLive = HashMap<String, AddTruckRequest>()
     private var liveAuctionList = HashMap<String, LiveAuctionListItem>()
-    private val liveTruckDataList = HashMap<String, LiveTruckDataListItem>()
+    private val liveTruckDataList = HashMap<String, LiveTruckDataListItemDTO>()
     private var liveRoutesList = HashMap<String, LiveRoutesListItemDTO>()
     private var lastAuctionListDTO: ArrayList<Pair<String, HistoryAuctionListItemDTO>> = ArrayList()
     private lateinit var lastOpenLiveList: ArrayList<LiveAuctionListItem>
@@ -50,7 +49,7 @@ object UnionAdminRepo {
     val PropRoutesList = MutableLiveData<ArrayList<LivePropRoutesListItem>>()
     val TruckRequestsLive = MutableLiveData<HashMap<String, AddTruckRequest>>()
     val LiveAuctionList = MutableLiveData<HashMap<String, LiveAuctionListItem>>()
-    val LiveTruckDataList = MutableLiveData<HashMap<String, LiveTruckDataListItem>>()
+    val LiveTruckDataList = MutableLiveData<HashMap<String, LiveTruckDataListItemDTO>>()
     val LiveRoutesList = MutableLiveData<HashMap<String, LiveRoutesListItemDTO>>()
     val LiveAuctionStatus = MutableLiveData<String>()
     val LiveAuctionStartTime = MutableLiveData<Long>()
@@ -168,7 +167,7 @@ object UnionAdminRepo {
                 changedEntry.forEach {
                     data[it.key.toString()] = it.value.toString()
                 }
-                liveTruckDataList[dataSnapshot.key!!] = LiveTruckDataListItem(
+                liveTruckDataList[dataSnapshot.key!!] = LiveTruckDataListItemDTO(
                     dataSnapshot.key!!, data
                 )
                 LiveTruckDataList.value = liveTruckDataList
@@ -183,7 +182,7 @@ object UnionAdminRepo {
                 changedEntry.forEach {
                     data[it.key.toString()] = it.value.toString()
                 }
-                liveTruckDataList[dataSnapshot.key!!] = LiveTruckDataListItem(
+                liveTruckDataList[dataSnapshot.key!!] = LiveTruckDataListItemDTO(
                     dataSnapshot.key!!, data
                 )
                 LiveTruckDataList.value = liveTruckDataList

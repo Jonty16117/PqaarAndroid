@@ -17,7 +17,7 @@
         <activity android:name=".truckOwner.view.ManageTrucksTest" />
         <activity android:name=".mandiAdmin.view.MandiAdminDashboard" />
         <activity android:name=".unionAdmin.view.UnionAdminDashboard" />
-        <activity android:name=".truckOwner.view.TruckOwnerDashboardActivity" />
+        <activity android:name=".truckOwner.view.TruckOwnerDashboard" />
         <activity
             android:name="com.pqaar.app.common.SplashScreen"
             android:theme="@style/SplashScreenTheme">
