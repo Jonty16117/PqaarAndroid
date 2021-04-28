@@ -6,17 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.cardview.widget.CardView
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.pqaar.app.R
-import com.pqaar.app.model.TruckHistory
+import com.pqaar.app.model.LiveTruckDataItem
 import com.pqaar.app.utils.TimeConversions.MillisToTimestamp
 
 class TruckDriverHistoryAdapter(
     private val context: Context,
-    private val truckHistoryList: ArrayList<TruckHistory>,
+    private val truckHistoryList: ArrayList<LiveTruckDataItem>,
 ) :
     RecyclerView.Adapter<TruckDriverHistoryAdapter.TruckHistoryViewHolder>() {
 
@@ -38,7 +36,7 @@ class TruckDriverHistoryAdapter(
     inner class TruckHistoryViewHolder(private val truckItemView: View) :
         RecyclerView.ViewHolder(truckItemView) {
 
-        fun setData(truckHistoryItem: TruckHistory, position: Int) {
+        fun setData(truckHistoryItem: LiveTruckDataItem, position: Int) {
             truckItemView.findViewById<TextView>(R.id.textView9).text = (position + 1).toString()
             truckItemView.findViewById<TextView>(R.id.textView7).text = truckHistoryItem.TruckNo
             truckItemView.findViewById<TextView>(R.id.textView12).text =

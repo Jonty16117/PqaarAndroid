@@ -82,15 +82,15 @@ class TruckOwnerViewModel : ViewModel() {
         fetchAuctionsBonusTimeInfo()
     }
 
+
     /**
      * Getters
      */
-
     fun getTruckOwnerData(): MutableLiveData<TruckOwner> {
         return TruckOwnerLiveData
     }
 
-    fun getLiveTruckDataList(): MutableLiveData<HashMap<String, TruckHistory>> {
+    fun getLiveTruckDataList(): MutableLiveData<HashMap<String, LiveTruckDataItem>> {
         return LiveTruckDataList
     }
 

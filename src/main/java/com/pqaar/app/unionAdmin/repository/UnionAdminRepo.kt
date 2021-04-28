@@ -33,11 +33,13 @@ object UnionAdminRepo {
     private var firestoreDb = FirebaseFirestore.getInstance()
     private var firebaseDb = FirebaseDatabase.getInstance()
 
-//    private var propRoutesList = HashMap<String, MutableMap<String, Any>>()
+    //    private var propRoutesList = HashMap<String, MutableMap<String, Any>>()
     private var propRoutesList = ArrayList<LivePropRoutesListItem>()
     private val truckRequestsLive = HashMap<String, AddTruckRequest>()
     private var liveAuctionList = HashMap<String, LiveAuctionListItem>()
-    private val liveTruckDataList = HashMap<String, LiveTruckDataListItemDTO>()
+
+    //    private val liveTruckDataList = HashMap<String, LiveTruckDataListItemDTO>()
+    private var liveTruckDataList = HashMap<String, LiveTruckDataItem>()
     private var liveRoutesList = HashMap<String, LiveRoutesListItemDTO>()
     private var lastAuctionListDTO: ArrayList<Pair<String, HistoryAuctionListItemDTO>> = ArrayList()
     private lateinit var lastOpenLiveList: ArrayList<LiveAuctionListItem>
@@ -48,7 +50,9 @@ object UnionAdminRepo {
     val PropRoutesList = MutableLiveData<ArrayList<LivePropRoutesListItem>>()
     val TruckRequestsLive = MutableLiveData<HashMap<String, AddTruckRequest>>()
     val LiveAuctionList = MutableLiveData<HashMap<String, LiveAuctionListItem>>()
-    val LiveTruckDataList = MutableLiveData<HashMap<String, LiveTruckDataListItemDTO>>()
+
+    //    val LiveTruckDataList = MutableLiveData<HashMap<String, LiveTruckDataListItemDTO>>()
+    val LiveTruckDataList = MutableLiveData<HashMap<String, LiveTruckDataItem>>()
     val LiveRoutesList = MutableLiveData<HashMap<String, LiveRoutesListItemDTO>>()
     val LiveAuctionStatus = MutableLiveData<String>()
     val LiveAuctionStartTime = MutableLiveData<Long>()
@@ -63,50 +67,52 @@ object UnionAdminRepo {
         firestoreDb
             .collection(MANDI_ROUTES_LIST)
             .addSnapshotListener { snapshots, error ->
-            if (error != null) {
-                Log.w(
-                    TAG, "Failed to update the latest proposed routes lists from" +
-                            "mandis"
-                )
-            } else {
-                /**
-                 * <snapshots>
-                 * MandiSrc:
-                 *     <snapshot>
-                 *     Des:
-                 *         Rate: <rate>
-                 *         Req: <req>
-                 *         Got: <got>
-                 * where snapshots represents MandiSrc
-                 *
-                 */
-                propRoutesList = ArrayList()
-                snapshots!!.forEach {
-                    if (it.id != "DummyDoc") {
-                        val mandiPropList = LivePropRoutesListItem()
-                        //get the entry from the mandi which has the status live on it
-                        it.data.forEach { mandiRoutesData ->
-                            Log.d(TAG,"mandiroutesdata: ${mandiRoutesData}")
-                            val mandiRoutesDataValue = mandiRoutesData.value as HashMap<*, *>
-                            if(mandiRoutesDataValue["Status"] == "Live") {
-                                mandiPropList.Timestamp = mandiRoutesDataValue["Timestamp"].toString().toLong()
-                                mandiPropList.Mandi = it.id
-                                val routes = ArrayList<Pair<String, Int>>()
-                                mandiRoutesDataValue.forEach { route ->
-                                    if (route.key.toString() != "Status" && route.key.toString() != "Timestamp") {
-                                        routes.add(Pair(route.key.toString(), route.value.toString().toInt()))
+                if (error != null) {
+                    Log.w(
+                        TAG, "Failed to update the latest proposed routes lists from" +
+                                "mandis"
+                    )
+                } else {
+                    /**
+                     * <snapshots>
+                     * MandiSrc:
+                     *     <snapshot>
+                     *     Des:
+                     *         Rate: <rate>
+                     *         Req: <req>
+                     *         Got: <got>
+                     * where snapshots represents MandiSrc
+                     *
+                     */
+                    propRoutesList = ArrayList()
+                    snapshots!!.forEach {
+                        if (it.id != "DummyDoc") {
+                            val mandiPropList = LivePropRoutesListItem()
+                            //get the entry from the mandi which has the status live on it
+                            it.data.forEach { mandiRoutesData ->
+                                Log.d(TAG, "mandiroutesdata: ${mandiRoutesData}")
+                                val mandiRoutesDataValue = mandiRoutesData.value as HashMap<*, *>
+                                if (mandiRoutesDataValue["Status"] == "Live") {
+                                    mandiPropList.Timestamp =
+                                        mandiRoutesDataValue["Timestamp"].toString().toLong()
+                                    mandiPropList.Mandi = it.id
+                                    val routes = ArrayList<Pair<String, Int>>()
+                                    mandiRoutesDataValue.forEach { route ->
+                                        if (route.key.toString() != "Status" && route.key.toString() != "Timestamp") {
+                                            routes.add(Pair(route.key.toString(),
+                                                route.value.toString().toInt()))
+                                        }
                                     }
+                                    mandiPropList.Routes = routes
                                 }
-                                mandiPropList.Routes = routes
                             }
+                            propRoutesList.add(mandiPropList)
                         }
-                        propRoutesList.add(mandiPropList)
                     }
+                    Log.w(TAG, "Updated proposed routes list ${propRoutesList}")
+                    PropRoutesList.postValue(propRoutesList)
                 }
-                Log.w(TAG, "Updated proposed routes list ${propRoutesList}")
-                PropRoutesList.postValue(propRoutesList)
             }
-        }
     }
 
     /**
@@ -152,7 +158,7 @@ object UnionAdminRepo {
     /**
      *Get Live Truck Data
      */
-    suspend fun fetchLiveTruckDataList() {
+    /*suspend fun fetchLiveTruckDataList() {
         val childEventListener = object : ChildEventListener {
             override fun onChildAdded(
                 dataSnapshot: DataSnapshot,
@@ -209,6 +215,72 @@ object UnionAdminRepo {
 
         val ref = firebaseDb.reference.child(LIVE_TRUCK_DATA_LIST)
         ref.addChildEventListener(childEventListener)
+    }*/
+
+
+    fun fetchLiveTruckDataList() {
+        val col = firestoreDb.collection(LIVE_TRUCK_DATA_LIST)
+        col.addSnapshotListener { snapshots, error ->
+            if (error == null) {
+                liveTruckDataList = HashMap()
+                snapshots!!.forEach { truckDocument ->
+                    val liveTruckDataItem = LiveTruckDataItem()
+                    liveTruckDataItem.TruckNo = truckDocument.id
+                    liveTruckDataItem.CurrentListNo = truckDocument.get("CurrentListNo").toString()
+                    liveTruckDataItem.Status = truckDocument.get("Status").toString()
+                    liveTruckDataItem.Timestamp = truckDocument.get("Timestamp").toString()
+                    liveTruckDataItem.Owner = (truckDocument.get("Owner") as List<*>)
+                        .zipWithNext { a, b -> Pair(a.toString(), b.toString()) }[0]
+                    liveTruckDataItem.Route = Pair(
+                        truckDocument.get("Source").toString(), truckDocument.get("Destination").toString()
+                    )
+
+                    /*//Get all the ticket names issued for this truck
+                    val pahunchTickets = ArrayList<Long>()
+                    truckDocument.data.forEach {
+                        if (it.key != "CurrentListNo" &&
+                            it.key != "Owner" &&
+                            it.key != "Route"
+                        ) {
+                            pahunchTickets.add(it.key.split("-")[1].toLong())
+                        }
+                    }
+
+                    //Get the most recent pahunch ticket
+                    val mostRecentTicket = truckDocument
+                        .get("Pahunch-${pahunchTickets.sortedDescending()[0]}") as Map<*, *>
+
+                    var src = ""
+                    var des = ""
+                    var status = ""
+                    var timestamp = ""
+                    mostRecentTicket.forEach {
+                        when (it.key.toString()) {
+                            "Source" -> {
+                                src = it.value.toString()
+                            }
+                            "Destination" -> {
+                                des = it.value.toString()
+                            }
+                            "DeliveryStatus" -> {
+                                status = it.value.toString()
+                            }
+                            "Timestamp" -> {
+                                timestamp = it.value.toString()
+                            }
+                        }
+                    }
+
+                    liveTruckDataItem.Route = Pair(src, des)
+                    liveTruckDataItem.Status = status
+                    liveTruckDataItem.Timestamp = timestamp*/
+
+                    liveTruckDataList[truckDocument.id] = liveTruckDataItem
+                }
+
+                LiveTruckDataList.postValue(liveTruckDataList)
+            }
+        }
     }
 
     /**
@@ -331,9 +403,10 @@ object UnionAdminRepo {
                 lastMissedList.add(
                     LiveAuctionListItem(
                         PrevNo =
-                        LiveTruckDataList.value!![truck]!!.data["CurrentListNo"]!!,
+                        LiveTruckDataList.value!![truck]!!.CurrentListNo,
+//                        LiveTruckDataList.value!![truck]!!.data["CurrentListNo"]!!,
                         TruckNo = truck,
-                        StartTime = LiveTruckDataList.value!![truck]!!.data["Timestamp"]!!.toLong()
+                        StartTime = LiveTruckDataList.value!![truck]!!.Timestamp.toLong()
                     )
                 )
             }
@@ -552,6 +625,9 @@ object UnionAdminRepo {
                         newGot = got + 1)
                     val currTime = CurrDateTimeInMillis()
 
+                    //update auction list item's status and route in live truck dataz
+                    releaseTruckForDelivery(changedEntry.TruckNo!!, src, des)
+
                     //check to see if the current request falls in bonus time
                     if ((currTime >= LiveBonusTimeInfo.value!!.StartTime) &&
                         (currTime < LiveBonusTimeInfo.value!!.EndTime)
@@ -572,6 +648,26 @@ object UnionAdminRepo {
         } else {
             Log.d(TAG, "Request to accept bid rejected for: ${changedEntry}")
         }
+    }
+
+    private suspend fun releaseTruckForDelivery(truckNo: String, src: String, des: String) {
+        val dataToUpdate = hashMapOf<String, Any>(
+            "Source" to src,
+            "Destination" to des,
+            "Status" to "DelInProg"
+        )
+        firestoreDb
+            .collection(LIVE_TRUCK_DATA_LIST)
+            .document(truckNo)
+            .update(dataToUpdate)
+            .addOnSuccessListener {
+                Log.d(TAG, "Live Truck Data updated for closed bid item")
+            }
+            .addOnFailureListener {
+                Log.d(TAG, "Failed to update live truck data for closed bid item, " +
+                        "error: ${it}")
+            }
+            .await()
     }
 
     private suspend fun StartTimerForLiveAuctionListItem(changedEntry: LiveAuctionListItem) {
@@ -606,8 +702,8 @@ object UnionAdminRepo {
                         )
                         when (doc.type) {
                             DocumentChange.Type.ADDED -> {
-                                        Log.d(TAG,
-                                            "Added new live auction list item: ${doc.document.data}")
+                                Log.d(TAG,
+                                    "Added new live auction list item: ${doc.document.data}")
                             }
                             DocumentChange.Type.MODIFIED -> {
                                 GlobalScope.launch(Dispatchers.IO) {
@@ -709,7 +805,6 @@ object UnionAdminRepo {
             )
         }
     }
-
 
 
     /*fun fetchLiveRoutesList() {
@@ -930,8 +1025,8 @@ object UnionAdminRepo {
         }
     }
 
-    private fun getTruckOwner(truckNo: String): String {
-        return LiveTruckDataList.value!![truckNo]!!.data["Owner"].toString()
+    private fun getTruckOwner(truckNo: String): Pair<String, String> {
+        return LiveTruckDataList.value!![truckNo]!!.Owner
     }
 
     //checks if the truck status is in progress
@@ -939,8 +1034,9 @@ object UnionAdminRepo {
         Log.d(TAG, "Finding truck status of ${truckNo}")
         Log.d(TAG, "${LiveTruckDataList.value}")
         Log.d(TAG,
-            "Finding truck status of ${truckNo}....found: ${LiveTruckDataList.value!![truckNo]!!.data["Status"] == "DelInProg"}")
-        val ans = LiveTruckDataList.value!![truckNo]!!.data["Status"] == "DelInProg"
+            "Finding truck status of ${truckNo}....found: " +
+                    "${LiveTruckDataList.value!![truckNo]!!.Status == "DelInProg"}")
+        val ans = LiveTruckDataList.value!![truckNo]!!.Status == "DelInProg"
         return ans
     }
 

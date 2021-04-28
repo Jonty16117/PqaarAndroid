@@ -1,7 +1,6 @@
  package com.pqaar.app.truckOwner.adapters
 
 import android.app.Activity
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,18 +12,15 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.pqaar.app.R
-import com.pqaar.app.mandiAdmin.repository.MandiAdminRepo
 import com.pqaar.app.model.LiveAuctionListItem
 import com.pqaar.app.model.LiveRoutesListItem
-import com.pqaar.app.model.TruckHistory
-import com.pqaar.app.truckOwner.repository.TruckOwnerRepo
+import com.pqaar.app.model.LiveTruckDataItem
 import com.pqaar.app.truckOwner.viewModel.TruckOwnerViewModel
 import com.pqaar.app.utils.TimeConversions.CurrDateTimeInMillis
 import kotlinx.coroutines.*
-import kotlin.system.measureTimeMillis
 
 
-class RouteListAdapter(
+ class RouteListAdapter(
     private var liveRoutesListItem: LiveRoutesListItem,
     private var headerPos: Int,
     private var activity: Activity,
@@ -39,7 +35,7 @@ class RouteListAdapter(
     private lateinit var alertDialogNoBtn: Button
     private lateinit var alertDialogSpinner: Spinner
     private val model: TruckOwnerViewModel
-    private var liveTrucksInfo = ArrayList<TruckHistory>()
+    private var liveTrucksInfo = ArrayList<LiveTruckDataItem>()
     private var liveAuctionList = ArrayList<LiveAuctionListItem>()
     private var truckSelected = "Select Truck"
 

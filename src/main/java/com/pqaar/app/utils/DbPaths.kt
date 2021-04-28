@@ -13,6 +13,9 @@ object DbPaths {
     const val SCHEDULED_AUCTIONS = "ScheduledAuctions"
     const val LIVE_AUCTION_LIST = "LiveAuctionList"
     const val AUCTION_BONUS_TIME_INFO = "AuctionBonusTimeInfo"
+    const val LIVE_TRUCK_DATA_LIST = "LiveTruckData"
+    const val PAHUNCH_ADMIN_RECORDS = "PahunchAdminRecords"
+
 
     /**
      * Firestore field keys
@@ -31,7 +34,7 @@ object DbPaths {
     /**
      * Firebase paths
      */
-    const val LIVE_TRUCK_DATA_LIST = "LiveTruckData"
+//    const val LIVE_TRUCK_DATA_LIST = "LiveTruckData"
     const val TRUCKS_REQUESTS = "TruckRequests"
 
     /**

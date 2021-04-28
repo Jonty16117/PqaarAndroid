@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -52,12 +51,12 @@ object TruckOwnerRepo {
     private var truckOwnerLiveData = TruckOwner()
     private var liveRoutesList = HashMap<String, LiveRoutesListItemDTO>()
     private var liveAuctionList = HashMap<String, LiveAuctionListItem>()
-    private val liveTruckDataList = HashMap<String, TruckHistory>()
+    private var liveTruckDataList = HashMap<String, LiveTruckDataItem>()
 
     val TruckOwnerLiveData = MutableLiveData<TruckOwner>()
     val LiveRoutesList = MutableLiveData<HashMap<String, LiveRoutesListItemDTO>>()
     val LiveAuctionList = MutableLiveData<HashMap<String, LiveAuctionListItem>>()
-    val LiveTruckDataList = MutableLiveData<HashMap<String, TruckHistory>>()
+    val LiveTruckDataList = MutableLiveData<HashMap<String, LiveTruckDataItem>>()
     val LiveAuctionStatus = MutableLiveData<String>()
     val LiveAuctionStartTime = MutableLiveData<Long>()
     val LiveAuctionEndTime = MutableLiveData<Long>()
@@ -200,6 +199,8 @@ object TruckOwnerRepo {
             }.await()
     }
 
+
+    /*
     fun fetchLiveTruckDataList() {
         if (truckOwnerLiveData.Trucks.isNotEmpty()) {
             truckOwnerLiveData.Trucks.forEach{ truck ->
@@ -214,7 +215,7 @@ object TruckOwnerRepo {
                         //if the current list does not have any entry for this truck, then initialize
                         //this truck by making its entry in the list
                         if (!liveTruckDataList.containsKey(truck)) {
-                            liveTruckDataList[truck] = TruckHistory(TruckNo = truck)
+                            liveTruckDataList[truck] = LiveTruckDataItem(TruckNo = truck)
 //                            liveTruckDataList[truck] = LiveTruckDataListItemDTO(truckNo = truck)
                         }
 
@@ -256,7 +257,7 @@ object TruckOwnerRepo {
                         Log.d(TAG, "Truck Status updated: ${dataSnapshot.value}")
 
                         if (!liveTruckDataList.containsKey(truck)) {
-                            liveTruckDataList[truck] = TruckHistory(TruckNo = truck)
+                            liveTruckDataList[truck] = LiveTruckDataItem(TruckNo = truck)
 //                            liveTruckDataList[truck] = LiveTruckDataListItemDTO(truckNo = truck)
                         }
 
@@ -320,7 +321,65 @@ object TruckOwnerRepo {
             }
         }
     }
+    */
 
+    fun fetchLiveTruckDataList() {
+        val col = firestoreDb.collection(LIVE_TRUCK_DATA_LIST)
+        col.addSnapshotListener { snapshots, error ->
+            liveTruckDataList = HashMap()
+            snapshots!!.forEach { truckDocument ->
+                val liveTruckDataItem = LiveTruckDataItem()
+                liveTruckDataItem.TruckNo = truckDocument.id
+                liveTruckDataItem.CurrentListNo = truckDocument.get("CurrentListNo").toString()
+                liveTruckDataItem.Owner = (truckDocument.get("Owner") as List<*>)
+                    .zipWithNext { a, b -> Pair(a.toString(), b.toString()) }[0]
+
+                //Get all the ticket names issued for this truck
+                val pahunchTickets = ArrayList<Long>()
+                truckDocument.data.forEach {
+                    if (it.key != "CurrentListNo" &&
+                        it.key != "Owner" &&
+                        it.key != "Route"
+                    ) {
+                        pahunchTickets.add(it.key.split("-")[1].toLong())
+                    }
+                }
+
+                //Get the most recent pahunch ticket
+                val mostRecentTicket = truckDocument
+                    .get("Pahunch-${pahunchTickets.sortedDescending()[0]}") as Map<*, *>
+
+                var src = ""
+                var des = ""
+                var status = ""
+                var timestamp = ""
+                mostRecentTicket.forEach {
+                    when (it.key.toString()) {
+                        "Source" -> {
+                            src = it.value.toString()
+                        }
+                        "Destination" -> {
+                            des = it.value.toString()
+                        }
+                        "Status" -> {
+                            status = it.value.toString()
+                        }
+                        "Timestamp" -> {
+                            timestamp = it.value.toString()
+                        }
+                    }
+                }
+
+                liveTruckDataItem.Route = Pair(src, des)
+                liveTruckDataItem.Status = status
+                liveTruckDataItem.Timestamp = timestamp
+
+                liveTruckDataList[truckDocument.id] = liveTruckDataItem
+            }
+
+            LiveTruckDataList.postValue(liveTruckDataList)
+        }
+    }
 
     fun fetchSchAuctionsInfo() {
         firestoreDb.collection(DbPaths.AUCTIONS_INFO)

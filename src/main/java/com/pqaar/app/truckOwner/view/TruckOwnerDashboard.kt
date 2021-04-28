@@ -25,7 +25,7 @@ import com.pqaar.app.R
 import com.pqaar.app.common.LoginActivity
 import com.pqaar.app.model.LiveAuctionListItem
 import com.pqaar.app.model.LiveRoutesListItem
-import com.pqaar.app.model.TruckHistory
+import com.pqaar.app.model.LiveTruckDataItem
 import com.pqaar.app.truckOwner.adapters.BottomSheetViewPagerAdapter
 import com.pqaar.app.truckOwner.adapters.TruckDriverHistoryAdapter
 import com.pqaar.app.truckOwner.viewModel.TruckOwnerViewModel
@@ -54,7 +54,7 @@ class TruckOwnerDashboard : AppCompatActivity() {
     private lateinit var alertDialog: AlertDialog
     private lateinit var timer: CountDownTimer
 
-    private var trucksHistoryList = ArrayList<TruckHistory>()
+    private var trucksHistoryList = ArrayList<LiveTruckDataItem>()
     private var auctionStartTime = 0L
     private var auctionEndTime = 0L
     private var liveAuctionList = ArrayList<LiveAuctionListItem>()

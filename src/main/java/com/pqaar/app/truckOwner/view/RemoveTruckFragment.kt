@@ -16,7 +16,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pqaar.app.R
-import com.pqaar.app.model.TruckHistory
+import com.pqaar.app.model.LiveTruckDataItem
 import com.pqaar.app.truckOwner.viewModel.TruckOwnerViewModel
 
 class RemoveTruckFragment : Fragment() {
@@ -37,7 +37,7 @@ class RemoveTruckFragment : Fragment() {
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
         val progressBar = view.findViewById<ProgressBar>(R.id.progressBar4)
 
-        val trucksList = ArrayList<TruckHistory>()
+        val trucksList = ArrayList<LiveTruckDataItem>()
         val adapter = Adapter(context!!, trucksList)
 
         recyclerView.layoutManager = LinearLayoutManager(context!!)
@@ -61,7 +61,7 @@ class RemoveTruckFragment : Fragment() {
 
     inner class Adapter(
         private val context: Context,
-        private val trucksList: ArrayList<TruckHistory>,
+        private val trucksList: ArrayList<LiveTruckDataItem>,
     ) :
         RecyclerView.Adapter<Adapter.ViewHolder>(),
         AdapterView.OnItemSelectedListener {
@@ -90,7 +90,7 @@ class RemoveTruckFragment : Fragment() {
             RecyclerView.ViewHolder(truckItemView) {
 
             fun setData(
-                truckHistoryItem: TruckHistory,
+                truckHistoryItem: LiveTruckDataItem,
                 position: Int,
                 onClickListener: View.OnClickListener
             ) {
