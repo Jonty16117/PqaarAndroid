@@ -45,7 +45,6 @@ object UnionAdminRepo {
     private lateinit var lastMissedList: ArrayList<LiveAuctionListItem>
     private lateinit var truckCheckArray: HashMap<String, Boolean>
     lateinit var liveCombinedAuctionList: ArrayList<LiveAuctionListItem>
-//    val PropRoutesList = MutableLiveData<HashMap<String, MutableMap<String, Any>>>()
     val PropRoutesList = MutableLiveData<ArrayList<LivePropRoutesListItem>>()
     val TruckRequestsLive = MutableLiveData<HashMap<String, AddTruckRequest>>()
     val LiveAuctionList = MutableLiveData<HashMap<String, LiveAuctionListItem>>()

@@ -18,15 +18,17 @@
         <activity android:name=".mandiAdmin.view.MandiAdminDashboard" />
         <activity android:name=".unionAdmin.view.UnionAdminDashboard" />
         <activity android:name=".truckOwner.view.TruckOwnerDashboard" />
+        <activity android:name=".pahunchAdmin.view.PahunchAdminDashboard" />
         <activity
-            android:name="com.pqaar.app.common.SplashScreen"
+            android:name=".common.SplashScreen"
             android:theme="@style/SplashScreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.pqaar.app.common.LoginActivity" />
+        <activity android:name=".common.LoginActivity" />
     </application>
 
 </manifest>

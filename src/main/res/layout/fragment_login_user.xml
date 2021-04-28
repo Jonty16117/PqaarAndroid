@@ -98,7 +98,7 @@
             <RadioGroup
                 android:id="@+id/radioGroup"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_marginTop="8dp"
                 android:background="@android:color/transparent"
                 android:orientation="horizontal">
@@ -106,7 +106,7 @@
                 <RadioButton
                     android:id="@+id/radioBtnMandiAdmin"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="bottom|center"
                     android:layout_weight="1"
                     android:background="@drawable/custom_radio_background"
@@ -117,10 +117,11 @@
                     android:textColor="@drawable/custom_radio_button_text_color"
                     android:textSize="10sp" />
 
+
                 <RadioButton
                     android:id="@+id/radioBtnUnionAdmin"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="bottom|center"
                     android:layout_marginStart="8dp"
                     android:layout_marginLeft="8dp"
@@ -136,9 +137,25 @@
                     android:textSize="10sp" />
 
                 <RadioButton
+                    android:id="@+id/radioBtnPahunchAdmin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="bottom|center"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/custom_radio_background"
+                    android:button="@android:color/transparent"
+                    android:gravity="center"
+                    android:text="Pahunch Admin"
+                    android:textAlignment="center"
+                    android:textColor="@drawable/custom_radio_button_text_color"
+                    android:textSize="10sp" />
+
+                <RadioButton
                     android:id="@+id/radioBtnTruckOwner"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="bottom|center"
                     android:layout_weight="1"
                     android:background="@drawable/custom_radio_background"
@@ -148,6 +165,7 @@
                     android:textAlignment="center"
                     android:textColor="@drawable/custom_radio_button_text_color"
                     android:textSize="10sp" />
+
 
             </RadioGroup>
 

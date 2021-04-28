@@ -124,6 +124,7 @@ class AddTruckFragment : Fragment(), PermissionListener {
         permission: PermissionRequest?,
         token: PermissionToken?,
     ) {
+        token?.continuePermissionRequest()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {

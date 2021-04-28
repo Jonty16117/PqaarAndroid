@@ -28,6 +28,7 @@ class LoginUserFragment : Fragment() {
     private lateinit var radioBtnMandiAdmin: RadioButton
     private lateinit var radioBtnUnionAdmin: RadioButton
     private lateinit var radioBtnTruckOwner: RadioButton
+    private lateinit var radioBtnPahunchAdmin: RadioButton
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,6 +45,7 @@ class LoginUserFragment : Fragment() {
         radioBtnMandiAdmin = view.findViewById(R.id.radioBtnMandiAdmin)
         radioBtnUnionAdmin = view.findViewById(R.id.radioBtnUnionAdmin)
         radioBtnTruckOwner = view.findViewById(R.id.radioBtnTruckOwner)
+        radioBtnPahunchAdmin = view.findViewById(R.id.radioBtnPahunchAdmin)
         var checkedPhoneNumber: String?
 
 
@@ -98,6 +100,12 @@ class LoginUserFragment : Fragment() {
                         TruckOwnerDashboard::class.java
                     ).apply { putExtra("null", "null") })
                 }
+                "pahunch-admin" -> {
+                    startActivity(Intent(
+                        context,
+                        PahunchAdminDashboard::class.java
+                    ).apply { putExtra("null", "null") })
+                }
                 else -> {
                     Toast.makeText(context, "Please Select User Type", Toast.LENGTH_LONG).show()
                 }
@@ -142,6 +150,9 @@ class LoginUserFragment : Fragment() {
 
             (radioBtnTruckOwner.id) -> {
                 return "truck-owner"
+            }
+            (radioBtnPahunchAdmin.id) -> {
+                return "pahunch-admin"
             }
             else -> {
                 return null
