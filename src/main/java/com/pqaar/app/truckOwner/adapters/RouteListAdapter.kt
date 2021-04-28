@@ -14,9 +14,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.pqaar.app.R
 import com.pqaar.app.mandiAdmin.repository.MandiAdminRepo
+import com.pqaar.app.model.LiveAuctionListItem
 import com.pqaar.app.model.LiveRoutesListItem
+import com.pqaar.app.model.TruckHistory
 import com.pqaar.app.truckOwner.repository.TruckOwnerRepo
 import com.pqaar.app.truckOwner.viewModel.TruckOwnerViewModel
+import com.pqaar.app.utils.TimeConversions.CurrDateTimeInMillis
 import kotlinx.coroutines.*
 import kotlin.system.measureTimeMillis
 
@@ -36,7 +39,8 @@ class RouteListAdapter(
     private lateinit var alertDialogNoBtn: Button
     private lateinit var alertDialogSpinner: Spinner
     private val model: TruckOwnerViewModel
-    private var liveTrucksInfo = ArrayList<String>()
+    private var liveTrucksInfo = ArrayList<TruckHistory>()
+    private var liveAuctionList = ArrayList<LiveAuctionListItem>()
     private var truckSelected = "Select Truck"
 
 
@@ -46,8 +50,17 @@ class RouteListAdapter(
         model = ViewModelProviders.of(fragment)
             .get(TruckOwnerViewModel::class.java)
 
-        model.getTruckOwnerData().observe(fragment, {
-            liveTrucksInfo = it.Trucks
+        model.getLiveTruckDataList().observe(fragment, {
+            liveTrucksInfo = ArrayList()
+            liveTrucksInfo.addAll(it.values)
+        })
+
+        model.getLiveAuctionList().observe(fragment, {
+            liveAuctionList = ArrayList<LiveAuctionListItem>()
+            liveAuctionList.addAll(it.values)
+            liveAuctionList = ArrayList(liveAuctionList.sortedWith(compareBy {
+                it.CurrNo!!.toInt()
+            }))
         })
     }
 
@@ -125,10 +138,23 @@ class RouteListAdapter(
             alertDialogMandi.text = liveRoutesListItem.Mandi
             alertDialogGodown.text = liveRoutesListItem.Routes[position].Des
 
+            val openTrucks = ArrayList<String>()
+            liveTrucksInfo.forEach { truck ->
+                if (
+                    (truck.Status != "DelInProg") &&
+                    (truck.CurrentListNo.toInt() <= liveAuctionList.size) &&
+                    (truck.TruckNo == liveAuctionList[truck.CurrentListNo.toInt() - 1].TruckNo) &&
+                    (liveAuctionList[truck.CurrentListNo.toInt() - 1].Closed == "false") &&
+                    (liveAuctionList[truck.CurrentListNo.toInt() - 1].StartTime!! <= CurrDateTimeInMillis())
+                )
+                         {
+                    openTrucks.add(truck.TruckNo)
+                }
+            }
             val spinnerAdapter = ArrayAdapter<String>(
                 activity,
                 android.R.layout.simple_spinner_item,
-                liveTrucksInfo
+                openTrucks
             )
             spinnerAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item

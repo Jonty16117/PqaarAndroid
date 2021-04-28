@@ -32,6 +32,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
+                android:clickable="true"
+                android:focusable="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
@@ -48,16 +50,15 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <ImageView
-                    android:id="@+id/imageView2"
+                <android.widget.Button
+                    android:id="@+id/menu"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="app logo"
-                    android:scaleType="fitCenter"
+                    android:background="@drawable/custom_ic_menu"
+                    android:contentDescription="Show Options"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_logo_solid_bg"
@@ -298,6 +299,11 @@
         app:layout_behavior="@string/bottom_sheet_behavior"
         tools:ignore="UnusedAttribute">
 
+        <ProgressBar
+            android:id="@+id/progressBar3"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </com.pqaar.app.utils.BottomSheetViewPager>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

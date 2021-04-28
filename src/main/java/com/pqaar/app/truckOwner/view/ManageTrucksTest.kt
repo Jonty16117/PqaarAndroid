@@ -81,8 +81,8 @@ class ManageTrucksTest : AppCompatActivity(), PermissionListener {
     }
 
     override fun onPermissionGranted(response: PermissionGrantedResponse?) {
-        intent = Intent(Intent.ACTION_PICK)
-        intent.setType("image/*")
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
         startActivityForResult(
             Intent.createChooser(intent, "Please select image"), 1)
     }

@@ -7,3 +7,4 @@ data class LiveAuctionListItem(var CurrNo: String?  = " ",
                                var StartTime: Long? = -1,
                                var Des: String? = " ",
                                var Src: String? = " ")
+

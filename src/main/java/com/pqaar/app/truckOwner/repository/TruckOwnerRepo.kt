@@ -1,14 +1,17 @@
 package com.pqaar.app.truckOwner.repository
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.pqaar.app.model.*
 import com.pqaar.app.unionAdmin.repository.UnionAdminRepo
 import com.pqaar.app.utils.DbPaths
@@ -19,8 +22,11 @@ import com.pqaar.app.utils.DbPaths.LIVE_ROUTES_LIST
 import com.pqaar.app.utils.DbPaths.LIVE_TRUCK_DATA_LIST
 import com.pqaar.app.utils.DbPaths.PHONE_NO
 import com.pqaar.app.utils.DbPaths.TRUCKS
+import com.pqaar.app.utils.DbPaths.TRUCK_RC
 import com.pqaar.app.utils.DbPaths.USER_DATA
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
+import java.io.ByteArrayOutputStream
 
 
 /**
@@ -38,9 +44,10 @@ import kotlinx.coroutines.tasks.await
 object TruckOwnerRepo {
     private const val TAG = "TruckOwnerRepo"
 
+    private val auth = FirebaseAuth.getInstance()
     private val firestoreDb = FirebaseFirestore.getInstance()
     private val firebaseDb = FirebaseDatabase.getInstance()
-    private val auth = FirebaseAuth.getInstance()
+    private val firebaseSt = FirebaseStorage.getInstance()
 
     private var truckOwnerLiveData = TruckOwner()
     private var liveRoutesList = HashMap<String, LiveRoutesListItemDTO>()
@@ -363,4 +370,39 @@ object TruckOwnerRepo {
             }
     }
 
+    suspend fun uploadTruckRC(rcFront: Bitmap, rcBack: Bitmap) {
+//        val userFolder = auth.uid.toString()
+
+        //For testing only
+        val userFolder = "DemoUserTO"
+
+        val rcFrontPath = "${TRUCK_RC}/${userFolder}/Front/rc_front.jpeg"
+        val rcFrontref = firebaseSt.reference.child(rcFrontPath)
+        val baos1 = ByteArrayOutputStream()
+        rcFront.compress(Bitmap.CompressFormat.JPEG, 50, baos1)
+        val rcFrontData = baos1.toByteArray()
+        rcFrontref.putBytes(rcFrontData)
+            .addOnSuccessListener {
+                /*Snackbar.make(currView, "Truck RC submitted successfully!",
+                    Snackbar.LENGTH_LONG).show()*/
+            }
+            .addOnFailureListener {
+                /*Snackbar.make(currView, "Failed to submit Truck RC, please try again later!",
+                    Snackbar.LENGTH_LONG).show()*/
+            }.await()
+
+        delay(2000)
+
+
+        val rcBackPath = "${TRUCK_RC}/${userFolder}/Back/rc_back.jpeg"
+        val rcBackref = firebaseSt.reference.child(rcBackPath)
+        val baos2 = ByteArrayOutputStream()
+        rcBack.compress(Bitmap.CompressFormat.JPEG, 50, baos2)
+        val rcBackData = baos2.toByteArray()
+        rcBackref.putBytes(rcBackData)
+            .addOnSuccessListener {
+            }
+            .addOnFailureListener {
+            }.await()
+    }
 }

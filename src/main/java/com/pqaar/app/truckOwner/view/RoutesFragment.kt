@@ -40,7 +40,6 @@ class RoutesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        inflateAlertBoxDialog()
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerView)
 
         val model = ViewModelProviders.of(this)

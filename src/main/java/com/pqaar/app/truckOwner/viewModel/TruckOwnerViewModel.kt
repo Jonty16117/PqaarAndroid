@@ -1,5 +1,6 @@
 package com.pqaar.app.truckOwner.viewModel
 
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,6 +20,7 @@ import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.fetchLiveRoutesList
 import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.fetchLiveTruckDataList
 import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.fetchSchAuctionsInfo
 import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.fetchTruckOwner
+import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.uploadTruckRC
 import kotlinx.coroutines.*
 import kotlin.system.measureTimeMillis
 
@@ -47,6 +49,13 @@ class TruckOwnerViewModel : ViewModel() {
             job.await()
         }
 
+    }
+
+    suspend fun UploadTruckRc(rcFront: Bitmap, rcBack: Bitmap) {
+        GlobalScope.launch(Dispatchers.IO) {
+            val job = async { uploadTruckRC(rcFront, rcBack) }
+            job.await()
+        }
     }
 
     suspend fun refreshTruckOwnerData() {

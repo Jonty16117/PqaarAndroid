@@ -74,7 +74,7 @@ class AddMandiRoutesFragment : Fragment() {
          * Setting actions on text buttons of alert dialog box
          */
         alertDialogBox.setButton(AlertDialog.BUTTON_POSITIVE, "Add"
-        ) { dialog, which ->
+        ) { _, _ ->
             if (des.text.isNullOrEmpty() || req.text.isNullOrEmpty()) {
                 Snackbar.make(view, "Please fill all the details!",
                     Snackbar.LENGTH_SHORT).show()
@@ -91,12 +91,12 @@ class AddMandiRoutesFragment : Fragment() {
             }
         }
         alertDialogBox.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel"
-        ) { dialog, which ->
+        ) { _, _ ->
             alertDialogBox.dismiss()
         }
 
 
-        fab.setOnClickListener { fabView ->
+        fab.setOnClickListener {
             alertDialogBox.show()
         }
 
