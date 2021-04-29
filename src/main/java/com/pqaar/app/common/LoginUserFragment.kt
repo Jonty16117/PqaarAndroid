@@ -10,6 +10,7 @@ import android.widget.*
 import com.google.firebase.auth.FirebaseAuth
 import com.pqaar.app.R
 import com.pqaar.app.mandiAdmin.view.MandiAdminDashboard
+import com.pqaar.app.pahunchAdmin.view.PahunchAdminDashboard
 import com.pqaar.app.truckOwner.view.TruckOwnerDashboard
 import com.pqaar.app.unionAdmin.view.UnionAdminDashboard
 

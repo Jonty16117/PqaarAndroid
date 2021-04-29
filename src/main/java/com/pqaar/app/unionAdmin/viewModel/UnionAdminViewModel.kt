@@ -136,27 +136,15 @@ class UnionAdminViewModel : ViewModel() {
             val executionTime = measureTimeMillis {
                 val lastAuctionDoc = fetchLastAuctionListDocument()
                 getLastAuctionList(lastAuctionDoc)
-                Log.d(TAG, "Fetched last auction list")
                 separateOpenCloseLists()
-                Log.d(TAG, "Separated open and close lists")
                 getLastMissedList()
-                Log.d(TAG, "Fetched last missed auction list")
                 combineLists()
-                Log.d(TAG, "Combined all three lists")
                 endTime = startTime + (liveCombinedAuctionList.size * perUserBidDurationInMillis)
                 getAuctionEndTime().postValue(endTime)
                 setStartTimeInLiveAuctionList(startTime, perUserBidDurationInMillis)
-                Log.d(TAG, "Start time is set for each entry in live auction list")
                 uploadLiveAuctionList()
-                Log.d(TAG, "Uploaded final live auction lists")
                 fetchLiveAuctionList()
-                Log.d(TAG, "Fetched live auction list")
-                uploadSchAuctionsInfo(
-                    status = status,
-                    startTime = startTime,
-                    endTime = endTime
-                )
-                Log.d(TAG, "Auction timing scheduled at ${startTime}")
+                uploadSchAuctionsInfo(status, startTime, endTime)
             }
             withContext(Dispatchers.Main) {
                 Log.d(TAG, "ExecutionTime = $executionTime")

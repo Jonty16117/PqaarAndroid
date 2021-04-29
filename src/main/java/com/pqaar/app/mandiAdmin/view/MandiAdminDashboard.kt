@@ -56,11 +56,6 @@ class MandiAdminDashboard : AppCompatActivity() {
         historyListData.add(mrhi1)*/
 
         val adapterList = arrayListOf<MandiAdminRoutesHistoryAdapter>()
-        //historyListData.forEach { adapterList.add(MandiAdminRoutesHistoryAdapter(it)) }
-        /*val concatAdapterConfig = ConcatAdapter.Config.Builder()
-            .setIsolateViewTypes(false)
-            .build()
-        var concatAdapter = ConcatAdapter(concatAdapterConfig, adapterList)*/
         val concatAdapter = ConcatAdapter(adapterList)
         history_list.layoutManager = LinearLayoutManager(baseContext)
         history_list.adapter = concatAdapter

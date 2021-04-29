@@ -1,6 +1,7 @@
 package com.pqaar.app.truckOwner.adapters
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,8 @@ class TruckDriverHistoryAdapter(
     private val truckHistoryList: ArrayList<LiveTruckDataItem>,
 ) :
     RecyclerView.Adapter<TruckDriverHistoryAdapter.TruckHistoryViewHolder>() {
+    private val TAG = "TruckDriverHistoryAdapter"
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TruckHistoryViewHolder {
         return TruckHistoryViewHolder(
@@ -37,6 +40,7 @@ class TruckDriverHistoryAdapter(
         RecyclerView.ViewHolder(truckItemView) {
 
         fun setData(truckHistoryItem: LiveTruckDataItem, position: Int) {
+            Log.d(TAG, "called setdata on item: ${truckHistoryItem}")
             truckItemView.findViewById<TextView>(R.id.textView9).text = (position + 1).toString()
             truckItemView.findViewById<TextView>(R.id.textView7).text = truckHistoryItem.TruckNo
             truckItemView.findViewById<TextView>(R.id.textView12).text =
@@ -77,7 +81,7 @@ class TruckDriverHistoryAdapter(
                 truckItemView.findViewById<ImageView>(R.id.delFail).isVisible = false
                 truckItemView.findViewById<ImageView>(R.id.delInProg).isVisible = false
                 truckItemView.findViewById<ImageView>(R.id.unassigned).isVisible = true
-                truckItemView.findViewById<TextView>(R.id.textView34).text = "_"
+                truckItemView.findViewById<TextView>(R.id.textView34).text = "Unassigned"
             }
         }
     }

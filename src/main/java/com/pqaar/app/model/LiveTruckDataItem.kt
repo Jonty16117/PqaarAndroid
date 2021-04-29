@@ -6,5 +6,6 @@ data class LiveTruckDataItem(
     var Owner: Pair<String, String> = Pair("NA", "NA"),
     var Route: Pair<String, String> = Pair("NA", "NA"),
     var Status: String = "",
-    var Timestamp: String = ""
+    var Timestamp: String = "",
+    var Active: Boolean = true
 )

@@ -1,5 +1,6 @@
 package com.pqaar.app.pahunchAdmin.repository
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
@@ -21,6 +22,7 @@ import com.pqaar.app.utils.DbPaths.USER_DATA
 import com.pqaar.app.utils.DbPaths.USER_TYPE
 import kotlinx.coroutines.tasks.await
 
+@SuppressLint("StaticFieldLeak")
 object PahunchAdminRepo {
     private const val TAG = "PahunchAdminRepo"
 
@@ -133,21 +135,28 @@ object PahunchAdminRepo {
         ref.addSnapshotListener { snapshots, error ->
             if (error == null) {
                 liveTruckDataList = ArrayList()
-                snapshots!!.forEach { truckDocument ->
+                snapshots!!.forEach { truckDocumentSnapshot ->
+                    Log.d(TAG, "Truck fetchted: ${truckDocumentSnapshot}")
                     val route = Pair(
-                        truckDocument.get("Source").toString(), truckDocument.get("Destination").toString()
+                        truckDocumentSnapshot.get("Source").toString(),
+                        truckDocumentSnapshot.get("Destination").toString()
                     )
-                    val status = truckDocument.get("Status").toString()
-                    if (UserDestination.value!! == route.second &&
-                            status == "DelInProg") {
+                    val status = truckDocumentSnapshot.get("Status").toString()
+                    if ((truckDocumentSnapshot.id != "DemoTruckNo") &&
+                        (route.second == UserDestination.value!!) &&
+                        (status == "DelInProg")
+                    ) {
                         val liveTruckDataItem = LiveTruckDataItem()
-                        liveTruckDataItem.TruckNo = truckDocument.id
-                        liveTruckDataItem.CurrentListNo = truckDocument.get("CurrentListNo").toString()
-                        liveTruckDataItem.Status = status
-                        liveTruckDataItem.Timestamp = truckDocument.get("Timestamp").toString()
-                        liveTruckDataItem.Owner = (truckDocument.get("Owner") as List<*>)
+                        liveTruckDataItem.TruckNo = truckDocumentSnapshot.id
+                        liveTruckDataItem.CurrentListNo = truckDocumentSnapshot.get("CurrentListNo").toString()
+                        liveTruckDataItem.Status = truckDocumentSnapshot.get("Status").toString()
+                        liveTruckDataItem.Timestamp = truckDocumentSnapshot.get("Timestamp").toString()
+                        liveTruckDataItem.Owner = (truckDocumentSnapshot.get("Owner") as List<*>)
                             .zipWithNext { a, b -> Pair(a.toString(), b.toString()) }[0]
-                        liveTruckDataItem.Route = route
+                        liveTruckDataItem.Route = Pair(
+                            truckDocumentSnapshot.get("Source").toString(),
+                            truckDocumentSnapshot.get("Destination").toString()
+                        )
                         liveTruckDataList.add(liveTruckDataItem)
                     }
                 }

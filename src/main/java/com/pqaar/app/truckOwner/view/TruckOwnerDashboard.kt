@@ -7,6 +7,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
@@ -28,12 +29,13 @@ import com.pqaar.app.model.LiveRoutesListItem
 import com.pqaar.app.model.LiveTruckDataItem
 import com.pqaar.app.truckOwner.adapters.BottomSheetViewPagerAdapter
 import com.pqaar.app.truckOwner.adapters.TruckDriverHistoryAdapter
+import com.pqaar.app.truckOwner.repository.TruckOwnerRepo
 import com.pqaar.app.truckOwner.viewModel.TruckOwnerViewModel
 import com.pqaar.app.utils.TimeConversions.CurrDateTimeInMillis
 
 @SuppressLint("SetTextI18n")
 class TruckOwnerDashboard : AppCompatActivity() {
-    //private val TAG = "TruckOwnerDashboard"
+    private val TAG = "TruckOwnerDashboard"
 
     private val SCHEDULED_AUCTION_STATUS = "Next Auction In"
     private val LIVE_AUCTION_STATUS = "Live Auction Ending In"
@@ -53,6 +55,7 @@ class TruckOwnerDashboard : AppCompatActivity() {
 
     private lateinit var alertDialog: AlertDialog
     private lateinit var timer: CountDownTimer
+    private lateinit var historyAdapter: TruckDriverHistoryAdapter
 
     private var trucksHistoryList = ArrayList<LiveTruckDataItem>()
     private var auctionStartTime = 0L
@@ -83,9 +86,16 @@ class TruckOwnerDashboard : AppCompatActivity() {
         val model = ViewModelProviders.of(this)
             .get(TruckOwnerViewModel::class.java)
 
-        val adapter = TruckDriverHistoryAdapter(this, trucksHistoryList)
+        trucksHistoryList.add(LiveTruckDataItem(
+            TruckNo = "PB30XXXX",
+                    CurrentListNo = "1",
+                    Route = Pair("a", "b"),
+                    Status = "DelPass",
+                    Timestamp = "1619696229361"
+        ))
+        historyAdapter = TruckDriverHistoryAdapter(this, trucksHistoryList)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
+        recyclerView.adapter = historyAdapter
 
         model.getAuctionStartTime().observe(this, {
             auctionStartTime = it
@@ -132,11 +142,8 @@ class TruckOwnerDashboard : AppCompatActivity() {
         model.getLiveTruckDataList().observe(this, { liveTruckDataListItem ->
             progressBar.isVisible = true
             trucksHistoryList.clear()
-            liveTruckDataListItem.forEach {
-            val truck = it.value
-                trucksHistoryList.add(truck)
-            }
-            adapter.notifyDataSetChanged()
+            trucksHistoryList.addAll(liveTruckDataListItem.values)
+            updateMyTrucksAdapter()
             progressBar.isVisible = false
         })
 
@@ -168,6 +175,11 @@ class TruckOwnerDashboard : AppCompatActivity() {
         })
 
     }
+
+    private fun updateMyTrucksAdapter() {
+        historyAdapter.notifyDataSetChanged()
+    }
+
 
     private fun setLiveTimer() {
         var hour: Long

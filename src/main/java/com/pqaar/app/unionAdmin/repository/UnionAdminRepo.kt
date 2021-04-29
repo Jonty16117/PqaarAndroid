@@ -158,66 +158,6 @@ object UnionAdminRepo {
     /**
      *Get Live Truck Data
      */
-    /*suspend fun fetchLiveTruckDataList() {
-        val childEventListener = object : ChildEventListener {
-            override fun onChildAdded(
-                dataSnapshot: DataSnapshot,
-                previousChildName: String?,
-            ) {
-                Log.d(TAG, "onChildAdded:" + dataSnapshot.key!!)
-                Log.d(TAG, "onChildAdded:" + dataSnapshot.value)
-
-                val changedEntry = dataSnapshot.value as HashMap<*, *>
-                val data = HashMap<String, String>()
-                changedEntry.forEach {
-                    data[it.key.toString()] = it.value.toString()
-                }
-                liveTruckDataList[dataSnapshot.key!!] = LiveTruckDataListItemDTO(
-                    dataSnapshot.key!!, data
-                )
-                LiveTruckDataList.value = liveTruckDataList
-            }
-
-            override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                Log.d(TAG, "onChildChanged: ${dataSnapshot.key}")
-                Log.d(TAG, "onChildChanged: ${dataSnapshot.value}")
-
-                val changedEntry = dataSnapshot.value as HashMap<*, *>
-                val data = HashMap<String, String>()
-                changedEntry.forEach {
-                    data[it.key.toString()] = it.value.toString()
-                }
-                liveTruckDataList[dataSnapshot.key!!] = LiveTruckDataListItemDTO(
-                    dataSnapshot.key!!, data
-                )
-                LiveTruckDataList.value = liveTruckDataList
-            }
-
-            override fun onChildRemoved(dataSnapshot: DataSnapshot) {
-                Log.d(TAG, "onChildRemoved:" + dataSnapshot.key!!)
-
-                liveTruckDataList.remove(dataSnapshot.key!!)
-                LiveTruckDataList.value = liveTruckDataList
-            }
-
-            override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                //no action
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.w(
-                    TAG,
-                    "Retrieving LiveTruckData Failed:onCancelled",
-                    databaseError.toException()
-                )
-            }
-        }
-
-        val ref = firebaseDb.reference.child(LIVE_TRUCK_DATA_LIST)
-        ref.addChildEventListener(childEventListener)
-    }*/
-
-
     fun fetchLiveTruckDataList() {
         val col = firestoreDb.collection(LIVE_TRUCK_DATA_LIST)
         col.addSnapshotListener { snapshots, error ->
@@ -232,7 +172,8 @@ object UnionAdminRepo {
                     liveTruckDataItem.Owner = (truckDocument.get("Owner") as List<*>)
                         .zipWithNext { a, b -> Pair(a.toString(), b.toString()) }[0]
                     liveTruckDataItem.Route = Pair(
-                        truckDocument.get("Source").toString(), truckDocument.get("Destination").toString()
+                        truckDocument.get("Source").toString(),
+                        truckDocument.get("Destination").toString()
                     )
 
                     /*//Get all the ticket names issued for this truck
@@ -277,7 +218,6 @@ object UnionAdminRepo {
 
                     liveTruckDataList[truckDocument.id] = liveTruckDataItem
                 }
-
                 LiveTruckDataList.postValue(liveTruckDataList)
             }
         }
@@ -358,7 +298,8 @@ object UnionAdminRepo {
              */
             truckCheckArray[listItem.second.truck_no] = true
             if ((listItem.second.bid_closed == "true") &&
-                (!truckInProgress(listItem.second.truck_no))
+                (!truckInProgress(listItem.second.truck_no)) &&
+                (truckIsActive(listItem.second.truck_no))
             ) {
                 lastClosedLiveList.add(
                     LiveAuctionListItem(
@@ -398,7 +339,8 @@ object UnionAdminRepo {
              * is to store the timestamp information during the live auction.
              */
             if (!truckCheckArray.containsKey(truck) &&
-                !truckInProgress(truck)
+                !truckInProgress(truck) &&
+                truckIsActive(truck)
             ) {
                 lastMissedList.add(
                     LiveAuctionListItem(
@@ -603,47 +545,35 @@ object UnionAdminRepo {
         val startTime =
             if (changedEntry.StartTime == null) POSITIVE_INFINITY.toLong() else changedEntry.StartTime!!
 
-        Log.d(TAG, "Checking live routes for: $changedEntry")
         if ((CurrDateTimeInMillis() > startTime) &&
-            (closed == "false") && (src.isNotEmpty()) && (des.isNotEmpty())
+            (closed == "false") &&
+            (src.isNotEmpty()) &&
+            (des.isNotEmpty()) &&
+            (liveRoutesList.containsKey(src)) &&
+            (liveRoutesList[src]!!.desData.containsKey(des))
         ) {
-            Log.d(TAG, "Incoming request to close the bid from mandi: " +
-                    "${src} to ${des}")
-            Log.d(TAG, "Live mandis: ${liveRoutesList.keys}")
+            val req = liveRoutesList[src]!!.desData[des]!!["Req"]!!.toInt()
+            val got = liveRoutesList[src]!!.desData[des]!!["Got"]!!.toInt()
 
-            //check if src(mandi) and des(godown) exists in the live routes list
-            if (liveRoutesList.containsKey(src) &&
-                (liveRoutesList[src]!!.desData.containsKey(des))
-            ) {
-                val req = liveRoutesList[src]!!.desData[des]!!["Req"]!!.toInt()
-                val got = liveRoutesList[src]!!.desData[des]!!["Got"]!!.toInt()
-                Log.d(TAG, "req: ${req}, got: ${got}")
+            //check if the bidd route is still available in the live route list
+            if ((req - got) > 0) {
+                updateRouteItem(src, des, (got + 1))
 
-                //check if the bidd route is still available in the live route list
-                if ((req - got) > 0) {
-                    updateRouteItem(src = src, des = des,
-                        newGot = got + 1)
-                    val currTime = CurrDateTimeInMillis()
-
-                    //update auction list item's status and route in live truck dataz
-                    releaseTruckForDelivery(changedEntry.TruckNo!!, src, des)
-
-                    //check to see if the current request falls in bonus time
-                    if ((currTime >= LiveBonusTimeInfo.value!!.StartTime) &&
-                        (currTime < LiveBonusTimeInfo.value!!.EndTime)
-                    ) {
-                        /**
-                         * Set the timer to start at infinity for this user to prevent
-                         * this user from requesting again
-                         */
-                        Log.d(TAG, "Setting the start timer to infinity" +
-                                " for: ${changedEntry}")
-                        StartTimerForLiveAuctionListItem(changedEntry)
-                    } else {
-                        //if not, then update live auction list item by closing this entry
-                        closeLiveAuctionListItem(changedEntry)
-                    }
+                //check to see if the current request falls in bonus time
+                val currTime = CurrDateTimeInMillis()
+                if ((currTime >= LiveBonusTimeInfo.value!!.StartTime) &&
+                    (currTime < LiveBonusTimeInfo.value!!.EndTime)
+                ) {
+                    StartTimerForLiveAuctionListItem(changedEntry)
+                } else {
+                    //if not, then update live auction list item by closing this entry
+                    closeLiveAuctionListItem(changedEntry)
                 }
+                //finally release the the truck for deliver
+                releaseTruckForDelivery(changedEntry.TruckNo!!, src, des)
+                Log.d(TAG, "Request to accept bid successful for: ${changedEntry}")
+            } else {
+                Log.d(TAG, "Request to accept bid rejected for: ${changedEntry}")
             }
         } else {
             Log.d(TAG, "Request to accept bid rejected for: ${changedEntry}")
@@ -806,83 +736,6 @@ object UnionAdminRepo {
         }
     }
 
-
-    /*fun fetchLiveRoutesList() {
-        val coll = firestoreDb.collection(LIVE_ROUTES_LIST)
-        coll.addSnapshotListener { routes, error ->
-            if (error != null) {
-                Log.w(
-                    TAG, "Failed to update the live routes list"
-                )
-            } else {
-                var src: String *//*Mandi*//*
-                var des: String *//*Destination*//*
-                var data: String *//*Represents specifier for Rate, Requirement or Got*//*
-                var value: String *//*Contains the value of the specified specifier*//*
-                var splittedWords: List<String>
-                routes!!.forEach {
-                    if (it.id != "DummyDoc") {
-                        splittedWords = it.id.split("-")
-                        src = splittedWords[0]
-                        des = splittedWords[1]
-                        data = splittedWords[2]
-                        value = it.get("Value").toString()
-                        when (data) {
-                            "Rate" -> {
-                                if (liveRoutesList.containsKey(src)) {
-                                    liveRoutesList[src]!!.desData[des]!![data] = value
-                                } else {
-                                    liveRoutesList[src] = LiveRoutesListItemDTO(
-                                        desData = hashMapOf(
-                                            des to hashMapOf(
-                                                "Req" to "",
-                                                "Got" to "",
-                                                "Rate" to value
-                                            )
-                                        )
-                                    )
-                                }
-
-                            }
-                            "Req" -> {
-                                if (liveRoutesList.containsKey(src)) {
-                                    liveRoutesList[src]!!.desData[des]!![data] = value
-                                } else {
-                                    liveRoutesList[src] = LiveRoutesListItemDTO(
-                                        desData = hashMapOf(
-                                            des to hashMapOf(
-                                                "Req" to value,
-                                                "Got" to "",
-                                                "Rate" to ""
-                                            )
-                                        )
-                                    )
-                                }
-                            }
-                            "Got" -> {
-                                if (liveRoutesList.containsKey(src)) {
-                                    liveRoutesList[src]!!.desData[des]!![data] = value
-                                } else {
-                                    liveRoutesList[src] = LiveRoutesListItemDTO(
-                                        desData = hashMapOf(
-                                            des to hashMapOf(
-                                                "Req" to "",
-                                                "Got" to value,
-                                                "Rate" to ""
-                                            )
-                                        )
-                                    )
-                                }
-                            }
-                        }
-                        Log.w(TAG, "Updated list for ${it.id} = ${it.data}")
-                    }
-                }
-            }
-            LiveRoutesList.value = liveRoutesList
-        }
-    }*/
-
     suspend fun saveLiveAuctionList() {
         val dataToUpload = HashMap<String, HistoryAuctionListItemDTO>()
         LiveAuctionList.value!!.forEach {
@@ -1031,13 +884,13 @@ object UnionAdminRepo {
 
     //checks if the truck status is in progress
     private fun truckInProgress(truckNo: String): Boolean {
-        Log.d(TAG, "Finding truck status of ${truckNo}")
-        Log.d(TAG, "${LiveTruckDataList.value}")
-        Log.d(TAG,
-            "Finding truck status of ${truckNo}....found: " +
-                    "${LiveTruckDataList.value!![truckNo]!!.Status == "DelInProg"}")
         val ans = LiveTruckDataList.value!![truckNo]!!.Status == "DelInProg"
         return ans
+    }
+
+    //checks if the truck is active
+    private fun truckIsActive(truckNo: String): Boolean {
+        return LiveTruckDataList.value!![truckNo]!!.Active
     }
 
 

@@ -199,185 +199,32 @@ object TruckOwnerRepo {
             }.await()
     }
 
-
-    /*
-    fun fetchLiveTruckDataList() {
-        if (truckOwnerLiveData.Trucks.isNotEmpty()) {
-            truckOwnerLiveData.Trucks.forEach{ truck ->
-
-                val childEventListener = object : ChildEventListener {
-                    override fun onChildAdded(
-                        dataSnapshot: DataSnapshot,
-                        previousChildName: String?,
-                    ) {
-                        Log.d(TAG, "Updated truck ${dataSnapshot.key.toString()} " +
-                                "status: ${dataSnapshot}")
-                        //if the current list does not have any entry for this truck, then initialize
-                        //this truck by making its entry in the list
-                        if (!liveTruckDataList.containsKey(truck)) {
-                            liveTruckDataList[truck] = LiveTruckDataItem(TruckNo = truck)
-//                            liveTruckDataList[truck] = LiveTruckDataListItemDTO(truckNo = truck)
-                        }
-
-                        when (dataSnapshot.key.toString()) {
-                            "CurrentListNo" -> {
-                                liveTruckDataList[truck]!!
-                                    .CurrentListNo = dataSnapshot.value.toString()
-                            }
-                            "Owner" -> {
-                                liveTruckDataList[truck]!!
-                                    .Owner = dataSnapshot.value.toString()
-                            }
-                            "Status" -> {
-                                liveTruckDataList[truck]!!
-                                    .Status = dataSnapshot.value.toString()
-                            }
-                            "Timestamp" -> {
-                                liveTruckDataList[truck]!!
-                                    .Timestamp = dataSnapshot.value.toString()
-                            }
-                            "Source" -> {
-                                val oldRouteValue = liveTruckDataList[truck]!!.Route
-                                val newRouteValue = Pair(dataSnapshot.value.toString(), oldRouteValue.second)
-                                liveTruckDataList[truck]!!
-                                    .Route = newRouteValue
-                            }
-                            "Destination" -> {
-                                val oldRouteValue = liveTruckDataList[truck]!!.Route
-                                val newRouteValue = Pair(oldRouteValue.first, dataSnapshot.value.toString())
-                                liveTruckDataList[truck]!!
-                                    .Route = newRouteValue
-                            }
-                        }
-
-                        LiveTruckDataList.value = liveTruckDataList
-                    }
-
-                    override fun onChildChanged(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                        Log.d(TAG, "Truck Status updated: ${dataSnapshot.value}")
-
-                        if (!liveTruckDataList.containsKey(truck)) {
-                            liveTruckDataList[truck] = LiveTruckDataItem(TruckNo = truck)
-//                            liveTruckDataList[truck] = LiveTruckDataListItemDTO(truckNo = truck)
-                        }
-
-                        when (dataSnapshot.key.toString()) {
-                            "CurrentListNo" -> {
-                                liveTruckDataList[truck]!!
-                                    .CurrentListNo = dataSnapshot.value.toString()
-                            }
-                            "Owner" -> {
-                                liveTruckDataList[truck]!!
-                                    .Owner = dataSnapshot.value.toString()
-                            }
-                            "Status" -> {
-                                liveTruckDataList[truck]!!
-                                    .Status = dataSnapshot.value.toString()
-                            }
-                            "Timestamp" -> {
-                                liveTruckDataList[truck]!!
-                                    .Timestamp = dataSnapshot.value.toString()
-                            }
-                            "Source" -> {
-                                val oldRouteValue = liveTruckDataList[truck]!!.Route
-                                val newRouteValue = Pair(dataSnapshot.value.toString(), oldRouteValue.second)
-                                liveTruckDataList[truck]!!
-                                    .Route = newRouteValue
-                            }
-                            "Destination" -> {
-                                val oldRouteValue = liveTruckDataList[truck]!!.Route
-                                val newRouteValue = Pair(oldRouteValue.first, dataSnapshot.value.toString())
-                                liveTruckDataList[truck]!!
-                                    .Route = newRouteValue
-                            }
-                        }
-
-                        LiveTruckDataList.value = liveTruckDataList
-                    }
-
-                    override fun onChildRemoved(dataSnapshot: DataSnapshot) {
-                        Log.d(TAG, "onChildRemoved:" + dataSnapshot.key!!)
-                        liveTruckDataList.remove(dataSnapshot.key!!)
-                        LiveTruckDataList.value = liveTruckDataList
-                    }
-
-                    override fun onChildMoved(dataSnapshot: DataSnapshot, previousChildName: String?) {
-                        //no action
-                    }
-
-                    override fun onCancelled(databaseError: DatabaseError) {
-                        Log.w(
-                            TAG,
-                            "Retrieving LiveTruckData Failed:onCancelled",
-                            databaseError.toException()
-                        )
-                    }
-                }
-                Log.w(TAG, "Updated live truck data list: ${liveTruckDataList}")
-                firebaseDb.reference
-                    .child(LIVE_TRUCK_DATA_LIST)
-                    .child(truck.trim())
-                    .addChildEventListener(childEventListener)
-            }
-        }
-    }
-    */
-
     fun fetchLiveTruckDataList() {
         val col = firestoreDb.collection(LIVE_TRUCK_DATA_LIST)
-        col.addSnapshotListener { snapshots, error ->
-            liveTruckDataList = HashMap()
-            snapshots!!.forEach { truckDocument ->
-                val liveTruckDataItem = LiveTruckDataItem()
-                liveTruckDataItem.TruckNo = truckDocument.id
-                liveTruckDataItem.CurrentListNo = truckDocument.get("CurrentListNo").toString()
-                liveTruckDataItem.Owner = (truckDocument.get("Owner") as List<*>)
-                    .zipWithNext { a, b -> Pair(a.toString(), b.toString()) }[0]
 
-                //Get all the ticket names issued for this truck
-                val pahunchTickets = ArrayList<Long>()
-                truckDocument.data.forEach {
-                    if (it.key != "CurrentListNo" &&
-                        it.key != "Owner" &&
-                        it.key != "Route"
-                    ) {
-                        pahunchTickets.add(it.key.split("-")[1].toLong())
+        if (truckOwnerLiveData.Trucks.isNotEmpty()) {
+            truckOwnerLiveData.Trucks.forEach { truck ->
+                col.document(truck).addSnapshotListener { truckDocument, error ->
+                    if (error == null) {
+                        Log.d(TAG, "truck: ${truck} doc: ${truckDocument}")
+                        val liveTruckDataItem = LiveTruckDataItem()
+                        liveTruckDataItem.TruckNo = truckDocument!!.id
+                        liveTruckDataItem.CurrentListNo = truckDocument.get("CurrentListNo").toString()
+                        liveTruckDataItem.Status = truckDocument.get("Status").toString()
+                        liveTruckDataItem.Timestamp = truckDocument.get("Timestamp").toString()
+                        liveTruckDataItem.Owner = (truckDocument.get("Owner") as List<*>)
+                            .zipWithNext { a, b -> Pair(a.toString(), b.toString()) }[0]
+                        liveTruckDataItem.Route = Pair(
+                            truckDocument.get("Source").toString(), truckDocument.get("Destination").toString()
+                        )
+                        liveTruckDataList[truckDocument.id] = liveTruckDataItem
+                        LiveTruckDataList.postValue(liveTruckDataList)
+                        Log.d(TAG, "after each truck update: ${liveTruckDataItem}")
+                    } else {
+                        Log.d(TAG, "unable to update live truck data, error: ${error}")
                     }
                 }
-
-                //Get the most recent pahunch ticket
-                val mostRecentTicket = truckDocument
-                    .get("Pahunch-${pahunchTickets.sortedDescending()[0]}") as Map<*, *>
-
-                var src = ""
-                var des = ""
-                var status = ""
-                var timestamp = ""
-                mostRecentTicket.forEach {
-                    when (it.key.toString()) {
-                        "Source" -> {
-                            src = it.value.toString()
-                        }
-                        "Destination" -> {
-                            des = it.value.toString()
-                        }
-                        "Status" -> {
-                            status = it.value.toString()
-                        }
-                        "Timestamp" -> {
-                            timestamp = it.value.toString()
-                        }
-                    }
-                }
-
-                liveTruckDataItem.Route = Pair(src, des)
-                liveTruckDataItem.Status = status
-                liveTruckDataItem.Timestamp = timestamp
-
-                liveTruckDataList[truckDocument.id] = liveTruckDataItem
             }
-
-            LiveTruckDataList.postValue(liveTruckDataList)
         }
     }
 
@@ -430,7 +277,7 @@ object TruckOwnerRepo {
     }
 
     suspend fun uploadTruckRC(rcFront: Bitmap, rcBack: Bitmap) {
-//        val userFolder = auth.uid.toString()
+        //val userFolder = auth.uid.toString()
 
         //For testing only
         val userFolder = "DemoUserTO"
@@ -440,28 +287,15 @@ object TruckOwnerRepo {
         val baos1 = ByteArrayOutputStream()
         rcFront.compress(Bitmap.CompressFormat.JPEG, 50, baos1)
         val rcFrontData = baos1.toByteArray()
-        rcFrontref.putBytes(rcFrontData)
-            .addOnSuccessListener {
-                /*Snackbar.make(currView, "Truck RC submitted successfully!",
-                    Snackbar.LENGTH_LONG).show()*/
-            }
-            .addOnFailureListener {
-                /*Snackbar.make(currView, "Failed to submit Truck RC, please try again later!",
-                    Snackbar.LENGTH_LONG).show()*/
-            }.await()
+        rcFrontref.putBytes(rcFrontData).await()
 
         delay(2000)
-
 
         val rcBackPath = "${TRUCK_RC}/${userFolder}/Back/rc_back.jpeg"
         val rcBackref = firebaseSt.reference.child(rcBackPath)
         val baos2 = ByteArrayOutputStream()
         rcBack.compress(Bitmap.CompressFormat.JPEG, 50, baos2)
         val rcBackData = baos2.toByteArray()
-        rcBackref.putBytes(rcBackData)
-            .addOnSuccessListener {
-            }
-            .addOnFailureListener {
-            }.await()
+        rcBackref.putBytes(rcBackData).await()
     }
 }

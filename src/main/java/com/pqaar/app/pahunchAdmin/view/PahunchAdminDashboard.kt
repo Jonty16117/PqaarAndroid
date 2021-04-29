@@ -27,6 +27,8 @@ class PahunchAdminDashboard : AppCompatActivity() {
 
     private var pahunchHistory = ArrayList<PahunchTicket>()
 
+    private lateinit var pahunchHistoryAdapter: PahunchHistoryAdapter
+
     private lateinit var historyRecyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,23 +40,27 @@ class PahunchAdminDashboard : AppCompatActivity() {
         val model = ViewModelProviders.of(this)
             .get(PahunchAdminViewModel::class.java)
 
-        val adapter = Adapter(this, pahunchHistory)
+        pahunchHistoryAdapter = PahunchHistoryAdapter(this, pahunchHistory)
         historyRecyclerView.layoutManager = LinearLayoutManager(this)
-        historyRecyclerView.adapter = adapter
+        historyRecyclerView.adapter = pahunchHistoryAdapter
 
         model.getPahunchHistory().observe(this, {
             pahunchHistory = ArrayList()
             pahunchHistory.addAll(it)
-            adapter.notifyDataSetChanged()
+            updatePahunchHistoryAdapter()
         })
 
     }
 
-    inner class Adapter(
+    private fun updatePahunchHistoryAdapter() {
+        pahunchHistoryAdapter.notifyDataSetChanged()
+    }
+
+    inner class PahunchHistoryAdapter(
         private val context: Context,
         private val pahunchHistory: ArrayList<PahunchTicket>,
     ) :
-        RecyclerView.Adapter<Adapter.ViewHolder>(),
+        RecyclerView.Adapter<PahunchHistoryAdapter.ViewHolder>(),
         AdapterView.OnItemSelectedListener {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
