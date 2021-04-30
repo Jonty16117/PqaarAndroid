@@ -8,4 +8,5 @@ data class PahunchTicket(
     var Status: String = "",
     var Timestamp: Long = 0L,
     var TruckNo: String = "",
+    var AuctionId: Long = 0L
 )

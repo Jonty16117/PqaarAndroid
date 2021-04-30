@@ -13,7 +13,6 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppThemeLight">
-        <activity android:name=".truckOwner.view.TruckOwnerDashboardTest" />
         <activity android:name=".truckOwner.view.ManageTrucksTest" />
         <activity android:name=".mandiAdmin.view.MandiAdminDashboard" />
         <activity android:name=".unionAdmin.view.UnionAdminDashboard" />

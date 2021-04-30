@@ -14,6 +14,7 @@ import com.pqaar.app.utils.DbPaths.LIVE_AUCTION_LIST
 import com.pqaar.app.utils.DbPaths.LIVE_ROUTES_LIST
 import com.pqaar.app.utils.DbPaths.LIVE_TRUCK_DATA_LIST
 import com.pqaar.app.utils.DbPaths.MANDI_ROUTES_LIST
+import com.pqaar.app.utils.DbPaths.PAHUNCH_ADMIN_RECORDS
 import com.pqaar.app.utils.DbPaths.ROUTES_LIST_DATA
 import com.pqaar.app.utils.DbPaths.SCHEDULED_AUCTIONS
 import com.pqaar.app.utils.TimeConversions.CurrDateTimeInMillis
@@ -45,8 +46,9 @@ object UnionAdminRepo {
     private lateinit var lastOpenLiveList: ArrayList<LiveAuctionListItem>
     private lateinit var lastClosedLiveList: ArrayList<LiveAuctionListItem>
     private lateinit var lastMissedList: ArrayList<LiveAuctionListItem>
-    private lateinit var truckCheckArray: HashMap<String, Boolean>
+    private lateinit var trucksInLastAuction: HashMap<String, Boolean>
     lateinit var liveCombinedAuctionList: ArrayList<LiveAuctionListItem>
+    private lateinit var pahunchs: HashMap<Long, HashMap<String, PahunchTicketDTO>>
     val PropRoutesList = MutableLiveData<ArrayList<LivePropRoutesListItem>>()
     val TruckRequestsLive = MutableLiveData<HashMap<String, AddTruckRequest>>()
     val LiveAuctionList = MutableLiveData<HashMap<String, LiveAuctionListItem>>()
@@ -164,59 +166,27 @@ object UnionAdminRepo {
             if (error == null) {
                 liveTruckDataList = HashMap()
                 snapshots!!.forEach { truckDocument ->
-                    val liveTruckDataItem = LiveTruckDataItem()
-                    liveTruckDataItem.TruckNo = truckDocument.id
-                    liveTruckDataItem.CurrentListNo = truckDocument.get("CurrentListNo").toString()
-                    liveTruckDataItem.Status = truckDocument.get("Status").toString()
-                    liveTruckDataItem.Timestamp = truckDocument.get("Timestamp").toString()
-                    liveTruckDataItem.Owner = (truckDocument.get("Owner") as List<*>)
-                        .zipWithNext { a, b -> Pair(a.toString(), b.toString()) }[0]
-                    liveTruckDataItem.Route = Pair(
-                        truckDocument.get("Source").toString(),
-                        truckDocument.get("Destination").toString()
-                    )
-
-                    /*//Get all the ticket names issued for this truck
-                    val pahunchTickets = ArrayList<Long>()
-                    truckDocument.data.forEach {
-                        if (it.key != "CurrentListNo" &&
-                            it.key != "Owner" &&
-                            it.key != "Route"
-                        ) {
-                            pahunchTickets.add(it.key.split("-")[1].toLong())
+                    Log.d(TAG, "Fetched live truck: ${truckDocument}")
+                    if (truckDocument.id != "DummyDoc") {
+                        val liveTruckDataItem = LiveTruckDataItem()
+                        liveTruckDataItem.Active = truckDocument.get("Active").toString() == "true"
+                        liveTruckDataItem.TruckNo = truckDocument.get("TruckNo").toString()
+                        if (liveTruckDataItem.Active) {
+                            liveTruckDataItem.CurrentListNo =
+                                truckDocument.get("CurrentListNo").toString()
+                            liveTruckDataItem.Status = truckDocument.get("Status").toString()
+                            liveTruckDataItem.Timestamp = truckDocument.get("Timestamp").toString()
+                            liveTruckDataItem.AuctionId =
+                                truckDocument.get("AuctionId").toString().toLong()
+                            liveTruckDataItem.Owner = (truckDocument.get("Owner") as List<*>)
+                                .zipWithNext { a, b -> Pair(a.toString(), b.toString()) }[0]
+                            liveTruckDataItem.Route = Pair(
+                                truckDocument.get("Source").toString(),
+                                truckDocument.get("Destination").toString()
+                            )
                         }
+                        liveTruckDataList[liveTruckDataItem.TruckNo] = liveTruckDataItem
                     }
-
-                    //Get the most recent pahunch ticket
-                    val mostRecentTicket = truckDocument
-                        .get("Pahunch-${pahunchTickets.sortedDescending()[0]}") as Map<*, *>
-
-                    var src = ""
-                    var des = ""
-                    var status = ""
-                    var timestamp = ""
-                    mostRecentTicket.forEach {
-                        when (it.key.toString()) {
-                            "Source" -> {
-                                src = it.value.toString()
-                            }
-                            "Destination" -> {
-                                des = it.value.toString()
-                            }
-                            "DeliveryStatus" -> {
-                                status = it.value.toString()
-                            }
-                            "Timestamp" -> {
-                                timestamp = it.value.toString()
-                            }
-                        }
-                    }
-
-                    liveTruckDataItem.Route = Pair(src, des)
-                    liveTruckDataItem.Status = status
-                    liveTruckDataItem.Timestamp = timestamp*/
-
-                    liveTruckDataList[truckDocument.id] = liveTruckDataItem
                 }
                 LiveTruckDataList.postValue(liveTruckDataList)
             }
@@ -286,35 +256,94 @@ object UnionAdminRepo {
         }))
     }
 
+    /**
+     * Get the pahunchs of each truck and organise them
+     */
+    suspend fun fetchPahunchs() {
+        pahunchs = HashMap()
+        val col = firestoreDb.collection(PAHUNCH_ADMIN_RECORDS)
+        col.get().addOnSuccessListener { pahunchsSnapshot ->
+            pahunchsSnapshot.forEach { pahunchSnapshot ->
+                Log.d(TAG, "Fetched pahunch: ${pahunchSnapshot}")
+                if (pahunchSnapshot.id != "DummyDoc") {
+                    val auctionId = pahunchSnapshot.get("AuctionId").toString().toLong()
+                    val truckNo = pahunchSnapshot.get("TruckNo").toString()
+                    val src = pahunchSnapshot.get("Source").toString()
+                    val des = pahunchSnapshot.get("Destination").toString()
+                    val status = pahunchSnapshot.get("Status").toString()
+                    val timestamp = pahunchSnapshot.get("Timestamp").toString().toLong()
+                    val pahunchTicketDTO =
+                        PahunchTicketDTO(auctionId, truckNo, src, des, status, timestamp)
+                    if (pahunchs.containsKey(auctionId)) {
+                        pahunchs[auctionId]!![truckNo] = pahunchTicketDTO
+                    } else {
+                        pahunchs[auctionId] = HashMap<String, PahunchTicketDTO>()
+                        pahunchs[auctionId]!![truckNo] = pahunchTicketDTO
+                    }
+                }
+            }
+        }.await()
+    }
+
+    private fun truckIsEligibleForAuction(truckNo: String): Boolean {
+        Log.d(TAG, "liveTruckDataList: ${liveTruckDataList}")
+        Log.d(TAG, "checking eligibility for truck: ${truckNo}")
+        val truckIsActive: Boolean = liveTruckDataList[truckNo]!!.Active
+        if (!truckIsActive){
+            return false
+        }
+        val truckIsUnassigned = liveTruckDataList[truckNo]!!.Status == "Unassigned"
+        if (truckIsUnassigned) {
+            return true
+        }
+        val truckInProgress = liveTruckDataList[truckNo]!!.Status == "DelInProg"
+        if (truckInProgress){
+            return false
+        }
+        var truckPahunchCorrect = pahunchs.containsKey(liveTruckDataList[truckNo]!!.AuctionId) &&
+                pahunchs[liveTruckDataList[truckNo]!!.AuctionId]!!
+                    .containsKey(liveTruckDataList[truckNo]!!.TruckNo) &&
+                pahunchs[liveTruckDataList[truckNo]!!.AuctionId]!![liveTruckDataList[truckNo]!!.TruckNo]!!
+                    .Source == liveTruckDataList[truckNo]!!.Route.first &&
+                pahunchs[liveTruckDataList[truckNo]!!.AuctionId]!![liveTruckDataList[truckNo]!!.TruckNo]!!
+                    .Destination == liveTruckDataList[truckNo]!!.Route.second &&
+                pahunchs[liveTruckDataList[truckNo]!!.AuctionId]!![liveTruckDataList[truckNo]!!.TruckNo]!!
+                    .Timestamp > liveTruckDataList[truckNo]!!.Timestamp.toLong()
+        if (liveTruckDataList[truckNo]!!.Status == "DelPass") {
+            truckPahunchCorrect = truckPahunchCorrect &&
+                pahunchs[liveTruckDataList[truckNo]!!.AuctionId]!![liveTruckDataList[truckNo]!!.TruckNo]!!
+                    .Status == "Accepted"
+        }
+        else if (liveTruckDataList[truckNo]!!.Status == "DelFail") {
+            truckPahunchCorrect = truckPahunchCorrect &&
+                pahunchs[liveTruckDataList[truckNo]!!.AuctionId]!![liveTruckDataList[truckNo]!!.TruckNo]!!
+                    .Status == "Rejected"
+        }
+        return truckPahunchCorrect
+    }
+
     fun separateOpenCloseLists() {
         lastClosedLiveList = ArrayList()
         lastOpenLiveList = ArrayList()
-        truckCheckArray = HashMap()
+        trucksInLastAuction = HashMap()
         Log.d(TAG, "LastAuctionListDTO: $lastAuctionListDTO")
         //to track which truck were in the last auction and which were not
         for (listItem in lastAuctionListDTO) {
             /**
              * if this bid was accepted in last auction, then put it in lastClosedLiveList
              */
-            truckCheckArray[listItem.second.truck_no] = true
-            if ((listItem.second.bid_closed == "true") &&
-                (!truckInProgress(listItem.second.truck_no)) &&
-                (truckIsActive(listItem.second.truck_no))
-            ) {
-                lastClosedLiveList.add(
-                    LiveAuctionListItem(
-                        PrevNo = listItem.first,
-                        TruckNo = listItem.second.truck_no
-                    )
+            if (truckIsEligibleForAuction(listItem.second.truck_no)) {
+                Log.d(TAG, "Truck is eligible for next auction: ${listItem.second.truck_no}")
+                trucksInLastAuction[listItem.second.truck_no] = true
+                val liveAuctionListItem = LiveAuctionListItem(
+                    PrevNo = listItem.first,
+                    TruckNo = listItem.second.truck_no
                 )
-            }
-            if (!truckInProgress(listItem.second.truck_no)) {
-                lastOpenLiveList.add(
-                    LiveAuctionListItem(
-                        PrevNo = listItem.first,
-                        TruckNo = listItem.second.truck_no
-                    )
-                )
+                if (listItem.second.bid_closed == "true") {
+                    lastClosedLiveList.add(liveAuctionListItem)
+                } else {
+                    lastOpenLiveList.add(liveAuctionListItem)
+                }
             }
         }
     }
@@ -326,9 +355,9 @@ object UnionAdminRepo {
          * this list contains all the trucks along with their status)
          */
         Log.d(TAG, "Searching for free trucks in available total trucks:" +
-                " ${LiveTruckDataList.value!!.keys}")
+                " ${liveTruckDataList.keys}")
 
-        for (truck in LiveTruckDataList.value!!.keys) {
+        for (truck in liveTruckDataList.keys) {
             /**
              * if there is a truck which was not in the last auction
              * and whose status is "not in progress", initialize it in the
@@ -338,17 +367,17 @@ object UnionAdminRepo {
              * which is done in the next, step. But this timestamp's original motive
              * is to store the timestamp information during the live auction.
              */
-            if (!truckCheckArray.containsKey(truck) &&
-                !truckInProgress(truck) &&
-                truckIsActive(truck)
+            if (!trucksInLastAuction.containsKey(truck) &&
+                truckIsEligibleForAuction(truck)
             ) {
+                Log.d(TAG, "Truck is eligible for next auction from missed auction: ${truck}")
+
                 lastMissedList.add(
                     LiveAuctionListItem(
                         PrevNo =
-                        LiveTruckDataList.value!![truck]!!.CurrentListNo,
-//                        LiveTruckDataList.value!![truck]!!.data["CurrentListNo"]!!,
+                        liveTruckDataList[truck]!!.CurrentListNo,
                         TruckNo = truck,
-                        StartTime = LiveTruckDataList.value!![truck]!!.Timestamp.toLong()
+                        StartTime = liveTruckDataList[truck]!!.Timestamp.toLong()
                     )
                 )
             }
@@ -385,7 +414,7 @@ object UnionAdminRepo {
     ) {
         liveCombinedAuctionList.forEachIndexed { index, item ->
             item.StartTime =
-                auctionStartTime + (perUserBidDurationInMillis * (index + 1))
+                auctionStartTime + (perUserBidDurationInMillis * (index))
             item.CurrNo = (index + 1).toString()
         }
         Log.d(TAG, "After setting CurrNo & StartTime in live auction" +
@@ -400,7 +429,7 @@ object UnionAdminRepo {
         batchedList.forEachIndexed { index, ls ->
             firestoreDb.runBatch { batch ->
                 ls.forEach {
-                    var doc = col.document(it.CurrNo!!)
+                    val doc = col.document(it.CurrNo!!)
                     batch.set(doc, it)
                 }
             }.addOnSuccessListener {
@@ -876,21 +905,6 @@ object UnionAdminRepo {
             }
             delay(2000)
         }
-    }
-
-    private fun getTruckOwner(truckNo: String): Pair<String, String> {
-        return LiveTruckDataList.value!![truckNo]!!.Owner
-    }
-
-    //checks if the truck status is in progress
-    private fun truckInProgress(truckNo: String): Boolean {
-        val ans = LiveTruckDataList.value!![truckNo]!!.Status == "DelInProg"
-        return ans
-    }
-
-    //checks if the truck is active
-    private fun truckIsActive(truckNo: String): Boolean {
-        return LiveTruckDataList.value!![truckNo]!!.Active
     }
 
 

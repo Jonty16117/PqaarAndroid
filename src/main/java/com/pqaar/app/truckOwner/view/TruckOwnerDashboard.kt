@@ -10,10 +10,7 @@ import android.os.CountDownTimer
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.PopupMenu
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -37,10 +34,6 @@ import com.pqaar.app.utils.TimeConversions.CurrDateTimeInMillis
 class TruckOwnerDashboard : AppCompatActivity() {
     private val TAG = "TruckOwnerDashboard"
 
-    private val SCHEDULED_AUCTION_STATUS = "Next Auction In"
-    private val LIVE_AUCTION_STATUS = "Live Auction Ending In"
-    private val NO_AUCTION_STATUS = "No Auctions Available"
-
     private lateinit var textViewTotalTrucks: TextView
     private lateinit var auctionStatus: TextView
     private lateinit var totalTrucksClosedCountText: TextView
@@ -54,12 +47,10 @@ class TruckOwnerDashboard : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
 
     private lateinit var alertDialog: AlertDialog
-    private lateinit var timer: CountDownTimer
     private lateinit var historyAdapter: TruckDriverHistoryAdapter
+    private lateinit var model: TruckOwnerViewModel
 
     private var trucksHistoryList = ArrayList<LiveTruckDataItem>()
-    private var auctionStartTime = 0L
-    private var auctionEndTime = 0L
     private var liveAuctionList = ArrayList<LiveAuctionListItem>()
     private var liveRoutesList = ArrayList<LiveRoutesListItem>()
 
@@ -83,40 +74,27 @@ class TruckOwnerDashboard : AppCompatActivity() {
         menu.setOnClickListener { showPopUpMenu(menu) }
         
         viewPager.adapter = BottomSheetViewPagerAdapter(supportFragmentManager)
-        val model = ViewModelProviders.of(this)
+        this.model = ViewModelProviders.of(this)
             .get(TruckOwnerViewModel::class.java)
 
-        trucksHistoryList.add(LiveTruckDataItem(
-            TruckNo = "PB30XXXX",
-                    CurrentListNo = "1",
-                    Route = Pair("a", "b"),
-                    Status = "DelPass",
-                    Timestamp = "1619696229361"
-        ))
         historyAdapter = TruckDriverHistoryAdapter(this, trucksHistoryList)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = historyAdapter
 
-        model.getAuctionStartTime().observe(this, {
-            auctionStartTime = it
+        model.liveAuctionStatusChanged.observe(this, {
+            /**
+             * This observer initializes other observers in the viewmodel that updates
+             * the dashboard timer, so DO NOT REMOVE THIS OBSERVER
+             */
+            Log.d(TAG, "Activity resumed observing viewmodel")
         })
 
-        model.getAuctionEndTime().observe(this, {
-            auctionEndTime = it
+        model.dashboardStatus.observe(this, {
+            auctionStatus.text = it
         })
 
-        model.getAuctionStatus().observe(this, {
-            when (it) {
-                "Scheduled" -> {
-                    auctionStatus.text = SCHEDULED_AUCTION_STATUS
-                    setScheduledTimer()
-                }
-                "Live" -> {
-                    auctionStatus.text = LIVE_AUCTION_STATUS
-                    setLiveTimer()
-                }
-                else -> { auctionStatus.text = NO_AUCTION_STATUS }
-            }
+        model.dashboardTimer.observe(this, {
+            dashboardTimer.text = it
         })
 
         model.getLiveAuctionList().observe(this, { LiveAuctionList ->
@@ -178,58 +156,6 @@ class TruckOwnerDashboard : AppCompatActivity() {
 
     private fun updateMyTrucksAdapter() {
         historyAdapter.notifyDataSetChanged()
-    }
-
-
-    private fun setLiveTimer() {
-        var hour: Long
-        var min: Long
-        var sec: Long
-        var text: String
-        timer = object : CountDownTimer(
-            auctionEndTime - auctionStartTime,
-            1000) {
-            override fun onTick(timeLeft: Long) {
-                hour = (timeLeft/(1000*60*60))%60
-                min = (timeLeft/(1000*60))%60
-                sec = (timeLeft/1000)%60
-                text = "${hour.toString().padStart(2, '0')}:" +
-                        "${min.toString().padStart(2, '0')}:" +
-                        sec.toString().padStart(2, '0')
-                dashboardTimer.text = text
-            }
-
-            override fun onFinish() {
-                auctionStatus.text = NO_AUCTION_STATUS
-                dashboardTimer.text = "00:00:00"
-            }
-        }
-        timer.start()
-    }
-
-    private fun setScheduledTimer() {
-        var hour: Long
-        var min: Long
-        var sec: Long
-        var text: String
-        timer = object : CountDownTimer(
-            auctionStartTime - CurrDateTimeInMillis(),
-            1000) {
-            override fun onTick(timeLeft: Long) {
-                hour = (timeLeft/(1000*60*60))%60
-                min = (timeLeft/(1000*60))%60
-                sec = (timeLeft/1000)%60
-                text = "${hour.toString().padStart(2, '0')}:" +
-                        "${min.toString().padStart(2, '0')}:" +
-                        sec.toString().padStart(2, '0')
-                dashboardTimer.text = text
-            }
-            override fun onFinish() {
-                auctionStatus.text = LIVE_AUCTION_STATUS
-                setLiveTimer()
-            }
-        }
-        timer.start()
     }
 
     private fun showPopUpMenu(view: View) {

@@ -3,12 +3,14 @@ package com.pqaar.app.unionAdmin.view
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProviders
 import com.pqaar.app.R
 import com.pqaar.app.model.LiveRoutesListItemDTO
+import com.pqaar.app.model.LiveTruckDataListItemDTO
 import com.pqaar.app.utils.TimeConversions.CurrDateTimeInMillis
 import com.pqaar.app.unionAdmin.viewModel.UnionAdminViewModel
 
@@ -49,6 +51,7 @@ class UnionAdminDashboard : AppCompatActivity() {
 
 
         model.getLiveTruckDataList().observe(this, {
+            Log.d(TAG, "$it")
             textView15.text = "Live Truck Status List = ${it}"
         })
 

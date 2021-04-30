@@ -35,6 +35,12 @@ class PahunchAdminViewModel: ViewModel() {
         }
     }
 
+    suspend fun refreshHistory() {
+        GlobalScope.launch(Dispatchers.IO) {
+            fetchPahunchHistory()
+        }
+    }
+
     fun AcceptDel(truckNo: String) {
        acceptDel(truckNo)
     }

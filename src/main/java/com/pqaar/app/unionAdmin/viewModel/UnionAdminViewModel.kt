@@ -22,6 +22,7 @@ import com.pqaar.app.unionAdmin.repository.UnionAdminRepo.fetchLiveAuctionList
 import com.pqaar.app.unionAdmin.repository.UnionAdminRepo.fetchLivePropRoutesList
 import com.pqaar.app.unionAdmin.repository.UnionAdminRepo.fetchLiveRoutesList
 import com.pqaar.app.unionAdmin.repository.UnionAdminRepo.fetchLiveTruckDataList
+import com.pqaar.app.unionAdmin.repository.UnionAdminRepo.fetchPahunchs
 import com.pqaar.app.unionAdmin.repository.UnionAdminRepo.fetchSchAuctionsInfo
 import com.pqaar.app.unionAdmin.repository.UnionAdminRepo.getLastAuctionList
 import com.pqaar.app.unionAdmin.repository.UnionAdminRepo.getLastMissedList
@@ -34,10 +35,7 @@ import com.pqaar.app.unionAdmin.repository.UnionAdminRepo.uploadAuctionsBonusTim
 import com.pqaar.app.unionAdmin.repository.UnionAdminRepo.uploadLiveAuctionList
 import com.pqaar.app.unionAdmin.repository.UnionAdminRepo.uploadLiveMandiRoutes
 import com.pqaar.app.unionAdmin.repository.UnionAdminRepo.uploadSchAuctionsInfo
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import kotlin.system.measureTimeMillis
 
 
@@ -136,6 +134,10 @@ class UnionAdminViewModel : ViewModel() {
             val executionTime = measureTimeMillis {
                 val lastAuctionDoc = fetchLastAuctionListDocument()
                 getLastAuctionList(lastAuctionDoc)
+                val job1 = async {
+                    fetchPahunchs()
+                }
+                job1.await()
                 separateOpenCloseLists()
                 getLastMissedList()
                 combineLists()

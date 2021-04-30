@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.pqaar.app.model.LiveTruckDataItem
 import com.pqaar.app.model.LiveTruckDataListItemDTO
 import com.pqaar.app.model.PahunchTicket
+import com.pqaar.app.model.PahunchTicketDTO
 import com.pqaar.app.unionAdmin.repository.UnionAdminRepo
 import com.pqaar.app.utils.DbPaths.DEL_FAIL
 import com.pqaar.app.utils.DbPaths.DEL_PASS
@@ -63,53 +64,6 @@ object PahunchAdminRepo {
             }
     }
 
-    /**
-     *Get Issued Pahunch History
-     */
-    fun fetchPahunchHistory() {
-        //val uid = auth.uid
-
-        //For testing purposes
-        val uid = "DemoUserPO"
-
-        val ref = firestoreDb.collection(PAHUNCH_ADMIN_RECORDS).document(uid)
-        ref.addSnapshotListener { document, error ->
-            if (error == null) {
-                pahunchHistory = ArrayList()
-                document!!.data!!.forEach { pahunchEntry ->
-                    val pahunchTicketListItem = PahunchTicket()
-                    pahunchTicketListItem.Timestamp = pahunchEntry.key.toLong()
-                    val pahunchEntryInfo = pahunchEntry.value as Map<*, *>
-                    pahunchEntryInfo.forEach {
-                        when (it.key.toString()) {
-                            "TruckNo" -> {
-                                pahunchTicketListItem.TruckNo = it.value.toString()
-                            }
-                            "Status" -> {
-                                pahunchTicketListItem.Status = it.value.toString()
-                            }
-                            "DelInfo" -> {
-                                pahunchTicketListItem.DeliveryInfo = it.value.toString()
-                            }
-                            "Source" -> {
-                                pahunchTicketListItem.Source = it.value.toString()
-                            }
-                            "Destination" -> {
-                                pahunchTicketListItem.Destination = it.value.toString()
-                            }
-                        }
-                    }
-                    pahunchHistory.add(pahunchTicketListItem)
-                }
-                pahunchHistory = ArrayList(pahunchHistory.sortedWith(compareBy {
-                    it.Timestamp
-                }))
-                pahunchHistory.reverse()
-                PahunchHistory.postValue(pahunchHistory)
-            }
-        }
-    }
-
     suspend fun fetchUserDestination() {
         //val uid = auth.uid
 
@@ -129,35 +83,83 @@ object PahunchAdminRepo {
             .await()
     }
 
+    /**
+     *Get Issued Pahunch History
+     */
+    suspend fun fetchPahunchHistory() {
+        //val uid = auth.uid
+
+        //For testing purposes
+        val uid = "DemoUserPA"
+
+        val ref = firestoreDb.collection(PAHUNCH_ADMIN_RECORDS)
+        val query = ref.whereEqualTo("PahunchAdminUId", uid)
+        query.get().addOnSuccessListener { documents ->
+            pahunchHistory = ArrayList()
+            documents!!.forEach { pahunchSnapshot ->
+                if (pahunchSnapshot.id != "DummyDoc") {
+                    val src = pahunchSnapshot.get("Source").toString()
+                    val des = pahunchSnapshot.get("Destination").toString()
+                    val delInfo = pahunchSnapshot.get("DelInfo").toString()
+                    val truckNo = pahunchSnapshot.get("TruckNo").toString()
+                    val status = pahunchSnapshot.get("Status").toString()
+                    val timestamp = pahunchSnapshot.get("Timestamp").toString().toLong()
+                    val auctionId = pahunchSnapshot.get("AuctionId").toString().toLong()
+                    val pahunchTicket = PahunchTicket(
+                        Source = src,
+                        Destination = des,
+                        DeliveryInfo = delInfo,
+                        TruckNo = truckNo,
+                        Status = status,
+                        Timestamp = timestamp,
+                        AuctionId = auctionId
+                    )
+                    pahunchHistory.add(pahunchTicket)
+                }
+            }
+            pahunchHistory = ArrayList(pahunchHistory.sortedWith(compareBy {
+                it.Timestamp
+            }))
+            pahunchHistory.reverse()
+            PahunchHistory.postValue(pahunchHistory)
+        }.await()
+    }
+
     fun fetchIncomingTrucks() {
         val ref = firestoreDb.collection(LIVE_TRUCK_DATA_LIST)
 
         ref.addSnapshotListener { snapshots, error ->
             if (error == null) {
                 liveTruckDataList = ArrayList()
-                snapshots!!.forEach { truckDocumentSnapshot ->
-                    Log.d(TAG, "Truck fetchted: ${truckDocumentSnapshot}")
-                    val route = Pair(
-                        truckDocumentSnapshot.get("Source").toString(),
-                        truckDocumentSnapshot.get("Destination").toString()
-                    )
-                    val status = truckDocumentSnapshot.get("Status").toString()
-                    if ((truckDocumentSnapshot.id != "DemoTruckNo") &&
-                        (route.second == UserDestination.value!!) &&
-                        (status == "DelInProg")
-                    ) {
-                        val liveTruckDataItem = LiveTruckDataItem()
-                        liveTruckDataItem.TruckNo = truckDocumentSnapshot.id
-                        liveTruckDataItem.CurrentListNo = truckDocumentSnapshot.get("CurrentListNo").toString()
-                        liveTruckDataItem.Status = truckDocumentSnapshot.get("Status").toString()
-                        liveTruckDataItem.Timestamp = truckDocumentSnapshot.get("Timestamp").toString()
-                        liveTruckDataItem.Owner = (truckDocumentSnapshot.get("Owner") as List<*>)
-                            .zipWithNext { a, b -> Pair(a.toString(), b.toString()) }[0]
-                        liveTruckDataItem.Route = Pair(
-                            truckDocumentSnapshot.get("Source").toString(),
-                            truckDocumentSnapshot.get("Destination").toString()
+                snapshots!!.forEach { truckDocument ->
+                    if ((truckDocument.get("TruckNo").toString() != "DemoTruckNo") &&
+                        truckDocument.get("Active").toString() == "true") {
+                        val route = Pair(
+                            truckDocument.get("Source").toString(),
+                            truckDocument.get("Destination").toString()
                         )
-                        liveTruckDataList.add(liveTruckDataItem)
+                        val status = truckDocument.get("Status").toString()
+                        if (
+                            (route.second == UserDestination.value!!) &&
+                            (status == "DelInProg")
+                        ) {
+                            if (truckDocument.id != "DummyDoc") {
+                                val liveTruckDataItem = LiveTruckDataItem()
+                                liveTruckDataItem.TruckNo = truckDocument.get("TruckNo").toString()
+                                liveTruckDataItem.Active = truckDocument.get("Active").toString() == "true"
+                                liveTruckDataItem.CurrentListNo =
+                                    truckDocument.get("CurrentListNo").toString()
+                                liveTruckDataItem.Status = status
+                                liveTruckDataItem.Timestamp = truckDocument.get("Timestamp").toString()
+                                liveTruckDataItem.AuctionId =
+                                    truckDocument.get("AuctionId").toString().toLong()
+                                liveTruckDataItem.Owner = (truckDocument.get("Owner") as List<*>)
+                                    .zipWithNext { a, b -> Pair(a.toString(), b.toString()) }[0]
+                                liveTruckDataItem.Route = route
+
+                                liveTruckDataList.add(liveTruckDataItem)
+                            }
+                        }
                     }
                 }
                 LiveTruckDataList.postValue(liveTruckDataList)

@@ -57,10 +57,8 @@ object TruckOwnerRepo {
     val LiveRoutesList = MutableLiveData<HashMap<String, LiveRoutesListItemDTO>>()
     val LiveAuctionList = MutableLiveData<HashMap<String, LiveAuctionListItem>>()
     val LiveTruckDataList = MutableLiveData<HashMap<String, LiveTruckDataItem>>()
-    val LiveAuctionStatus = MutableLiveData<String>()
-    val LiveAuctionStartTime = MutableLiveData<Long>()
-    val LiveAuctionEndTime = MutableLiveData<Long>()
     val LiveBonusTimeInfo = MutableLiveData<BonusTime>()
+    val LiveAuctionTimestamps = MutableLiveData<Pair<Long, Long>>()
 
     suspend fun fetchTruckOwner() {
         val testUid = "DemoUserTO"
@@ -182,10 +180,7 @@ object TruckOwnerRepo {
 
     suspend fun closeBid(truckNo: String, src: String, des: String) {
         val dataToUpdate = hashMapOf<String, Any>("src" to src, "des" to des)
-        Log.d(TAG, "Request to close the bid for truck ${truckNo}")
-        Log.d(TAG, "livetruckdatalist in close bid fun: ${liveTruckDataList}")
         val currListNo = liveTruckDataList[truckNo]!!.CurrentListNo
-        Log.d(TAG, "Closing the bid for ${truckNo} at list no ${currListNo}")
         firestoreDb.collection(LIVE_AUCTION_LIST)
             .document(currListNo)
             .update(dataToUpdate)
@@ -208,7 +203,7 @@ object TruckOwnerRepo {
                     if (error == null) {
                         Log.d(TAG, "truck: ${truck} doc: ${truckDocument}")
                         val liveTruckDataItem = LiveTruckDataItem()
-                        liveTruckDataItem.TruckNo = truckDocument!!.id
+                        liveTruckDataItem.TruckNo = truckDocument!!.get("TruckNo").toString()
                         liveTruckDataItem.CurrentListNo = truckDocument.get("CurrentListNo").toString()
                         liveTruckDataItem.Status = truckDocument.get("Status").toString()
                         liveTruckDataItem.Timestamp = truckDocument.get("Timestamp").toString()
@@ -217,7 +212,7 @@ object TruckOwnerRepo {
                         liveTruckDataItem.Route = Pair(
                             truckDocument.get("Source").toString(), truckDocument.get("Destination").toString()
                         )
-                        liveTruckDataList[truckDocument.id] = liveTruckDataItem
+                        liveTruckDataList[truckDocument.get("TruckNo").toString()] = liveTruckDataItem
                         LiveTruckDataList.postValue(liveTruckDataList)
                         Log.d(TAG, "after each truck update: ${liveTruckDataItem}")
                     } else {
@@ -232,16 +227,13 @@ object TruckOwnerRepo {
         firestoreDb.collection(DbPaths.AUCTIONS_INFO)
             .document(DbPaths.SCHEDULED_AUCTIONS).addSnapshotListener { snapshot, error ->
                 if (error != null) {
-                    LiveAuctionStatus.value = "NA"
-                    LiveAuctionStartTime.value = 0L
-                    LiveAuctionEndTime.value = 0L
                     Log.w(
                         TAG, "Failed to fetch auction info!"
                     )
                 } else {
-                    LiveAuctionStatus.value = snapshot!!.get("Status").toString()
-                    LiveAuctionStartTime.value = snapshot.getLong("StartTime")
-                    LiveAuctionEndTime.value = snapshot.getLong("EndTime")
+                    val startTime: Long = snapshot!!.getLong("StartTime")!!
+                    val endTime: Long = snapshot.getLong("EndTime")!!
+                    LiveAuctionTimestamps.value = Pair(startTime, endTime)
                 }
             }
     }

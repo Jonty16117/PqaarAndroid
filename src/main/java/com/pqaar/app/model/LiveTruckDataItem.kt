@@ -7,5 +7,6 @@ data class LiveTruckDataItem(
     var Route: Pair<String, String> = Pair("NA", "NA"),
     var Status: String = "",
     var Timestamp: String = "",
-    var Active: Boolean = true
+    var Active: Boolean = false,
+    var AuctionId: Long = 0L
 )
