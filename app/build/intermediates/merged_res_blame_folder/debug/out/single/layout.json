@@ -1,0 +1,146 @@
+[
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\fragment_live_auction_list.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\fragment_live_auction_list.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_mandi_admin_dashboard.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\activity_mandi_admin_dashboard.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\fragment_add_mandi_routes.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\fragment_add_mandi_routes.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\live_route_list_header_item.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\live_route_list_header_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\close_bid_alert_dialog_box.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\close_bid_alert_dialog_box.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\route_item.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\route_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\pahunch_history_item.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\pahunch_history_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\fragment_second.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\fragment_second.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\fragment_live_routes_list.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\fragment_live_routes_list.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\custom_spinner_item.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\custom_spinner_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\fragment_otp_verification.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\fragment_otp_verification.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\content_pahunch_admin_dashboard.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\content_pahunch_admin_dashboard.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\mandi_admin_routes_history_item.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\mandi_admin_routes_history_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\truck_item.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\truck_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_pahunch_admin_dashboard.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\activity_pahunch_admin_dashboard.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\live_route_list_sub_item.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\live_route_list_sub_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\mandi_admin_routes_history_sub_item.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\mandi_admin_routes_history_sub_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\live_auction_item.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\live_auction_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_truck_owner_dashboard_test.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\activity_truck_owner_dashboard_test.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_splash_screen.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\activity_splash_screen.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\fragment_first.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\fragment_first.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\history_truck_item.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\history_truck_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_truck_owner_dashboard.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\activity_truck_owner_dashboard.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_union_admin_dashboard.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\activity_union_admin_dashboard.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\fragment_login_user.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\fragment_login_user.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\fragment_register_user.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\fragment_register_user.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\fragment_add_truck.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\fragment_add_truck.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_login_activity.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\activity_login_activity.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\incoming_truck_request_item.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\incoming_truck_request_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\fragment_add_routes_alert_dialog_box.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\fragment_add_routes_alert_dialog_box.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\truck_delivery_alert_dialog_box.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\truck_delivery_alert_dialog_box.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\fragment_remove_truck.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\fragment_remove_truck.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\dashboard_bottom_sheet.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\dashboard_bottom_sheet.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\fragment_truck_requests.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\fragment_truck_requests.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\fragment_add_trucks.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\fragment_add_trucks.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_manage_trucks_test.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\activity_manage_trucks_test.xml"
+    }
+]

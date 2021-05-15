@@ -1,0 +1,74 @@
+com/pqaar/app/databinding/ActivityPahunchAdminDashboardBinding.java
+ com.pqaar.app.databinding.ActivityPahunchAdminDashboardBinding
+com/pqaar/app/databinding/FragmentTruckRequestsBinding.java
+ com.pqaar.app.databinding.FragmentTruckRequestsBinding
+com/pqaar/app/databinding/CustomSpinnerItemBinding.java
+ com.pqaar.app.databinding.CustomSpinnerItemBinding
+com/pqaar/app/databinding/ActivityUnionAdminDashboardBinding.java
+ com.pqaar.app.databinding.ActivityUnionAdminDashboardBinding
+com/pqaar/app/databinding/FragmentFirstBinding.java
+ com.pqaar.app.databinding.FragmentFirstBinding
+com/pqaar/app/databinding/CloseBidAlertDialogBoxBinding.java
+ com.pqaar.app.databinding.CloseBidAlertDialogBoxBinding
+com/pqaar/app/databinding/LiveRouteListSubItemBinding.java
+ com.pqaar.app.databinding.LiveRouteListSubItemBinding
+com/pqaar/app/databinding/HistoryTruckItemBinding.java
+ com.pqaar.app.databinding.HistoryTruckItemBinding
+com/pqaar/app/databinding/MandiAdminRoutesHistoryItemBinding.java
+ com.pqaar.app.databinding.MandiAdminRoutesHistoryItemBinding
+com/pqaar/app/databinding/FragmentAddTruckBinding.java
+ com.pqaar.app.databinding.FragmentAddTruckBinding
+com/pqaar/app/databinding/FragmentLiveAuctionListBinding.java
+ com.pqaar.app.databinding.FragmentLiveAuctionListBinding
+com/pqaar/app/databinding/LiveRouteListHeaderItemBinding.java
+ com.pqaar.app.databinding.LiveRouteListHeaderItemBinding
+com/pqaar/app/databinding/ActivityManageTrucksTestBinding.java
+ com.pqaar.app.databinding.ActivityManageTrucksTestBinding
+com/pqaar/app/databinding/ContentPahunchAdminDashboardBinding.java
+ com.pqaar.app.databinding.ContentPahunchAdminDashboardBinding
+com/pqaar/app/databinding/ActivitySplashScreenBinding.java
+ com.pqaar.app.databinding.ActivitySplashScreenBinding
+com/pqaar/app/BuildConfig.java
+ com.pqaar.app.BuildConfig
+com/pqaar/app/databinding/FragmentRemoveTruckBinding.java
+ com.pqaar.app.databinding.FragmentRemoveTruckBinding
+com/pqaar/app/databinding/LiveAuctionItemBinding.java
+ com.pqaar.app.databinding.LiveAuctionItemBinding
+com/pqaar/app/databinding/PahunchHistoryItemBinding.java
+ com.pqaar.app.databinding.PahunchHistoryItemBinding
+com/pqaar/app/databinding/TruckDeliveryAlertDialogBoxBinding.java
+ com.pqaar.app.databinding.TruckDeliveryAlertDialogBoxBinding
+com/pqaar/app/databinding/FragmentLiveRoutesListBinding.java
+ com.pqaar.app.databinding.FragmentLiveRoutesListBinding
+com/pqaar/app/databinding/DashboardBottomSheetBinding.java
+ com.pqaar.app.databinding.DashboardBottomSheetBinding
+com/pqaar/app/DataBindingTriggerClass.java
+ com.pqaar.app.DataBindingTriggerClass
+com/pqaar/app/databinding/MandiAdminRoutesHistorySubItemBinding.java
+ com.pqaar.app.databinding.MandiAdminRoutesHistorySubItemBinding
+com/pqaar/app/databinding/ActivityMandiAdminDashboardBinding.java
+ com.pqaar.app.databinding.ActivityMandiAdminDashboardBinding
+com/pqaar/app/databinding/TruckItemBinding.java
+ com.pqaar.app.databinding.TruckItemBinding
+com/pqaar/app/databinding/FragmentSecondBinding.java
+ com.pqaar.app.databinding.FragmentSecondBinding
+com/pqaar/app/databinding/ActivityLoginActivityBinding.java
+ com.pqaar.app.databinding.ActivityLoginActivityBinding
+com/pqaar/app/databinding/FragmentLoginUserBinding.java
+ com.pqaar.app.databinding.FragmentLoginUserBinding
+com/pqaar/app/databinding/ActivityTruckOwnerDashboardBinding.java
+ com.pqaar.app.databinding.ActivityTruckOwnerDashboardBinding
+com/pqaar/app/databinding/FragmentRegisterUserBinding.java
+ com.pqaar.app.databinding.FragmentRegisterUserBinding
+com/pqaar/app/databinding/FragmentAddTrucksBinding.java
+ com.pqaar.app.databinding.FragmentAddTrucksBinding
+com/pqaar/app/databinding/FragmentAddMandiRoutesBinding.java
+ com.pqaar.app.databinding.FragmentAddMandiRoutesBinding
+com/pqaar/app/databinding/FragmentAddRoutesAlertDialogBoxBinding.java
+ com.pqaar.app.databinding.FragmentAddRoutesAlertDialogBoxBinding
+com/pqaar/app/databinding/RouteItemBinding.java
+ com.pqaar.app.databinding.RouteItemBinding
+com/pqaar/app/databinding/FragmentOtpVerificationBinding.java
+ com.pqaar.app.databinding.FragmentOtpVerificationBinding
+com/pqaar/app/databinding/IncomingTruckRequestItemBinding.java
+ com.pqaar.app.databinding.IncomingTruckRequestItemBinding

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#f3ebfd</color>
+    <color name="colorPrimaryDark">#2b155b</color>
+    <color name="colorAccent">#4A2D8A</color>
+    <color name="green">#aaffa7</color>
+    <color name="red">#ff9078</color>
+    <color name="yellow">#f8ff09</color>
+    <color name="lightBlue">#e2c9ff</color>
+    <color name="lightPurple">#c5c5c5ff</color>
+    <color name="lightRed">#e9aa9f</color>
+
+    <color name="light_cyan">#e4fbff</color>
+    <color name="light_purple">#b8b5ff</color>
+    <color name="purple">#7868e6</color>
+    <color name="light_blue">#edeef7</color>
+
+    <color name="c1">#B590CA</color>
+    <color name="c2">#A8D3DA</color>
+    <color name="c3">#F5CAB3</color>
+    <color name="c4">#F3ECB8</color>
+
+    <color name="d1">#6A60E4</color>
+    <color name="d2">#20D8C8</color>
+    <color name="d3">#0C50B7</color>
+    <color name="d4">#E0FFFF</color>
+    <color name="d5">#0C0F47</color>
+    <color name="d6">#00BFA5</color>
+    <color name="d7">#C7EAF6</color>
+    <color name="highlight_text_dark">#8193AD</color>
+    <color name="delivery_status_successful">#83F9BF</color>
+    <color name="delivery_status_unsuccessful">#F27280</color>
+    <color name="delivery_status_in_progress">#FF039BE5</color>
+
+    <color name="gradient_start">#8ECBE4</color>
+    <color name="gradient_end">#88F4F4</color>
+
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="light_blue_600">#FF039BE5</color>
+    <color name="light_blue_900">#FF01579B</color>
+    <color name="light_blue_A200">#FF40C4FF</color>
+    <color name="light_blue_A400">#FF00B0FF</color>
+    <color name="black_overlay">#66000000</color>
+
+</resources>

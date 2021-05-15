@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "214104549048",
+    "project_id": "pqaar-1841d",
+    "storage_bucket": "pqaar-1841d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214104549048:android:fae3edb296e9753569764d",
+        "android_client_info": {
+          "package_name": "com.pqaar.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "214104549048-ep58056ld660vki8lol60voi9c3luc9r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMsF1s-mrFOiMRF-Ca5zWgH-cXbmiVBro"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "214104549048-ep58056ld660vki8lol60voi9c3luc9r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
