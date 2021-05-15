@@ -25,7 +25,16 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e5478683-7550-42cb-99e1-30bdab9cda3a" name="Default Changelist" comment="" />
+    <list default="true" id="e5478683-7550-42cb-99e1-30bdab9cda3a" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/pqaar/app/common/LoginUserFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/pqaar/app/common/LoginUserFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/pqaar/app/truckOwner/repository/TruckOwnerRepo.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/pqaar/app/truckOwner/repository/TruckOwnerRepo.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/pqaar/app/truckOwner/viewModel/TruckOwnerViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/pqaar/app/truckOwner/viewModel/TruckOwnerViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/pqaar/app/utils/DbPaths.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/pqaar/app/utils/DbPaths.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_login_user.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_login_user.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -123,6 +132,7 @@
     <property name="ResourceManagerPrefKey.ResourceType" value="LAYOUT" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="SHOW_ALL_PROCESSES" value="false" />
     <property name="TERMINAL_CUSTOM_COMMANDS_GOT_IT" value="true" />
     <property name="android-custom-viewC:/Users/Jonty/.gradle/caches/modules-2/files-2.1/com.airbnb.android/lottie/3.4.1/5083f3e4cd203a9412213be75d58b4976f7f4966/lottie-3.4.1-sources.jar!/com/airbnb/lottie/LottieAnimationView.java_SELECTED" value="LottieAnimationView" />
@@ -743,12 +753,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="kotlin-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/com/pqaar/app/truckOwner/repository/TruckOwnerRepo.kt</url>
-          <line>97</line>
+          <line>98</line>
           <option name="timeStamp" value="18" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="kotlin-line">
           <url>file://$PROJECT_DIR$/app/src/main/java/com/pqaar/app/truckOwner/repository/TruckOwnerRepo.kt</url>
-          <line>83</line>
+          <line>84</line>
           <option name="timeStamp" value="19" />
         </line-breakpoint>
       </breakpoints>

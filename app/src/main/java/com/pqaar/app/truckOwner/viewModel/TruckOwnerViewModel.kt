@@ -3,7 +3,6 @@ package com.pqaar.app.truckOwner.viewModel
 import android.graphics.Bitmap
 import android.os.CountDownTimer
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
@@ -21,11 +20,9 @@ import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.fetchLiveRoutesList
 import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.fetchLiveTruckDataList
 import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.fetchSchAuctionsInfo
 import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.fetchTruckOwner
-import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.uploadTruckRC
-import com.pqaar.app.utils.TimeConversions
+import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.sendAddTruckReq
 import com.pqaar.app.utils.TimeConversions.CurrDateTimeInMillis
 import kotlinx.coroutines.*
-import java.util.function.LongConsumer
 import kotlin.system.measureTimeMillis
 
 class TruckOwnerViewModel : ViewModel() {
@@ -88,9 +85,20 @@ class TruckOwnerViewModel : ViewModel() {
         }
     }
 
-    suspend fun UploadTruckRc(rcFront: Bitmap, rcBack: Bitmap) {
+    suspend fun addTruck(
+        rcFront: Bitmap, rcBack: Bitmap,
+        truckNo: String,
+        truckRC: String,
+    ) {
         GlobalScope.launch(Dispatchers.IO) {
-            val job = async { uploadTruckRC(rcFront, rcBack) }
+            val job = async {
+                sendAddTruckReq(
+                    rcFront,
+                    rcBack,
+                    truckNo,
+                    truckRC,
+                )
+            }
             job.await()
         }
     }

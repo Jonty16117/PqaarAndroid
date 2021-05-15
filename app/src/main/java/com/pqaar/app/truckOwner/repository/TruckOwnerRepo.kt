@@ -9,6 +9,7 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.pqaar.app.model.*
@@ -23,7 +24,8 @@ import com.pqaar.app.utils.DbPaths.PHONE_NO
 import com.pqaar.app.utils.DbPaths.TRUCKS
 import com.pqaar.app.utils.DbPaths.TRUCK_RC
 import com.pqaar.app.utils.DbPaths.USER_DATA
-import kotlinx.coroutines.delay
+import com.pqaar.app.utils.DbPaths.TRUCK_REQUESTS
+import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import java.io.ByteArrayOutputStream
 
@@ -204,15 +206,18 @@ object TruckOwnerRepo {
                         Log.d(TAG, "truck: ${truck} doc: ${truckDocument}")
                         val liveTruckDataItem = LiveTruckDataItem()
                         liveTruckDataItem.TruckNo = truckDocument!!.get("TruckNo").toString()
-                        liveTruckDataItem.CurrentListNo = truckDocument.get("CurrentListNo").toString()
+                        liveTruckDataItem.CurrentListNo =
+                            truckDocument.get("CurrentListNo").toString()
                         liveTruckDataItem.Status = truckDocument.get("Status").toString()
                         liveTruckDataItem.Timestamp = truckDocument.get("Timestamp").toString()
                         liveTruckDataItem.Owner = (truckDocument.get("Owner") as List<*>)
                             .zipWithNext { a, b -> Pair(a.toString(), b.toString()) }[0]
                         liveTruckDataItem.Route = Pair(
-                            truckDocument.get("Source").toString(), truckDocument.get("Destination").toString()
+                            truckDocument.get("Source").toString(),
+                            truckDocument.get("Destination").toString()
                         )
-                        liveTruckDataList[truckDocument.get("TruckNo").toString()] = liveTruckDataItem
+                        liveTruckDataList[truckDocument.get("TruckNo").toString()] =
+                            liveTruckDataItem
                         LiveTruckDataList.postValue(liveTruckDataList)
                         Log.d(TAG, "after each truck update: ${liveTruckDataItem}")
                     } else {
@@ -268,7 +273,12 @@ object TruckOwnerRepo {
             }
     }
 
-    suspend fun uploadTruckRC(rcFront: Bitmap, rcBack: Bitmap) {
+    suspend fun sendAddTruckReq(
+        rcFront: Bitmap,
+        rcBack: Bitmap,
+        truckNo: String,
+        truckRC: String,
+    ) {
         //val userFolder = auth.uid.toString()
 
         //For testing only
@@ -279,15 +289,63 @@ object TruckOwnerRepo {
         val baos1 = ByteArrayOutputStream()
         rcFront.compress(Bitmap.CompressFormat.JPEG, 50, baos1)
         val rcFrontData = baos1.toByteArray()
-        rcFrontref.putBytes(rcFrontData).await()
+        rcFrontref.putBytes(rcFrontData).addOnSuccessListener {
+            val frontRCURL = rcFrontref.downloadUrl.toString()
+            var backRCURL = ""
+            GlobalScope.launch(Dispatchers.IO) {
+                val job1 = async {
+                    val rcBackPath = "${TRUCK_RC}/${userFolder}/Back/rc_back.jpeg"
+                    val rcBackref = firebaseSt.reference.child(rcBackPath)
+                    val baos2 = ByteArrayOutputStream()
+                    rcBack.compress(Bitmap.CompressFormat.JPEG, 50, baos2)
+                    val rcBackData = baos2.toByteArray()
+                    rcBackref.putBytes(rcBackData).addOnSuccessListener {
+                        backRCURL = rcBackref.downloadUrl.toString()
+                    }.await()
+                }
+                job1.await()
 
-        delay(2000)
+                delay(2000)
 
-        val rcBackPath = "${TRUCK_RC}/${userFolder}/Back/rc_back.jpeg"
-        val rcBackref = firebaseSt.reference.child(rcBackPath)
-        val baos2 = ByteArrayOutputStream()
-        rcBack.compress(Bitmap.CompressFormat.JPEG, 50, baos2)
-        val rcBackData = baos2.toByteArray()
-        rcBackref.putBytes(rcBackData).await()
+                val job2 = async {
+                    //add req doc to TRUCK_REQUESTS collection
+                    val dataToUpload = hashMapOf(
+                        "FirstName" to truckOwnerLiveData.FirstName,
+                        "LastName" to truckOwnerLiveData.LastName,
+                        "OwnerUId" to auth.uid,
+                        "TruckNo" to truckNo,
+                        "TruckRC" to truckRC,
+                        "RequestType" to "Add",
+                        "RequestStatus" to null,
+                        "Timestamp" to FieldValue.serverTimestamp(),
+                        "FrontRCURL" to frontRCURL,
+                        "BackRCURL" to backRCURL
+                    )
+                    firestoreDb
+                        .collection(TRUCK_REQUESTS)
+                        .document(truckNo)
+                        .set(dataToUpload)
+                }
+                job2.await()
+            }
+        }
+
+        /**
+         * truckNo,
+         * firstName,
+         * lastName,
+         * ownerUId,
+         * requestType,
+         * truckRC,
+         * frontRCURL,
+         * backRCURL,
+         * requestStatus: null,
+         * timestamp,
+         */
+        suspend fun sendAddTruckReq(
+            truckNo: String, firstName: String, lastName: String,
+        ) {
+
+        }
     }
 }

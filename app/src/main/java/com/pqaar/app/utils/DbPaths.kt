@@ -15,6 +15,8 @@ object DbPaths {
     const val AUCTION_BONUS_TIME_INFO = "AuctionBonusTimeInfo"
     const val LIVE_TRUCK_DATA_LIST = "LiveTruckData"
     const val PAHUNCH_ADMIN_RECORDS = "PahunchAdminRecords"
+    const val TRUCK_REQUESTS = "AddTrucksRequests"
+
 
 
     /**

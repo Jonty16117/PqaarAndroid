@@ -12,7 +12,6 @@ import com.pqaar.app.R
 import com.pqaar.app.mandiAdmin.view.MandiAdminDashboard
 import com.pqaar.app.pahunchAdmin.view.PahunchAdminDashboard
 import com.pqaar.app.truckOwner.view.TruckOwnerDashboard
-import com.pqaar.app.unionAdmin.view.UnionAdminDashboard
 
 
 class LoginUserFragment : Fragment() {
@@ -27,7 +26,6 @@ class LoginUserFragment : Fragment() {
     private lateinit var btnLoginWithPhone: Button
     private lateinit var radioGroup: RadioGroup
     private lateinit var radioBtnMandiAdmin: RadioButton
-    private lateinit var radioBtnUnionAdmin: RadioButton
     private lateinit var radioBtnTruckOwner: RadioButton
     private lateinit var radioBtnPahunchAdmin: RadioButton
 
@@ -44,7 +42,6 @@ class LoginUserFragment : Fragment() {
         btnLoginWithPhone = view.findViewById(R.id.btnLoginWithPhone)
         radioGroup = view.findViewById(R.id.radioGroup)
         radioBtnMandiAdmin = view.findViewById(R.id.radioBtnMandiAdmin)
-        radioBtnUnionAdmin = view.findViewById(R.id.radioBtnUnionAdmin)
         radioBtnTruckOwner = view.findViewById(R.id.radioBtnTruckOwner)
         radioBtnPahunchAdmin = view.findViewById(R.id.radioBtnPahunchAdmin)
         var checkedPhoneNumber: String?
@@ -87,12 +84,6 @@ class LoginUserFragment : Fragment() {
                     startActivity(Intent(
                         context,
                         MandiAdminDashboard::class.java
-                    ).apply { putExtra("null", "null") })
-                }
-                "union-admin" -> {
-                    startActivity(Intent(
-                        context,
-                        UnionAdminDashboard::class.java
                     ).apply { putExtra("null", "null") })
                 }
                 "truck-owner" -> {
@@ -144,11 +135,6 @@ class LoginUserFragment : Fragment() {
             (radioBtnMandiAdmin.id) -> {
                 return "mandi-admin"
             }
-
-            (radioBtnUnionAdmin.id) -> {
-                return "union-admin"
-            }
-
             (radioBtnTruckOwner.id) -> {
                 return "truck-owner"
             }
