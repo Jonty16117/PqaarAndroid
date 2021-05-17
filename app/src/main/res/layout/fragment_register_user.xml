@@ -97,7 +97,7 @@
             <RadioGroup
                 android:id="@+id/radioGroup"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:layout_marginTop="8dp"
                 android:background="@android:color/transparent"
                 android:orientation="horizontal">
@@ -105,7 +105,7 @@
                 <RadioButton
                     android:id="@+id/mandiAdmin"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="bottom|center"
                     android:layout_weight="1"
                     android:background="@drawable/custom_radio_background"
@@ -117,9 +117,9 @@
                     android:textSize="10sp" />
 
                 <RadioButton
-                    android:id="@+id/unionAdmin"
+                    android:id="@+id/pahunchAdmin"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="bottom|center"
                     android:layout_marginStart="8dp"
                     android:layout_marginLeft="8dp"
@@ -129,7 +129,7 @@
                     android:background="@drawable/custom_radio_background"
                     android:button="@android:color/transparent"
                     android:gravity="center"
-                    android:text="@string/union_admin"
+                    android:text="Pahunch Admin"
                     android:textAlignment="center"
                     android:textColor="@drawable/custom_radio_button_text_color"
                     android:textSize="10sp" />
@@ -137,7 +137,7 @@
                 <RadioButton
                     android:id="@+id/truckOwner"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="bottom|center"
                     android:layout_weight="1"
                     android:background="@drawable/custom_radio_background"
@@ -188,18 +188,18 @@
                 android:textSize="14sp"
                 tools:ignore="HardcodedText,RtlSymmetry" />
 
-            <View
+            <!--<View
                 android:id="@+id/divider4"
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:layout_marginTop="8dp"
-                android:background="@color/lightBlue" />
+                android:background="@color/lightBlue" />-->
 
             <EditText
                 android:id="@+id/textInputEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="16dp"
                 android:background="@drawable/custom_input"
                 android:drawableStart="@drawable/custom_ic_email"
                 android:drawableLeft="@drawable/custom_ic_email"
@@ -215,6 +215,26 @@
                 tools:ignore="HardcodedText,RtlSymmetry" />
 
             <EditText
+                android:id="@+id/textInputPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/custom_input"
+                android:digits="@string/allDigits"
+                android:drawableStart="@drawable/custom_ic_phone"
+                android:drawableLeft="@drawable/custom_ic_phone"
+                android:drawablePadding="12dp"
+                android:ems="10"
+                android:gravity="center_vertical"
+                android:hint="@string/prompt_phone"
+                android:maxLength="10"
+                android:paddingStart="10dp"
+                android:paddingLeft="10dp"
+                android:textSize="14sp"
+                android:inputType="number"
+                tools:ignore="HardcodedText,RtlSymmetry,TextFields" />
+
+<!--            <EditText
                 android:id="@+id/textInputPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -251,28 +271,28 @@
                 android:paddingStart="10dp"
                 android:paddingLeft="10dp"
                 android:textSize="14sp"
-                tools:ignore="HardcodedText,RtlSymmetry" />
+                tools:ignore="HardcodedText,RtlSymmetry" />-->
 
             <android.widget.Button
-                android:id="@+id/btnRegisterWithEmail"
+                android:id="@+id/btnRegister"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/custom_button_background"
-                android:text="REGISTER WITH EMAIL"
+                android:text="REGISTER"
                 android:textColor="@drawable/custom_button_text_color"
                 android:textSize="12sp"
                 android:textStyle="normal"
                 tools:ignore="HardcodedText" />
 
-            <View
+            <!--<View
                 android:id="@+id/divider5"
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:layout_marginTop="8dp"
-                android:background="@color/lightBlue" />
+                android:background="@color/lightBlue" />-->
 
-            <EditText
+            <!--<EditText
                 android:id="@+id/textInputPhone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -290,9 +310,9 @@
                 android:paddingLeft="10dp"
                 android:textSize="14sp"
                 android:inputType="number"
-                tools:ignore="HardcodedText,RtlSymmetry,TextFields" />
+                tools:ignore="HardcodedText,RtlSymmetry,TextFields" />-->
 
-            <android.widget.Button
+            <!--<android.widget.Button
                 android:id="@+id/btnRegisterWithPhone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -303,7 +323,7 @@
                 android:textColor="@drawable/custom_button_text_color"
                 android:textSize="12sp"
                 android:textStyle="normal"
-                tools:ignore="HardcodedText" />
+                tools:ignore="HardcodedText" />-->
 
             <TextView
                 android:id="@+id/warning"

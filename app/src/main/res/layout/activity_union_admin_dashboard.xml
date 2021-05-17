@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
-    tools:context=".unionAdmin.view.UnionAdminDashboard">
+    android:background="@color/colorPrimary">
+<!--    tools:context=".unionAdmin.view.UnionAdminDashboard">-->
 
     <androidx.constraintlayout.motion.widget.MotionLayout
         android:id="@+id/motion_layout"

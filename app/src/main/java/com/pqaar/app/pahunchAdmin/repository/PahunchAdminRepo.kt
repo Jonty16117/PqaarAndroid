@@ -14,7 +14,6 @@ import com.pqaar.app.model.LiveTruckDataItem
 import com.pqaar.app.model.LiveTruckDataListItemDTO
 import com.pqaar.app.model.PahunchTicket
 import com.pqaar.app.model.PahunchTicketDTO
-import com.pqaar.app.unionAdmin.repository.UnionAdminRepo
 import com.pqaar.app.utils.DbPaths.DEL_FAIL
 import com.pqaar.app.utils.DbPaths.DEL_PASS
 import com.pqaar.app.utils.DbPaths.LIVE_TRUCK_DATA_LIST
@@ -56,8 +55,8 @@ object PahunchAdminRepo {
                 pahunchTicket["AuctionId"] = truck.AuctionId.toString()
                 pahunchTicket["DeliveryInfo"] = delInfo
                 pahunchTicket["Destination"] = truck.Route.second
-                pahunchTicket["PahunchAdminUId"] = demoUserUId
-                /*pahunchTicket["PahunchAdminUId"] = auth.uid.toString()*/
+//                pahunchTicket["PahunchAdminUId"] = demoUserUId
+                pahunchTicket["PahunchAdminUId"] = auth.uid.toString()
                 pahunchTicket["Source"] = truck.Route.first
                 pahunchTicket["Status"] = "Accepted"
                 pahunchTicket["Timestamp"] = FieldValue.serverTimestamp()
@@ -103,8 +102,8 @@ object PahunchAdminRepo {
                 pahunchTicket["AuctionId"] = truck.AuctionId.toString()
                 pahunchTicket["DeliveryInfo"] = delInfo
                 pahunchTicket["Destination"] = truck.Route.second
-                pahunchTicket["PahunchAdminUId"] = demoUserUId
-//                pahunchTicket["PahunchAdminUId"] = auth.uid.toString()
+//                pahunchTicket["PahunchAdminUId"] = demoUserUId
+                pahunchTicket["PahunchAdminUId"] = auth.uid.toString()
                 pahunchTicket["Source"] = truck.Route.first
                 pahunchTicket["Status"] = "Rejected"
                 pahunchTicket["Timestamp"] = FieldValue.serverTimestamp()
@@ -137,11 +136,9 @@ object PahunchAdminRepo {
     }
 
     suspend fun fetchUserDestination() {
-        //val uid = auth.uid
-
         firestoreDb
             .collection(USER_DATA)
-            .document(demoUserUId)
+            .document(auth.uid.toString())
             .get()
             .addOnSuccessListener {
                 UserDestination.postValue(it.getString(USER_TYPE))
@@ -156,10 +153,10 @@ object PahunchAdminRepo {
      *Get Issued Pahunch History
      */
     suspend fun fetchPahunchHistory() {
-        //val uid = auth.uid
+        val uid = auth.uid
 
         val ref = firestoreDb.collection(PAHUNCH_ADMIN_RECORDS)
-        val query = ref.whereEqualTo("PahunchAdminUId", demoUserUId)
+        val query = ref.whereEqualTo("PahunchAdminUId", uid)
         query.get().addOnSuccessListener { documents ->
             pahunchHistory = ArrayList()
             documents!!.forEach { pahunchSnapshot ->

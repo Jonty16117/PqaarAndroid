@@ -1,5 +1,6 @@
 package com.pqaar.app.common
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.pqaar.app.R
 import com.pqaar.app.mandiAdmin.view.MandiAdminDashboard
@@ -21,44 +24,66 @@ class LoginUserFragment : Fragment() {
     val lastAuctionList = ArrayList<Pair<String, Any>>()
 
     private lateinit var btnregister: Button
-    private lateinit var btnlogin: Button
+//    private lateinit var btnlogin: Button
     private lateinit var textInputPhone: EditText
-    private lateinit var btnLoginWithPhone: Button
+    private lateinit var btnLogin: Button
     private lateinit var radioGroup: RadioGroup
     private lateinit var radioBtnMandiAdmin: RadioButton
     private lateinit var radioBtnTruckOwner: RadioButton
     private lateinit var radioBtnPahunchAdmin: RadioButton
+    private lateinit var closeButton: Button
+
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_login_user, container, false)
 
         btnregister = view.findViewById(R.id.btnregister)
-        btnlogin = view.findViewById(R.id.btnlogin)
+//        btnlogin = view.findViewById(R.id.btnlogin)
         textInputPhone = view.findViewById(R.id.textInputPhone)
-        btnLoginWithPhone = view.findViewById(R.id.btnLoginWithPhone)
+        btnLogin = view.findViewById(R.id.btnLogin)
         radioGroup = view.findViewById(R.id.radioGroup)
         radioBtnMandiAdmin = view.findViewById(R.id.radioBtnMandiAdmin)
         radioBtnTruckOwner = view.findViewById(R.id.radioBtnTruckOwner)
         radioBtnPahunchAdmin = view.findViewById(R.id.radioBtnPahunchAdmin)
+        closeButton = view.findViewById(R.id.button)
         var checkedPhoneNumber: String?
 
+        closeButton.setOnClickListener {
+            val alertDialog: AlertDialog
+            val builder = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
+            builder.setTitle("Exit")
+            builder.setMessage("Are you sure you want to exit?")
+            builder.setIcon(R.drawable.ic_close_dark)
+            builder.setPositiveButton("Yes") { dialogInterface, _ ->
+                dialogInterface.dismiss()
+                activity?.finish()
+                System.exit(0)
+            }
+            builder.setNegativeButton("No") { dialogInterface, _ ->
+                dialogInterface.dismiss()
+            }
+            alertDialog = builder.create()
+            alertDialog.setCancelable(true)
+            alertDialog.show()
 
-        /**
-         * FOR TESTING
-         */
+            val messageText = alertDialog.findViewById<TextView>(android.R.id.message)
+            val logoutBtn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+            val cancelBtn = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+            logoutBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
+            cancelBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
+            messageText?.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorPrimaryDark))
 
-
-
+        }
 
 
         /**
          * NOT FOR TESTING
          */
-        btnLoginWithPhone.setOnClickListener {
+        btnLogin.setOnClickListener {
             if (radioGroup.checkedRadioButtonId == -1) {
                 Toast.makeText(context, "Please Select User Type", Toast.LENGTH_LONG).show()
             } else {
@@ -70,46 +95,46 @@ class LoginUserFragment : Fragment() {
                     val otpVerificationFragment = OtpVerificationFragment()
                     otpVerificationFragment.arguments = dataBundle
                     activity?.supportFragmentManager
-                        ?.beginTransaction()
-                        ?.replace(R.id.fragment, otpVerificationFragment)
-                        ?.addToBackStack(null)
-                        ?.commit()
+                            ?.beginTransaction()
+                            ?.replace(R.id.fragment, otpVerificationFragment)
+                            ?.addToBackStack(null)
+                            ?.commit()
                 }
             }
         }
 
-        btnlogin.setOnClickListener {
+        /*btnlogin.setOnClickListener {
             when (getUserType()) {
                 "mandi-admin" -> {
                     startActivity(Intent(
-                        context,
-                        MandiAdminDashboard::class.java
+                            context,
+                            MandiAdminDashboard::class.java
                     ).apply { putExtra("null", "null") })
                 }
                 "truck-owner" -> {
                     startActivity(Intent(
-                        context,
-                        TruckOwnerDashboard::class.java
+                            context,
+                            TruckOwnerDashboard::class.java
                     ).apply { putExtra("null", "null") })
                 }
                 "pahunch-admin" -> {
                     startActivity(Intent(
-                        context,
-                        PahunchAdminDashboard::class.java
+                            context,
+                            PahunchAdminDashboard::class.java
                     ).apply { putExtra("null", "null") })
                 }
                 else -> {
                     Toast.makeText(context, "Please Select User Type", Toast.LENGTH_LONG).show()
                 }
             }
-        }
+        }*/
 
         btnregister.setOnClickListener {
             activity?.supportFragmentManager
-                ?.beginTransaction()
-                ?.replace(R.id.fragment, RegisterUserFragment())
-                ?.addToBackStack(null)
-                ?.commit()
+                    ?.beginTransaction()
+                    ?.replace(R.id.fragment, RegisterUserFragment())
+                    ?.addToBackStack(null)
+                    ?.commit()
         }
 
         return view
@@ -117,12 +142,12 @@ class LoginUserFragment : Fragment() {
 
     private fun getPhoneNoFromEditText(): String? {
         return if (textInputPhone.text.trim().isEmpty() ||
-            textInputPhone.text.trim().length != 10
+                textInputPhone.text.trim().length != 10
         ) {
             Toast.makeText(
-                context,
-                "Please enter a valid 10 digits phone number!",
-                Toast.LENGTH_LONG
+                    context,
+                    "Please enter a valid 10 digits phone number!",
+                    Toast.LENGTH_LONG
             ).show()
             null
         } else {

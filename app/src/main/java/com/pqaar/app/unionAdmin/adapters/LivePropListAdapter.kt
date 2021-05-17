@@ -1,4 +1,5 @@
 package com.pqaar.app.unionAdmin.adapters
+/*
 
 import android.view.LayoutInflater
 import android.view.View
@@ -132,3 +133,4 @@ class LivePropListAdapter(private var groupedItem: LivePropRoutesListItem) :
 }
 
 
+*/

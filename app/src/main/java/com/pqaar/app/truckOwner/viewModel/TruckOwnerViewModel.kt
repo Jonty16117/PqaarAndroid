@@ -21,6 +21,7 @@ import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.fetchLiveTruckDataList
 import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.fetchSchAuctionsInfo
 import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.fetchTruckOwner
 import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.sendAddTruckReq
+import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.sendRemoveTruckReq
 import com.pqaar.app.utils.TimeConversions.CurrDateTimeInMillis
 import kotlinx.coroutines.*
 import kotlin.system.measureTimeMillis
@@ -103,6 +104,15 @@ class TruckOwnerViewModel : ViewModel() {
         }
     }
 
+    suspend fun removeTruck(truckNo: String) {
+        GlobalScope.launch(Dispatchers.IO) {
+            val job = async {
+                sendRemoveTruckReq(truckNo)
+            }
+            job.await()
+        }
+    }
+
     private fun setScheduledTimer(auctionStartTime: Long, auctionEndTime: Long) {
         if (!timerIsRunning) {
             timerIsRunning = true
@@ -112,7 +122,8 @@ class TruckOwnerViewModel : ViewModel() {
             var text: String
             timer = object : CountDownTimer(
                 auctionStartTime.minus(CurrDateTimeInMillis()),
-                1000) {
+                1000
+            ) {
                 override fun onTick(timeLeft: Long) {
                     hour = (timeLeft / (1000 * 60 * 60)) % 60
                     min = (timeLeft / (1000 * 60)) % 60
@@ -128,7 +139,8 @@ class TruckOwnerViewModel : ViewModel() {
                     timerIsRunning = true
                     timer = object : CountDownTimer(
                         auctionEndTime.minus(auctionStartTime),
-                        1000) {
+                        1000
+                    ) {
                         override fun onTick(timeLeft: Long) {
                             hour = (timeLeft / (1000 * 60 * 60)) % 60
                             min = (timeLeft / (1000 * 60)) % 60
@@ -162,7 +174,8 @@ class TruckOwnerViewModel : ViewModel() {
             var text: String
             timer = object : CountDownTimer(
                 auctionEndTime.minus(auctionStartTime),
-                1000) {
+                1000
+            ) {
                 override fun onTick(timeLeft: Long) {
                     hour = (timeLeft / (1000 * 60 * 60)) % 60
                     min = (timeLeft / (1000 * 60)) % 60

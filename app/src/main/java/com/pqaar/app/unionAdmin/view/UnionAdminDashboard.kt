@@ -1,4 +1,5 @@
 package com.pqaar.app.unionAdmin.view
+/*
 
 import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
@@ -138,4 +139,4 @@ class UnionAdminDashboard : AppCompatActivity() {
         }
     }
 
-}
+}*/

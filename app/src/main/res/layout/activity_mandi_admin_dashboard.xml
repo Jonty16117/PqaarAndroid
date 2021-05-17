@@ -58,16 +58,15 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <ImageView
-                    android:id="@+id/imageView2"
+                <android.widget.Button
+                    android:id="@+id/menu"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginRight="8dp"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="app logo"
-                    android:scaleType="fitCenter"
+                    android:background="@drawable/custom_ic_menu"
+                    android:contentDescription="Show Options"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_logo_solid_bg"
@@ -81,7 +80,7 @@
                     android:layout_marginTop="4dp"
                     android:background="@android:color/transparent"
                     android:gravity="bottom"
-                    android:text="Mandi Abohar"
+                    android:text="Mandi NA"
                     app:layout_constraintBottom_toTopOf="@+id/title_text"
                     app:layout_constraintEnd_toEndOf="@+id/divider6"
                     app:layout_constraintStart_toStartOf="@+id/divider6"
@@ -94,7 +93,7 @@
                     android:layout_height="wrap_content"
                     android:background="@android:color/transparent"
                     android:gravity="center"
-                    android:text="5"
+                    android:text="NA"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/divider6"
                     app:layout_constraintTop_toBottomOf="@id/title_text2" />

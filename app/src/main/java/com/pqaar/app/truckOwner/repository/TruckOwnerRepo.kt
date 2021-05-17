@@ -13,7 +13,6 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.pqaar.app.model.*
-import com.pqaar.app.unionAdmin.repository.UnionAdminRepo
 import com.pqaar.app.utils.DbPaths
 import com.pqaar.app.utils.DbPaths.FIRST_NAME
 import com.pqaar.app.utils.DbPaths.LAST_NAME
@@ -63,16 +62,18 @@ object TruckOwnerRepo {
     val LiveAuctionTimestamps = MutableLiveData<Pair<Long, Long>>()
 
     suspend fun fetchTruckOwner() {
-        val testUid = "DemoUserTO"
+//        val testUid = "DemoUserTO"
         firestoreDb.collection(USER_DATA)
-            .document(testUid).get()
+            .document(auth.uid!!).get()
             .addOnSuccessListener {
                 truckOwnerLiveData.FirstName = it.get(FIRST_NAME).toString()
                 truckOwnerLiveData.LastName = it.get(LAST_NAME).toString()
                 truckOwnerLiveData.PhoneNo = it.get(PHONE_NO).toString()
-                val trucks = it.get(TRUCKS) as List<*>
                 val trucksArrayList = ArrayList<String>()
-                trucks.forEach { trucksArrayList.add(it.toString()) }
+                if (it.get(TRUCKS) != null) {
+                    val trucks = it.get(TRUCKS) as List<*>
+                    trucks.forEach { trucksArrayList.add(it.toString()) }
+                }
                 truckOwnerLiveData.Trucks = trucksArrayList
                 Log.w(TAG, "Truck user data fetched successfully!")
             }
@@ -176,7 +177,8 @@ object TruckOwnerRepo {
                 LiveAuctionList.postValue(liveAuctionList)
             }
             Log.w(
-                TAG, "Updated live auction list: ${LiveAuctionList.value}")
+                TAG, "Updated live auction list: ${LiveAuctionList.value}"
+            )
         }
     }
 
@@ -187,12 +189,16 @@ object TruckOwnerRepo {
             .document(currListNo)
             .update(dataToUpdate)
             .addOnSuccessListener {
-                Log.d(TAG, "Request to close the bid for truck ${truckNo} " +
-                        "sent!")
+                Log.d(
+                    TAG, "Request to close the bid for truck ${truckNo} " +
+                            "sent!"
+                )
             }
             .addOnFailureListener {
-                Log.d(TAG, "Failed to send request to close the " +
-                        "bid for truck ${truckNo}!, error: ${it}")
+                Log.d(
+                    TAG, "Failed to send request to close the " +
+                            "bid for truck ${truckNo}!, error: ${it}"
+                )
             }.await()
     }
 
@@ -209,9 +215,15 @@ object TruckOwnerRepo {
                         liveTruckDataItem.CurrentListNo =
                             truckDocument.get("CurrentListNo").toString()
                         liveTruckDataItem.Status = truckDocument.get("Status").toString()
-                        liveTruckDataItem.Timestamp = truckDocument.get("Timestamp").toString()
-                        liveTruckDataItem.Owner = (truckDocument.get("Owner") as List<*>)
-                            .zipWithNext { a, b -> Pair(a.toString(), b.toString()) }[0]
+                        val timestamp =
+                            truckDocument.get("Timestamp") as com.google.firebase.Timestamp
+                        val millis = timestamp.seconds * 1000 + timestamp.nanoseconds * 1000000
+                        liveTruckDataItem.Timestamp = millis.toString()
+                        val firstName = truckDocument.get("OwnerFirstName").toString()
+                        val lastName = truckDocument.get("OwnerFirstName").toString()
+                        liveTruckDataItem.Owner = Pair(firstName, lastName)
+//                        liveTruckDataItem.Owner = (truckDocument.get("Owner") as List<*>)
+//                                .zipWithNext { a, b -> Pair(a.toString(), b.toString()) }[0]
                         liveTruckDataItem.Route = Pair(
                             truckDocument.get("Source").toString(),
                             truckDocument.get("Destination").toString()
@@ -279,10 +291,10 @@ object TruckOwnerRepo {
         truckNo: String,
         truckRC: String,
     ) {
-        //val userFolder = auth.uid.toString()
+        val userFolder = auth.uid.toString()
 
         //For testing only
-        val userFolder = "DemoUserTO"
+//        val userFolder = "DemoUserTO"
 
         val rcFrontPath = "${TRUCK_RC}/${userFolder}/Front/rc_front.jpeg"
         val rcFrontref = firebaseSt.reference.child(rcFrontPath)
@@ -342,10 +354,28 @@ object TruckOwnerRepo {
          * requestStatus: null,
          * timestamp,
          */
-        suspend fun sendAddTruckReq(
-            truckNo: String, firstName: String, lastName: String,
-        ) {
 
+    }
+
+    suspend fun sendRemoveTruckReq(
+        truckNo: String
+    ) {
+        GlobalScope.launch(Dispatchers.IO) {
+            val job = async {
+                //add req doc to TRUCK_REQUESTS collection
+                val dataToUpload = hashMapOf(
+                    "TruckNo" to truckNo,
+                    "RequestType" to "Remove",
+                    "RequestStatus" to null,
+                    "Timestamp" to FieldValue.serverTimestamp(),
+                )
+                firestoreDb
+                    .collection(TRUCK_REQUESTS)
+                    .document(truckNo)
+                    .update(dataToUpload)
+            }
+            job.await()
         }
     }
+
 }

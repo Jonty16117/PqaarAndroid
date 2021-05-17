@@ -1,89 +1,27 @@
-plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-    id 'com.google.gms.google-services'
-}
-
-android {
-    signingConfigs {
-        'pqaar_release_v1.0.1' {
-            storeFile file('C:\\Users\\Jonty\\.android\\debug.keystore')
-            storePassword 'jonty16117'
-            keyPassword 'jonty16117'
-            keyAlias 'AndroidDebugKey'
-        }
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    ext.kotlin_version = "1.4.32"
+    repositories {
+        google()
+        jcenter()
     }
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
+    dependencies {
+        classpath "com.android.tools.build:gradle:4.1.3"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.google.gms:google-services:4.3.5'
 
-    lintOptions {
-        disable 'ContentDescription'
-    }
-
-    buildFeatures {
-        dataBinding true
-        viewBinding true
-    }
-
-    defaultConfig {
-        applicationId "com.pqaar.app"
-        minSdkVersion 16
-        targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
-        vectorDrawables.useSupportLibrary = true
-
-        multiDexEnabled true
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        versionNameSuffix '1'
-        signingConfig signingConfigs.'pqaar_release_v1.0.1'
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
     }
 }
 
-dependencies {
-    implementation 'androidx.core:core-ktx:1.3.2'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.3.0'
-    implementation 'androidx.annotation:annotation:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
-    implementation 'com.google.android.material:material:1.3.0'
-    implementation 'com.airbnb.android:lottie:3.6.1'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.0'
-    implementation 'com.google.android.material:material:1.4.0-alpha02'
-    implementation 'androidx.coordinatorlayout:coordinatorlayout:1.1.0'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.android.support.constraint:constraint-layout:2.0.4'
-    implementation 'com.google.firebase:firebase-auth-ktx:20.0.3'
-    implementation 'com.google.firebase:firebase-bom:26.8.0'
-    implementation 'com.google.firebase:firebase-firestore-ktx:22.1.2'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1'
-    implementation 'com.google.firebase:firebase-database-ktx:19.7.0'
-    implementation 'android.arch.lifecycle:extensions:1.1.1'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'com.karumi:dexter:6.0.2'
-    implementation 'com.google.firebase:firebase-storage-ktx:19.2.2'
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
 
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }

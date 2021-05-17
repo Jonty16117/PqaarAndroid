@@ -20,19 +20,19 @@ class RegisterUserFragment : Fragment() {
     private val auth = FirebaseAuth.getInstance()
     private val db = Firebase.firestore
 
-    private lateinit var btnRegisterWithEmail: Button
+    private lateinit var btnRegister: Button
     private lateinit var btnRegisterWithPhone: Button
     private lateinit var radioGroup: RadioGroup
     private lateinit var textInputUsername: EditText
     private lateinit var textInputUsername2: EditText
     private lateinit var textInputPhone: EditText
     private lateinit var textInputEmail: EditText
-    private lateinit var textInputPassword: EditText
-    private lateinit var textInputPassword2: EditText
+//    private lateinit var textInputPassword: EditText
+//    private lateinit var textInputPassword2: EditText
     private lateinit var warning: TextView
     private lateinit var progressBar: ProgressBar
     private lateinit var radioBtnMandiAdmin: RadioButton
-    private lateinit var radioBtnUnionAdmin: RadioButton
+    private lateinit var radioBtnPahunchAdmin: RadioButton
     private lateinit var radioBtnTruckOwner: RadioButton
 
     override fun onCreateView(
@@ -42,19 +42,19 @@ class RegisterUserFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_register_user, container, false)
 
-        btnRegisterWithEmail = view.findViewById(R.id.btnRegisterWithEmail)
-        btnRegisterWithPhone = view.findViewById(R.id.btnRegisterWithPhone)
+        btnRegister = view.findViewById(R.id.btnRegister)
+//        btnRegisterWithPhone = view.findViewById(R.id.btnRegisterWithPhone)
         radioGroup = view.findViewById(R.id.radioGroup)
         textInputUsername = view.findViewById(R.id.textInputUsername)
         textInputUsername2 = view.findViewById(R.id.textInputUsername2)
         textInputPhone = view.findViewById(R.id.textInputPhone)
         textInputEmail = view.findViewById(R.id.textInputEmail)
-        textInputPassword = view.findViewById(R.id.textInputPassword)
-        textInputPassword2 = view.findViewById(R.id.textInputPassword2)
+//        textInputPassword = view.findViewById(R.id.textInputPassword)
+//        textInputPassword2 = view.findViewById(R.id.textInputPassword2)
         warning = view.findViewById(R.id.warning)
         progressBar = view.findViewById(R.id.progressBar)
         radioBtnMandiAdmin = view.findViewById<RadioButton>(R.id.mandiAdmin)
-        radioBtnUnionAdmin = view.findViewById<RadioButton>(R.id.unionAdmin)
+        radioBtnPahunchAdmin = view.findViewById<RadioButton>(R.id.pahunchAdmin)
         radioBtnTruckOwner = view.findViewById<RadioButton>(R.id.truckOwner)
         var checkedPhoneNumber: String?
         var userType: String?
@@ -65,40 +65,66 @@ class RegisterUserFragment : Fragment() {
             ?.addToBackStack(null)
             ?.commit()*/
 
-        btnRegisterWithPhone.setOnClickListener {
+        btnRegister.setOnClickListener {
             if (radioGroup.checkedRadioButtonId == -1) {
                 Toast.makeText(context, "Please Select User Type", Toast.LENGTH_LONG).show()
             } else {
                 checkedPhoneNumber = getDataFromText()
                 if (checkedPhoneNumber != null) {
-                    val dataBundle = Bundle()
-                    dataBundle.putString("inputTextPhoneNo", checkedPhoneNumber)
-                    dataBundle.putString("userType", getUserType())
-                    val otpVerificationFragment = OtpVerificationFragment()
-                    otpVerificationFragment.arguments = dataBundle
-                    activity?.supportFragmentManager
-                        ?.beginTransaction()
-                        ?.replace(R.id.fragment, otpVerificationFragment)
-                        ?.addToBackStack(null)
-                        ?.commit()
+                    if (textInputUsername.text.trim().isEmpty()) {
+                        warning.isVisible = true
+                        warning.text = "*Please fill your first name!"
+                    } else if (textInputUsername2.text.trim().isEmpty()) {
+                        warning.isVisible = true
+                        warning.text = "*Please fill your last name!"
+                    } else if (textInputEmail.text.trim().isEmpty()) {
+                        warning.isVisible = true
+                        warning.text = "*Please enter your email!"
+                    } /*else if (textInputPassword.text.trim().length < 8 || textInputPassword.text.trim().length > 16) {
+                        warning.isVisible = true
+                        warning.text = "*Password length can only be between 8 and 16 characters!"
+                    } else if (textInputPassword.text.trim() != textInputPassword2.text.trim()) {
+                        warning.isVisible = true
+                        warning.text = "*Passwords did'nt match, please check your passwords!"
+                    }*/ else {
+                        val dataBundle = Bundle()
+                        dataBundle.putString("inputTextPhoneNo", checkedPhoneNumber)
+                        dataBundle.putString("userType", getUserType())
+                        dataBundle.putString("firstName", textInputUsername.text.trim().toString())
+                        dataBundle.putString("lastName", textInputUsername2.text.trim().toString())
+                        dataBundle.putString("email", textInputEmail.text.trim().toString())
+
+                        val registerUserOtpVerifyFragment = RegisterUserOtpVerifyFragment()
+                        registerUserOtpVerifyFragment.arguments = dataBundle
+                        activity?.supportFragmentManager
+                            ?.beginTransaction()
+                            ?.replace(R.id.fragment, registerUserOtpVerifyFragment)
+                            ?.addToBackStack(null)
+                            ?.commit()
+                    }
                 }
             }
         }
 
-        btnRegisterWithEmail.setOnClickListener {
+        /*btnRegisterWithEmail.setOnClickListener {
             if (radioGroup.checkedRadioButtonId == -1) {
                 Toast.makeText(context, "Please Select User Type", Toast.LENGTH_LONG).show()
             } else {
                 //creates new user and stores user data credentials in the cloud
                 registerWithEmail()
-                saveEmailUserDataToCloud(view!!)
+                saveUserDataToCloud(
+                    getUserType()!!,
+                    textInputEmail.text.trim().toString(),
+                    textInputUsername.text.trim().toString(),
+                    textInputUsername2.text.trim().toString()
+                )
             }
-        }
+        }*/
 
         return view
     }
 
-    @SuppressLint("SetTextI18n")
+    /*@SuppressLint("SetTextI18n")
     private fun registerWithEmail() {
 
         if (textInputUsername.text.trim().isEmpty()) {
@@ -110,13 +136,13 @@ class RegisterUserFragment : Fragment() {
         } else if (textInputEmail.text.trim().isEmpty()) {
             warning.isVisible = true
             warning.text = "*Please enter your email!"
-        } else if (textInputPassword.text.trim().length < 8 || textInputPassword.text.trim().length > 16) {
+        } *//*else if (textInputPassword.text.trim().length < 8 || textInputPassword.text.trim().length > 16) {
             warning.isVisible = true
             warning.text = "*Password length can only be between 8 and 16 characters!"
         } else if (textInputPassword.text.trim() != textInputPassword2.text.trim()) {
             warning.isVisible = true
             warning.text = "*Passwords did'nt match, please check your passwords!"
-        } else {
+        }*//* else {
             //all fields correct, therefore register user
             warning.isVisible = false
             progressBar.isVisible = true
@@ -126,6 +152,12 @@ class RegisterUserFragment : Fragment() {
                 textInputPassword.text.trim().toString()
             ).addOnCompleteListener(activity!!) { task ->
                 if (task.isSuccessful) {
+                    saveUserDataToCloud(
+                        getUserType()!!,
+                        textInputEmail.text.trim().toString(),
+                        textInputUsername.text.trim().toString(),
+                        textInputUsername2.text.trim().toString()
+                    )
                     startActivity(
                         Intent(
                             context,
@@ -144,21 +176,23 @@ class RegisterUserFragment : Fragment() {
             progressBar.isVisible = false
         }
     }
-
-    private fun saveEmailUserDataToCloud(view: View) {
+*/
+    /*private fun saveUserDataToCloud(
+        userType: String, email: String, firstName: String, lastName: String,
+    ) {
         progressBar.isVisible = true
 
-        //add user credentials to cloud firestone
+        //add user credentials to cloud firestore
         if (auth.currentUser != null) {
             val data = HashMap<String, Any>()
             data["email"] = textInputEmail.text.trim().toString()
             data["first-name"] = textInputUsername.text.trim().toString()
             data["last-name"] = textInputUsername2.text.trim().toString()
-            data["password"] = textInputPassword.text.trim().toString()
 
-            when (getUserType()) {
+            when (userType) {
                 "mandi-admin" -> {
-                    db.collection("mandi-admin-credentials").document(auth.currentUser.uid).set(data)
+                    db.collection("mandi-admin-credentials").document(auth.currentUser.uid)
+                        .set(data)
                     Toast.makeText(
                         context,
                         "New Mandi Admin Created!",
@@ -167,7 +201,8 @@ class RegisterUserFragment : Fragment() {
                 }
 
                 "union-admin" -> {
-                    db.collection("union-admin-credentials").document(auth.currentUser.uid).set(data)
+                    db.collection("union-admin-credentials").document(auth.currentUser.uid)
+                        .set(data)
                     Toast.makeText(
                         context,
                         "New Union Admin Created!",
@@ -176,7 +211,8 @@ class RegisterUserFragment : Fragment() {
                 }
 
                 "truck-owner" -> {
-                    db.collection("truck-owner-credentials").document(auth.currentUser.uid).set(data)
+                    db.collection("truck-owner-credentials").document(auth.currentUser.uid)
+                        .set(data)
                     Toast.makeText(
                         context,
                         "New Truck Owner Created!",
@@ -193,11 +229,12 @@ class RegisterUserFragment : Fragment() {
             ).show()
         }
         progressBar.isVisible = false
-    }
+    }*/
 
     private fun getDataFromText(): String? {
         return if (textInputPhone.text.trim().isEmpty() ||
-            textInputPhone.text.trim().length != 10) {
+            textInputPhone.text.trim().length != 10
+        ) {
             Toast.makeText(
                 context,
                 "Please enter a valid 10 digits phone number!",
@@ -215,8 +252,8 @@ class RegisterUserFragment : Fragment() {
                 return "mandi-admin"
             }
 
-            (radioBtnUnionAdmin.id) -> {
-                return "union-admin"
+            (radioBtnPahunchAdmin.id) -> {
+                return "pahunch-admin"
             }
 
             (radioBtnTruckOwner.id) -> {

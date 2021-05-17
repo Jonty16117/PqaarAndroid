@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.pqaar.app.model.PropRoutesListItem
 import com.pqaar.app.model.MandiRoutesHistoryItem
 import com.pqaar.app.utils.DbPaths.MANDI_ROUTES_LIST
+import com.pqaar.app.utils.DbPaths.USER_DATA
 import com.pqaar.app.utils.TimeConversions.CurrDateTimeInMillis
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
@@ -35,20 +36,20 @@ object MandiAdminRepo {
      */
     suspend fun fetchUsersMandi() {
         var result = ""
-        /*firestoreDb.collection(USER_DATA)
+        firestoreDb.collection(USER_DATA)
             .document(firebaseAuth.uid.toString()).get()
             .addOnSuccessListener {
-                result = it.data!!["mandi"].toString()
-                Log.d(TAG,"Fe tched user's mandi successfully!")
+                result = it.data!![MANDI].toString()
+                Log.d(TAG,"Fetched user's mandi successfully!")
             }.addOnFailureListener {
                 Log.d(TAG, "Fetching user's mandi failed!")
             }.await()
         _MANDI = result
-        MANDI.postValue(result)*/
+        MANDI.postValue(result)
 
         // For testing only
-        _MANDI = "Abohar"
-        MANDI.postValue("Abohar")
+//        _MANDI = "Abohar"
+//        MANDI.postValue("Abohar")
     }
 
     /**
@@ -61,10 +62,16 @@ object MandiAdminRepo {
                     val col = firestoreDb.collection(MANDI_ROUTES_LIST)
                     Log.d(TAG, "Fetching routes for mandi: $_MANDI")
                     col.document(_MANDI).addSnapshotListener { docSnapshot, error ->
+
                         if (docSnapshot != null && error == null) {
-                            mandiRoutesListLiveHistory = docToDTO(docSnapshot.data!!)
-                            MandiRoutesListLiveHistory
-                                .postValue(mandiRoutesListLiveHistory)
+                            if (docSnapshot.data != null) {
+                                mandiRoutesListLiveHistory = docToDTO(docSnapshot.data!!)
+                                MandiRoutesListLiveHistory
+                                    .postValue(mandiRoutesListLiveHistory)
+                            } else {
+                                MandiRoutesListLiveHistory
+                                    .postValue(ArrayList<MandiRoutesHistoryItem>())
+                            }
                         }
                     }
                 }

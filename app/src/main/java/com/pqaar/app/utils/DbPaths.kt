@@ -23,10 +23,12 @@ object DbPaths {
      * Firestore field keys
      */
     const val TRUCKS = "Trucks"
-    const val FIRST_NAME = "firstName"
-    const val LAST_NAME = "lastName"
-    const val PHONE_NO = "phoneNo"
-    const val USER_TYPE = "userType"
+    const val FIRST_NAME = "first-name"
+    const val LAST_NAME = "last-name"
+    const val PHONE_NO = "phone"
+    const val USER_TYPE = "user-type"
+    const val EMAIL = "email"
+    const val MANDI = "mandi"
 
     /**
      * Firebase storage paths

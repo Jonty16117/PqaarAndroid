@@ -42,6 +42,7 @@ class AddTruckFragment : Fragment(), PermissionListener {
     private lateinit var truckNo: EditText
     private lateinit var truckRcNo: EditText
     private lateinit var submitApplication: Button
+    private lateinit var backButton: Button
 
     private var clickedRcFrontImageView: Boolean = true
 
@@ -60,7 +61,11 @@ class AddTruckFragment : Fragment(), PermissionListener {
         truckNo = view.findViewById<EditText>(R.id.textInputTruckNo)
         truckRcNo = view.findViewById<EditText>(R.id.textInputRcNo)
         submitApplication = view.findViewById<Button>(R.id.submitTruckApplication)
+        backButton = view.findViewById<Button>(R.id.button)
 
+        backButton.setOnClickListener {
+            activity?.onBackPressed()
+        }
 
         rcfront.setOnClickListener {
             clickedRcFrontImageView = true
@@ -82,19 +87,29 @@ class AddTruckFragment : Fragment(), PermissionListener {
 
         submitApplication.setOnClickListener {
             if (truckNo.text.trim().isEmpty()) {
-                Snackbar.make(it, "Please enter your Truck Number!",
-                    Snackbar.LENGTH_LONG).show()
+                Snackbar.make(
+                    it, "Please enter your Truck Number!",
+                    Snackbar.LENGTH_LONG
+                ).show()
             } else if (truckRcNo.text.trim().isEmpty()) {
-                Snackbar.make(it, "Please enter your Truck RC Number!",
-                    Snackbar.LENGTH_LONG).show()
-            } else if(rcBackBitmap == null || rcFrontBitmap == null) {
-                Snackbar.make(it, "Please select both the front and back images of " +
-                        "your Truck's RC!",
-                    Snackbar.LENGTH_LONG).show()
+                Snackbar.make(
+                    it, "Please enter your Truck RC Number!",
+                    Snackbar.LENGTH_LONG
+                ).show()
+            } else if (rcBackBitmap == null || rcFrontBitmap == null) {
+                Snackbar.make(
+                    it, "Please select both the front and back images of " +
+                            "your Truck's RC!",
+                    Snackbar.LENGTH_LONG
+                ).show()
             } else {
                 GlobalScope.launch(Dispatchers.IO) {
                     val job = async {
-                        model.UploadTruckRc(rcFront = rcFrontBitmap!!, rcBack = rcBackBitmap!!)
+                        model.addTruck(
+                            rcFront = rcFrontBitmap!!,
+                            rcBack = rcBackBitmap!!,
+                            truckNo.text.toString(), truckRcNo.text.toString(),
+                        )
                     }
                     job.await()
                 }
@@ -102,8 +117,10 @@ class AddTruckFragment : Fragment(), PermissionListener {
                 rcback.setImageBitmap(null)
                 truckNo.text.clear()
                 truckRcNo.text.clear()
-                Snackbar.make(it, "Truck RC submitted successfully!",
-                    Snackbar.LENGTH_LONG).show()
+                Snackbar.make(
+                    it, "Truck RC submitted successfully!",
+                    Snackbar.LENGTH_LONG
+                ).show()
             }
         }
         return view
@@ -114,7 +131,8 @@ class AddTruckFragment : Fragment(), PermissionListener {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"
         startActivityForResult(
-            Intent.createChooser(intent, "Please select image"), 1)
+            Intent.createChooser(intent, "Please select image"), 1
+        )
     }
 
     override fun onPermissionDenied(response: PermissionDeniedResponse?) {
@@ -132,7 +150,7 @@ class AddTruckFragment : Fragment(), PermissionListener {
             if (intentData != null) {
                 filepath = intentData.data!!
                 val inputStream = context!!.contentResolver.openInputStream(filepath)
-                if(clickedRcFrontImageView) {
+                if (clickedRcFrontImageView) {
                     rcFrontBitmap = BitmapFactory.decodeStream(inputStream)
                     rcfront.setImageBitmap(rcFrontBitmap)
                 } else {

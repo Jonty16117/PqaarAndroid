@@ -20,7 +20,6 @@ import com.pqaar.app.model.Bid
 import com.pqaar.app.model.LiveAuctionListItem
 import com.pqaar.app.model.LiveRoutesListItem
 import com.pqaar.app.truckOwner.viewModel.TruckOwnerViewModel
-import com.pqaar.app.unionAdmin.repository.UnionAdminRepo
 import com.pqaar.app.utils.TimeConversions.CurrDateTimeInMillis
 import com.pqaar.app.utils.TimeConversions.MillisToTimestamp
 

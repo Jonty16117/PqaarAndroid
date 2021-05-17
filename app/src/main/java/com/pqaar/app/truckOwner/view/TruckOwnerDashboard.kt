@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
+import com.google.firebase.auth.FirebaseAuth
 import com.pqaar.app.R
 import com.pqaar.app.common.LoginActivity
 import com.pqaar.app.model.LiveAuctionListItem
@@ -45,6 +46,7 @@ class TruckOwnerDashboard : AppCompatActivity() {
     private lateinit var viewPager: ViewPager
     private lateinit var menu: Button
     private lateinit var progressBar: ProgressBar
+    private lateinit var closeButton: Button
 
     private lateinit var alertDialog: AlertDialog
     private lateinit var historyAdapter: TruckDriverHistoryAdapter
@@ -70,10 +72,37 @@ class TruckOwnerDashboard : AppCompatActivity() {
         viewPager = findViewById(R.id.view_pager)
         menu = findViewById(R.id.menu)
         progressBar = findViewById(R.id.progressBar3)
-        
+        closeButton = findViewById(R.id.button)
+
         menu.setOnClickListener { showPopUpMenu(menu) }
-        
         viewPager.adapter = BottomSheetViewPagerAdapter(supportFragmentManager)
+        closeButton.setOnClickListener {
+            val alertDialog: AlertDialog
+            val builder = AlertDialog.Builder(this, R.style.CustomAlertDialog)
+            builder.setTitle("Exit")
+            builder.setMessage("Are you sure you want to exit?")
+            builder.setIcon(R.drawable.ic_close_dark)
+            builder.setPositiveButton("Yes") { dialogInterface, _ ->
+                dialogInterface.dismiss()
+                finish()
+                System.exit(0)
+            }
+            builder.setNegativeButton("No") { dialogInterface, _ ->
+                dialogInterface.dismiss()
+            }
+            alertDialog = builder.create()
+            alertDialog.setCancelable(true)
+            alertDialog.show()
+
+            val messageText = alertDialog.findViewById<TextView>(android.R.id.message)
+            val logoutBtn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+            val cancelBtn = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+            logoutBtn.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
+            cancelBtn.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
+            messageText?.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
+
+        }
+
         this.model = ViewModelProviders.of(this)
             .get(TruckOwnerViewModel::class.java)
 
@@ -192,12 +221,14 @@ class TruckOwnerDashboard : AppCompatActivity() {
                     builder.setIcon(R.drawable.ic_logout)
                     builder.setPositiveButton("Logout") { dialogInterface, _ ->
                         dialogInterface.dismiss()
+                        FirebaseAuth.getInstance().signOut()
                         val intent = Intent(this@TruckOwnerDashboard, LoginActivity::class.java)
                         try {
                             startActivity(intent)
                         } finally {
                             finish()
                         }
+
                     }
                     builder.setNegativeButton("Cancel") { dialogInterface, _ ->
                         dialogInterface.dismiss()
@@ -218,4 +249,31 @@ class TruckOwnerDashboard : AppCompatActivity() {
         }
         popup.show()
     }
+
+    override fun onBackPressed() {
+        val alertDialog: AlertDialog
+        val builder = AlertDialog.Builder(this, R.style.CustomAlertDialog)
+        builder.setTitle("Exit")
+        builder.setMessage("Are you sure you want to exit?")
+        builder.setIcon(R.drawable.ic_close_dark)
+        builder.setPositiveButton("Yes") { dialogInterface, _ ->
+            dialogInterface.dismiss()
+            super.onBackPressed()
+        }
+        builder.setNegativeButton("No") { dialogInterface, _ ->
+            dialogInterface.dismiss()
+        }
+        alertDialog = builder.create()
+        alertDialog.setCancelable(true)
+        alertDialog.show()
+
+        val messageText = alertDialog.findViewById<TextView>(android.R.id.message)
+        val logoutBtn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+        val cancelBtn = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+        logoutBtn.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
+        cancelBtn.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
+        messageText?.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
+
+    }
+
 }
