@@ -27,8 +27,6 @@ class RegisterUserFragment : Fragment() {
     private lateinit var textInputUsername2: EditText
     private lateinit var textInputPhone: EditText
     private lateinit var textInputEmail: EditText
-//    private lateinit var textInputPassword: EditText
-//    private lateinit var textInputPassword2: EditText
     private lateinit var warning: TextView
     private lateinit var progressBar: ProgressBar
     private lateinit var radioBtnMandiAdmin: RadioButton

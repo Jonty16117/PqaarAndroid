@@ -1,15 +1,14 @@
 package com.pqaar.app.common
 
-import android.content.DialogInterface
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.firebase.FirebaseException
@@ -18,16 +17,14 @@ import com.google.firebase.firestore.Source
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.pqaar.app.R
-import com.pqaar.app.mandiAdmin.view.MandiAdminDashboard
-import com.pqaar.app.pahunchAdmin.view.PahunchAdminDashboard
-import com.pqaar.app.truckOwner.view.TruckOwnerDashboard
-import com.pqaar.app.utils.DbPaths
 import com.pqaar.app.utils.DbPaths.EMAIL
 import com.pqaar.app.utils.DbPaths.FIRST_NAME
 import com.pqaar.app.utils.DbPaths.LAST_NAME
-import com.pqaar.app.utils.DbPaths.MANDI
+import com.pqaar.app.utils.DbPaths.MANDI_ADMIN
+import com.pqaar.app.utils.DbPaths.PAHUNCH_ADMIN
 import com.pqaar.app.utils.DbPaths.PHONE_NO
 import com.pqaar.app.utils.DbPaths.TRUCKS
+import com.pqaar.app.utils.DbPaths.TRUCK_OWNER
 import com.pqaar.app.utils.DbPaths.USER_DATA
 import com.pqaar.app.utils.DbPaths.USER_TYPE
 import java.util.concurrent.TimeUnit
@@ -68,30 +65,7 @@ class RegisterUserOtpVerifyFragment : Fragment() {
         email = arguments?.getString("email")!!
         mAuth = FirebaseAuth.getInstance()
         closeButton.setOnClickListener {
-            val alertDialog: AlertDialog
-            val builder = AlertDialog.Builder(activity!!, R.style.CustomAlertDialog)
-            builder.setTitle("Exit")
-            builder.setMessage("Are you sure you want to exit?")
-            builder.setIcon(R.drawable.ic_close_dark)
-            builder.setPositiveButton("Yes") { dialogInterface, _ ->
-                dialogInterface.dismiss()
-                activity!!.finish()
-                System.exit(0)
-            }
-            builder.setNegativeButton("No") { dialogInterface, _ ->
-                dialogInterface.dismiss()
-            }
-            alertDialog = builder.create()
-            alertDialog.setCancelable(true)
-            alertDialog.show()
-
-            val messageText = alertDialog.findViewById<TextView>(android.R.id.message)
-            val logoutBtn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
-            val cancelBtn = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
-            logoutBtn.setTextColor(ContextCompat.getColor(requireActivity(), R.color.colorPrimaryDark))
-            cancelBtn.setTextColor(ContextCompat.getColor(requireActivity(), R.color.colorPrimaryDark))
-            messageText?.setTextColor(ContextCompat.getColor(requireActivity(), R.color.colorPrimaryDark))
-
+            fragmentManager!!.popBackStack()
         }
 
         progressBar.isVisible = true
@@ -207,8 +181,8 @@ class RegisterUserOtpVerifyFragment : Fragment() {
         data[LAST_NAME] = lastName
         when (userType) {
             "mandi-admin" -> {
-                data[USER_TYPE] = "MA"
-//                data[MANDI] = "MA"
+                data[USER_TYPE] = MANDI_ADMIN
+//                data[USER_MANDI] = "MA"
                 db.collection(USER_DATA).document(userUId)
                     .set(data).addOnSuccessListener {
                         //enter user's mandi in db
@@ -228,7 +202,7 @@ class RegisterUserOtpVerifyFragment : Fragment() {
             }
 
             "pahunch-admin" -> {
-                data[USER_TYPE] = "PA"
+                data[USER_TYPE] = PAHUNCH_ADMIN
                 db.collection(USER_DATA).document(userUId)
                     .set(data).addOnSuccessListener {
                         Toast.makeText(
@@ -252,7 +226,7 @@ class RegisterUserOtpVerifyFragment : Fragment() {
             }
 
             "truck-owner" -> {
-                data[USER_TYPE] = "TO"
+                data[USER_TYPE] = TRUCK_OWNER
                 data[TRUCKS] = null
                 db.collection(USER_DATA).document(userUId)
                     .set(data).addOnSuccessListener {

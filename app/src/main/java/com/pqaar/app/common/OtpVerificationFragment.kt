@@ -1,17 +1,17 @@
 package com.pqaar.app.common
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.Source
@@ -21,6 +21,9 @@ import com.pqaar.app.R
 import com.pqaar.app.mandiAdmin.view.MandiAdminDashboard
 import com.pqaar.app.pahunchAdmin.view.PahunchAdminDashboard
 import com.pqaar.app.truckOwner.view.TruckOwnerDashboard
+import com.pqaar.app.utils.DbPaths.MANDI_ADMIN
+import com.pqaar.app.utils.DbPaths.PAHUNCH_ADMIN
+import com.pqaar.app.utils.DbPaths.TRUCK_OWNER
 import com.pqaar.app.utils.DbPaths.USER_DATA
 import com.pqaar.app.utils.DbPaths.USER_TYPE
 import java.util.concurrent.TimeUnit
@@ -57,30 +60,7 @@ class OtpVerificationFragment : Fragment() {
         userType = arguments?.getString("userType")!!
         mAuth = FirebaseAuth.getInstance()
         closeButton.setOnClickListener {
-            val alertDialog: AlertDialog
-            val builder = AlertDialog.Builder(activity!!, R.style.CustomAlertDialog)
-            builder.setTitle("Exit")
-            builder.setMessage("Are you sure you want to exit?")
-            builder.setIcon(R.drawable.ic_close_dark)
-            builder.setPositiveButton("Yes") { dialogInterface, _ ->
-                dialogInterface.dismiss()
-                activity!!.finish()
-                System.exit(0)
-            }
-            builder.setNegativeButton("No") { dialogInterface, _ ->
-                dialogInterface.dismiss()
-            }
-            alertDialog = builder.create()
-            alertDialog.setCancelable(true)
-            alertDialog.show()
-
-            val messageText = alertDialog.findViewById<TextView>(android.R.id.message)
-            val logoutBtn = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
-            val cancelBtn = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
-            logoutBtn.setTextColor(ContextCompat.getColor(requireActivity(), R.color.colorPrimaryDark))
-            cancelBtn.setTextColor(ContextCompat.getColor(requireActivity(), R.color.colorPrimaryDark))
-            messageText?.setTextColor(ContextCompat.getColor(requireActivity(), R.color.colorPrimaryDark))
-
+            fragmentManager!!.popBackStack()
         }
 
         progressBar.isVisible = true
@@ -157,7 +137,7 @@ class OtpVerificationFragment : Fragment() {
                             if (document.exists()) {
                                 when (userType) {
                                     "mandi-admin" -> {
-                                        if (document.get(USER_TYPE) == "MA") {
+                                        if (document.get(USER_TYPE) == MANDI_ADMIN) {
                                             val intent = Intent(activity, MandiAdminDashboard::class.java)
                                             try {
                                                 startActivity(intent)
@@ -173,7 +153,7 @@ class OtpVerificationFragment : Fragment() {
                                         }
                                     }
                                     "truck-owner" -> {
-                                        if (document.get(USER_TYPE) == "TO") {
+                                        if (document.get(USER_TYPE) == TRUCK_OWNER) {
                                             val intent = Intent(activity, TruckOwnerDashboard::class.java)
                                             try {
                                                 startActivity(intent)
@@ -189,7 +169,7 @@ class OtpVerificationFragment : Fragment() {
                                         }
                                     }
                                     "pahunch-admin" -> {
-                                        if (document.get(USER_TYPE) == "PA") {
+                                        if (document.get(USER_TYPE) == PAHUNCH_ADMIN) {
                                             Log.d(TAG, "In pa switch block")
                                             val intent = Intent(activity, PahunchAdminDashboard::class.java)
                                             try {

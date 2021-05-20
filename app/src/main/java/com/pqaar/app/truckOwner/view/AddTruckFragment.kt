@@ -5,12 +5,14 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.storage.FirebaseStorage
@@ -64,7 +66,7 @@ class AddTruckFragment : Fragment(), PermissionListener {
         backButton = view.findViewById<Button>(R.id.button)
 
         backButton.setOnClickListener {
-            activity?.onBackPressed()
+            fragmentManager!!.popBackStack()
         }
 
         rcfront.setOnClickListener {
@@ -86,29 +88,59 @@ class AddTruckFragment : Fragment(), PermissionListener {
         }
 
         submitApplication.setOnClickListener {
+            Log.d(TAG, "truck: ${truckNo.text.toString()}")
             if (truckNo.text.trim().isEmpty()) {
-                Snackbar.make(
-                    it, "Please enter your Truck Number!",
+                val snackbar = Snackbar.make(
+                    view, "Please enter your Truck Number!",
                     Snackbar.LENGTH_LONG
-                ).show()
+                )
+                val snackbarView = snackbar.view
+                snackbarView.setBackgroundColor(
+                    ContextCompat.getColor(
+                        activity!!,
+                        android.R.color.holo_red_light
+                    )
+                )
+                snackbar.show()
+
             } else if (truckRcNo.text.trim().isEmpty()) {
-                Snackbar.make(
-                    it, "Please enter your Truck RC Number!",
+                val snackbar = Snackbar.make(
+                    view, "Please enter your Truck RC Number!",
                     Snackbar.LENGTH_LONG
-                ).show()
+                )
+                val snackbarView = snackbar.view
+                snackbarView.setBackgroundColor(
+                    ContextCompat.getColor(
+                        activity!!,
+                        android.R.color.holo_red_light
+                    )
+                )
+                snackbar.show()
+
             } else if (rcBackBitmap == null || rcFrontBitmap == null) {
-                Snackbar.make(
-                    it, "Please select both the front and back images of " +
+                val snackbar = Snackbar.make(
+                    view, "Please select both the front and back images of " +
                             "your Truck's RC!",
                     Snackbar.LENGTH_LONG
-                ).show()
+                )
+                val snackbarView = snackbar.view
+                snackbarView.setBackgroundColor(
+                    ContextCompat.getColor(
+                        activity!!,
+                        android.R.color.holo_red_light
+                    )
+                )
+                snackbar.show()
             } else {
+                val TruckNo = truckNo.text.toString()
+                val TruckRcNo = truckRcNo.text.toString()
+                Log.d(TAG, "truck info: ${TruckNo}, ${TruckRcNo}")
                 GlobalScope.launch(Dispatchers.IO) {
                     val job = async {
                         model.addTruck(
                             rcFront = rcFrontBitmap!!,
                             rcBack = rcBackBitmap!!,
-                            truckNo.text.toString(), truckRcNo.text.toString(),
+                            TruckNo, TruckRcNo,
                         )
                     }
                     job.await()
@@ -117,10 +149,19 @@ class AddTruckFragment : Fragment(), PermissionListener {
                 rcback.setImageBitmap(null)
                 truckNo.text.clear()
                 truckRcNo.text.clear()
-                Snackbar.make(
-                    it, "Truck RC submitted successfully!",
+
+                val snackbar = Snackbar.make(
+                    view, "Truck RC submitted successfully!",
                     Snackbar.LENGTH_LONG
-                ).show()
+                )
+                val snackbarView = snackbar.view
+                snackbarView.setBackgroundColor(
+                    ContextCompat.getColor(
+                        activity!!,
+                        android.R.color.holo_green_light
+                    )
+                )
+                snackbar.show()
             }
         }
         return view

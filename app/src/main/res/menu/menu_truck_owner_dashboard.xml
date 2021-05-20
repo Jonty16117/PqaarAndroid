@@ -3,15 +3,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/header1"
-        android:title="Add Truck"
+        android:title="Refresh Dashboard"
         tools:ignore="HardcodedText" />
 
     <item android:id="@+id/header2"
+        android:title="Add Truck"
+        tools:ignore="HardcodedText" />
+
+    <item android:id="@+id/header3"
         android:title="Remove Truck"
         tools:ignore="HardcodedText" />
 
     <item
-        android:id="@+id/header3"
+        android:id="@+id/header4"
         android:title="Logout"
         tools:ignore="HardcodedText" />
 

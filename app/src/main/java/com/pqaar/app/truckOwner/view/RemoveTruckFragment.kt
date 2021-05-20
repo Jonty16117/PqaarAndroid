@@ -48,7 +48,7 @@ class RemoveTruckFragment : Fragment() {
         val backButton = view.findViewById<Button>(R.id.button)
 
         backButton.setOnClickListener {
-            activity?.onBackPressed()
+            fragmentManager!!.popBackStack()
         }
 
         val trucksList = ArrayList<LiveTruckDataItem>()
@@ -96,43 +96,12 @@ class RemoveTruckFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            holder.setData(trucksList[position], position, onItemClicked())
+            holder.setData(trucksList[position], position, onItemClicked(position))
         }
 
 
-        private fun onItemClicked() = View.OnClickListener {
-
-        }
-
-        override fun getItemCount(): Int {
-            return trucksList.size
-        }
-
-        inner class ViewHolder(private val truckItemView: View) :
-            RecyclerView.ViewHolder(truckItemView) {
-
-            fun setData(
-                truckHistoryItem: LiveTruckDataItem,
-                position: Int,
-                onClickListener: View.OnClickListener
-            ) {
-                val seqNo = truckItemView.findViewById<TextView>(R.id.truck_no)
-                val truckNo = truckItemView.findViewById<TextView>(R.id.textView3)
-                val deleteIcon = truckItemView.findViewById<ImageView>(R.id.imageView)
-                val deleteInProgressIcon = truckItemView.findViewById<ImageView>(R.id.imageView12)
-
-                seqNo.text = (position + 1).toString()
-                truckNo.text = truckHistoryItem.TruckNo
-                deleteIcon.isVisible = true
-                deleteInProgressIcon.isVisible = false
-
-                itemView.setOnClickListener {
-                    onClickListener.onClick(it)
-                }
-            }
-        }
-
-        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        private fun onItemClicked(position: Int) = View.OnClickListener {
+            Log.d(TAG, "Item clicked")
             val alertDialog: AlertDialog
             val builder = AlertDialog.Builder(context, R.style.CustomAlertDialog)
             builder.setTitle("Send remove truck request")
@@ -159,6 +128,38 @@ class RemoveTruckFragment : Fragment() {
             logoutBtn.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryDark))
             cancelBtn.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryDark))
             messageText?.setTextColor(ContextCompat.getColor(context, R.color.colorPrimaryDark))
+
+        }
+
+        override fun getItemCount(): Int {
+            return trucksList.size
+        }
+
+        inner class ViewHolder(private val truckItemView: View) :
+            RecyclerView.ViewHolder(truckItemView) {
+
+            fun setData(
+                truckHistoryItem: LiveTruckDataItem,
+                position: Int,
+                onClickListener: View.OnClickListener
+            ) {
+                val seqNo = truckItemView.findViewById<TextView>(R.id.truck_no)
+                val truckNo = truckItemView.findViewById<TextView>(R.id.textView3)
+                val deleteIcon = truckItemView.findViewById<ImageView>(R.id.imageView)
+                val deleteInProgressIcon = truckItemView.findViewById<ImageView>(R.id.imageView12)
+
+                seqNo.text = (position + 1).toString()
+                truckNo.text = truckHistoryItem.TruckNo
+                deleteIcon.isVisible = true
+                deleteInProgressIcon.isVisible = false
+
+                truckItemView.setOnClickListener {
+                    onClickListener.onClick(it)
+                }
+            }
+        }
+
+        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
 
         }
 

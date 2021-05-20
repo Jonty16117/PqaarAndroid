@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.pqaar.app.R
 import com.pqaar.app.common.LoginActivity
@@ -29,7 +30,14 @@ import com.pqaar.app.truckOwner.adapters.BottomSheetViewPagerAdapter
 import com.pqaar.app.truckOwner.adapters.TruckDriverHistoryAdapter
 import com.pqaar.app.truckOwner.repository.TruckOwnerRepo
 import com.pqaar.app.truckOwner.viewModel.TruckOwnerViewModel
+import com.pqaar.app.utils.DbPaths.GOT
+import com.pqaar.app.utils.DbPaths.RATE
+import com.pqaar.app.utils.DbPaths.REQ
 import com.pqaar.app.utils.TimeConversions.CurrDateTimeInMillis
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 @SuppressLint("SetTextI18n")
 class TruckOwnerDashboard : AppCompatActivity() {
@@ -138,7 +146,9 @@ class TruckOwnerDashboard : AppCompatActivity() {
             //Count total trucks which closed their bids
             var totalClosed = 0
             liveAuctionList.forEach {
-                if (it.Closed == "true") { totalClosed += 1 }
+                if (it.Closed == "true") {
+                    totalClosed += 1
+                }
             }
             val text1 = "$totalClosed"
             totalTrucksClosedCountText.text = text1
@@ -160,23 +170,27 @@ class TruckOwnerDashboard : AppCompatActivity() {
             liveRoutesListDTO.forEach { liveRoutesListDTOItem ->
                 val routes = ArrayList<LiveRoutesListItem.RouteDestination>()
                 liveRoutesListDTOItem.value.desData.forEach { route ->
-                    val req = route.value["Req"]!!.toInt()
-                    val got = route.value["Got"]!!.toInt()
-                    val rate = route.value["Rate"]!!.toInt()
+                    val req = route.value[REQ]!!.toInt()
+                    val got = route.value[GOT]!!.toInt()
+                    val rate = route.value[RATE]!!.toInt()
 
-                    routes.add(LiveRoutesListItem.RouteDestination(
-                        Des = route.key,
-                        Req = req,
-                        Got = got,
-                        Rate = rate
-                    ))
+                    routes.add(
+                        LiveRoutesListItem.RouteDestination(
+                            Des = route.key,
+                            Req = req,
+                            Got = got,
+                            Rate = rate
+                        )
+                    )
                     //Count remaining routes
                     routesLeft += (req - got)
                 }
-                liveRoutesList.add(LiveRoutesListItem(
-                    Mandi = liveRoutesListDTOItem.key,
-                    Routes = routes
-                ))
+                liveRoutesList.add(
+                    LiveRoutesListItem(
+                        Mandi = liveRoutesListDTOItem.key,
+                        Routes = routes
+                    )
+                )
                 totalRoutesLeft.text = routesLeft.toString()
             }
         })
@@ -190,12 +204,27 @@ class TruckOwnerDashboard : AppCompatActivity() {
     private fun showPopUpMenu(view: View) {
         val popup = PopupMenu(this, view)
         popup.inflate(R.menu.menu_truck_owner_dashboard)
-        
+
         popup.setOnMenuItemClickListener { item: MenuItem? ->
             when (item!!.itemId) {
 
-                //Add Truck
+                //Refresh Dashboard
                 R.id.header1 -> {
+                    GlobalScope.launch(Dispatchers.IO) {
+                        model.refreshTruckOwnerData()
+                        model.refreshLiveTruckDataList()
+                        model.refreshAuctionsBonusTimeInfo()
+                        model.refreshLiveAuctionList()
+                        model.refreshLiveRoutesList()
+                        model.refreshSchAuctionsInfo()
+                    }
+
+                    Toast.makeText(this, "Refreshed Dashboard", Toast.LENGTH_LONG).show()
+
+                }
+
+                //Add Truck
+                R.id.header2 -> {
                     supportFragmentManager
                         .beginTransaction()
                         .replace(android.R.id.content, AddTruckFragment())
@@ -204,7 +233,7 @@ class TruckOwnerDashboard : AppCompatActivity() {
                 }
 
                 //Remove Truck
-                R.id.header2 -> {
+                R.id.header3 -> {
                     supportFragmentManager
                         .beginTransaction()
                         .replace(android.R.id.content, RemoveTruckFragment())
@@ -213,7 +242,7 @@ class TruckOwnerDashboard : AppCompatActivity() {
                 }
 
                 //Logout
-                R.id.header3 -> {
+                R.id.header4 -> {
                     //show alert dialog box before logging out
                     val builder = AlertDialog.Builder(this, R.style.CustomAlertDialog)
                     builder.setTitle("Logout")
@@ -242,7 +271,12 @@ class TruckOwnerDashboard : AppCompatActivity() {
                     val cancelBtn = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
                     logoutBtn.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
                     cancelBtn.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
-                    messageText?.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
+                    messageText?.setTextColor(
+                        ContextCompat.getColor(
+                            this,
+                            R.color.colorPrimaryDark
+                        )
+                    )
                 }
             }
             true
@@ -274,6 +308,14 @@ class TruckOwnerDashboard : AppCompatActivity() {
         cancelBtn.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
         messageText?.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark))
 
+    }
+
+    private fun showSnackbar(message: String, color: Int) {
+//        val snackbar = Snackbar.make(view, message,
+//            Snackbar.LENGTH_LONG)
+//        val snackbarView = snackbar.view
+//        snackbarView.setBackgroundColor(color)
+//        snackbar.show()
     }
 
 }

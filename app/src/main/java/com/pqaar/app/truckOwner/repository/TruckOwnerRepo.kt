@@ -5,22 +5,49 @@ import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ChildEventListener
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.pqaar.app.model.*
-import com.pqaar.app.utils.DbPaths
+import com.pqaar.app.utils.DbPaths.ADD
+import com.pqaar.app.utils.DbPaths.AUCTIONS_INFO
+import com.pqaar.app.utils.DbPaths.AUCTION_BONUS_TIME_INFO
+import com.pqaar.app.utils.DbPaths.BACK_RC_URL
+import com.pqaar.app.utils.DbPaths.CURRENT_LIST_NO
+import com.pqaar.app.utils.DbPaths.CURR_NO
+import com.pqaar.app.utils.DbPaths.DES
+import com.pqaar.app.utils.DbPaths.DESTINATION
+import com.pqaar.app.utils.DbPaths.DUMMY_DOC
+import com.pqaar.app.utils.DbPaths.END_TIME
+import com.pqaar.app.utils.DbPaths.FIRSTNAME
 import com.pqaar.app.utils.DbPaths.FIRST_NAME
+import com.pqaar.app.utils.DbPaths.FRONT_RC_URL
+import com.pqaar.app.utils.DbPaths.GOT
+import com.pqaar.app.utils.DbPaths.IS_CLOSED
+import com.pqaar.app.utils.DbPaths.LASTNAME
 import com.pqaar.app.utils.DbPaths.LAST_NAME
 import com.pqaar.app.utils.DbPaths.LIVE_AUCTION_LIST
 import com.pqaar.app.utils.DbPaths.LIVE_ROUTES_LIST
 import com.pqaar.app.utils.DbPaths.LIVE_TRUCK_DATA_LIST
+import com.pqaar.app.utils.DbPaths.OWNER_FIRST_NAME
+import com.pqaar.app.utils.DbPaths.OWNER_LAST_NAME
+import com.pqaar.app.utils.DbPaths.OWNER_UID
 import com.pqaar.app.utils.DbPaths.PHONE_NO
+import com.pqaar.app.utils.DbPaths.PREVIOUS_LIST_NO
+import com.pqaar.app.utils.DbPaths.RATE
+import com.pqaar.app.utils.DbPaths.REMOVE
+import com.pqaar.app.utils.DbPaths.REQ
+import com.pqaar.app.utils.DbPaths.REQUEST_STATUS
+import com.pqaar.app.utils.DbPaths.REQUEST_TYPE
+import com.pqaar.app.utils.DbPaths.SCHEDULED_AUCTIONS
+import com.pqaar.app.utils.DbPaths.SOURCE
+import com.pqaar.app.utils.DbPaths.SRC
+import com.pqaar.app.utils.DbPaths.START_TIME
+import com.pqaar.app.utils.DbPaths.STATUS
+import com.pqaar.app.utils.DbPaths.TIMESTAMP
 import com.pqaar.app.utils.DbPaths.TRUCKS
+import com.pqaar.app.utils.DbPaths.TRUCK_NUMBER
 import com.pqaar.app.utils.DbPaths.TRUCK_RC
 import com.pqaar.app.utils.DbPaths.USER_DATA
 import com.pqaar.app.utils.DbPaths.TRUCK_REQUESTS
@@ -70,9 +97,11 @@ object TruckOwnerRepo {
                 truckOwnerLiveData.LastName = it.get(LAST_NAME).toString()
                 truckOwnerLiveData.PhoneNo = it.get(PHONE_NO).toString()
                 val trucksArrayList = ArrayList<String>()
-                if (it.get(TRUCKS) != null) {
+                if (it.get(TRUCKS) != null || (it.get(TRUCKS) as List<*>).size > 0) {
                     val trucks = it.get(TRUCKS) as List<*>
                     trucks.forEach { trucksArrayList.add(it.toString()) }
+                } else {
+                    trucksArrayList.clear()
                 }
                 truckOwnerLiveData.Trucks = trucksArrayList
                 Log.w(TAG, "Truck user data fetched successfully!")
@@ -97,7 +126,7 @@ object TruckOwnerRepo {
                 var value: String /*Contains the value of the specified specifier*/
                 var splittedWords: List<String>
                 routes!!.forEach {
-                    if (it.id != "DummyDoc") {
+                    if (it.id != DUMMY_DOC) {
                         splittedWords = it.id.split("-")
                         src = splittedWords[0].replace('_', ' ')
                         des = splittedWords[1].replace('_', ' ')
@@ -116,20 +145,20 @@ object TruckOwnerRepo {
     private fun getDesDataDTO(data: String, value: String): HashMap<String, String> {
         val desData = HashMap<String, String>()
         when (data) {
-            "Req" -> {
-                desData["Req"] = value
-                desData["Got"] = "0"
-                desData["Rate"] = "0"
+            REQ -> {
+                desData[REQ] = value
+                desData[GOT] = "0"
+                desData[RATE] = "0"
             }
-            "Got" -> {
-                desData["Req"] = "0"
-                desData["Got"] = value
-                desData["Rate"] = "0"
+            GOT -> {
+                desData[REQ] = "0"
+                desData[GOT] = value
+                desData[RATE] = "0"
             }
-            "Rate" -> {
-                desData["Req"] = "0"
-                desData["Got"] = "0"
-                desData["Rate"] = value
+            RATE -> {
+                desData[REQ] = "0"
+                desData[GOT] = "0"
+                desData[RATE] = value
             }
         }
         return desData
@@ -161,16 +190,16 @@ object TruckOwnerRepo {
                 )
             } else {
                 for (doc in snapshots!!.documentChanges) {
-                    if (doc.document.id != "DummyDoc") {
+                    if (doc.document.id != DUMMY_DOC) {
                         val docData = doc.document
                         liveAuctionList[doc.document.id] = LiveAuctionListItem(
-                            CurrNo = docData.data["currNo"].toString(),
-                            PrevNo = docData.data["prevNo"].toString(),
-                            TruckNo = docData.data["truckNo"].toString(),
-                            Closed = docData.data["closed"].toString(),
-                            StartTime = docData.getLong("startTime"),
-                            Des = docData.data["des"].toString(),
-                            Src = docData.data["src"].toString()
+                            CurrNo = docData.data[CURR_NO].toString(),
+                            PrevNo = docData.data[PREVIOUS_LIST_NO].toString(),
+                            TruckNo = docData.data[TRUCK_NUMBER].toString(),
+                            Closed = docData.data[IS_CLOSED].toString(),
+                            StartTime = docData.getLong(START_TIME),
+                            Des = docData.data[DES].toString(),
+                            Src = docData.data[SRC].toString()
                         )
                     }
                 }
@@ -183,7 +212,7 @@ object TruckOwnerRepo {
     }
 
     suspend fun closeBid(truckNo: String, src: String, des: String) {
-        val dataToUpdate = hashMapOf<String, Any>("src" to src, "des" to des)
+        val dataToUpdate = hashMapOf<String, Any>(SOURCE to src, DESTINATION to des)
         val currListNo = liveTruckDataList[truckNo]!!.CurrentListNo
         firestoreDb.collection(LIVE_AUCTION_LIST)
             .document(currListNo)
@@ -204,31 +233,30 @@ object TruckOwnerRepo {
 
     fun fetchLiveTruckDataList() {
         val col = firestoreDb.collection(LIVE_TRUCK_DATA_LIST)
-
+        liveTruckDataList.clear()
         if (truckOwnerLiveData.Trucks.isNotEmpty()) {
             truckOwnerLiveData.Trucks.forEach { truck ->
                 col.document(truck).addSnapshotListener { truckDocument, error ->
                     if (error == null) {
                         Log.d(TAG, "truck: ${truck} doc: ${truckDocument}")
                         val liveTruckDataItem = LiveTruckDataItem()
-                        liveTruckDataItem.TruckNo = truckDocument!!.get("TruckNo").toString()
+                        liveTruckDataItem.TruckNo = truckDocument!!.get(TRUCK_NUMBER).toString()
                         liveTruckDataItem.CurrentListNo =
-                            truckDocument.get("CurrentListNo").toString()
-                        liveTruckDataItem.Status = truckDocument.get("Status").toString()
+                            truckDocument.get(CURRENT_LIST_NO).toString()
+                        liveTruckDataItem.Status = truckDocument.get(STATUS).toString()
                         val timestamp =
-                            truckDocument.get("Timestamp") as com.google.firebase.Timestamp
-                        val millis = timestamp.seconds * 1000 + timestamp.nanoseconds * 1000000
+                            truckDocument.get(TIMESTAMP) as com.google.firebase.Timestamp
+                        val millis = (timestamp.seconds * 1000)
+                        Log.d(TAG, "truck timestamp in millis: ${millis}")
                         liveTruckDataItem.Timestamp = millis.toString()
-                        val firstName = truckDocument.get("OwnerFirstName").toString()
-                        val lastName = truckDocument.get("OwnerFirstName").toString()
+                        val firstName = truckDocument.get(OWNER_FIRST_NAME).toString()
+                        val lastName = truckDocument.get(OWNER_LAST_NAME).toString()
                         liveTruckDataItem.Owner = Pair(firstName, lastName)
-//                        liveTruckDataItem.Owner = (truckDocument.get("Owner") as List<*>)
-//                                .zipWithNext { a, b -> Pair(a.toString(), b.toString()) }[0]
                         liveTruckDataItem.Route = Pair(
-                            truckDocument.get("Source").toString(),
-                            truckDocument.get("Destination").toString()
+                            truckDocument.get(SOURCE).toString(),
+                            truckDocument.get(DESTINATION).toString()
                         )
-                        liveTruckDataList[truckDocument.get("TruckNo").toString()] =
+                        liveTruckDataList[truckDocument.get(TRUCK_NUMBER).toString()] =
                             liveTruckDataItem
                         LiveTruckDataList.postValue(liveTruckDataList)
                         Log.d(TAG, "after each truck update: ${liveTruckDataItem}")
@@ -238,26 +266,29 @@ object TruckOwnerRepo {
                 }
             }
         }
+        else {
+            LiveTruckDataList.postValue(liveTruckDataList)
+        }
     }
 
     fun fetchSchAuctionsInfo() {
-        firestoreDb.collection(DbPaths.AUCTIONS_INFO)
-            .document(DbPaths.SCHEDULED_AUCTIONS).addSnapshotListener { snapshot, error ->
+        firestoreDb.collection(AUCTIONS_INFO)
+            .document(SCHEDULED_AUCTIONS).addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     Log.w(
                         TAG, "Failed to fetch auction info!"
                     )
                 } else {
-                    val startTime: Long = snapshot!!.getLong("StartTime")!!
-                    val endTime: Long = snapshot.getLong("EndTime")!!
+                    val startTime: Long = snapshot!!.getLong(START_TIME)!!
+                    val endTime: Long = snapshot.getLong(END_TIME)!!
                     LiveAuctionTimestamps.value = Pair(startTime, endTime)
                 }
             }
     }
 
     fun fetchAuctionsBonusTimeInfo() {
-        firestoreDb.collection(DbPaths.AUCTIONS_INFO)
-            .document(DbPaths.AUCTION_BONUS_TIME_INFO).addSnapshotListener { snapshot, error ->
+        firestoreDb.collection(AUCTIONS_INFO)
+            .document(AUCTION_BONUS_TIME_INFO).addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     Log.d(
                         TAG, "Failed to fetch auction info!"
@@ -266,7 +297,7 @@ object TruckOwnerRepo {
                     if (snapshot != null) {
                         Log.d(
                             TAG,
-                            "Fetched updated auction bonus time: ${snapshot.get("StartTime")}" +
+                            "Fetched updated auction bonus time: ${snapshot.get(START_TIME)}" +
                                     ", ${snapshot.get("EndTime")}!"
                         )
                         Log.d(
@@ -276,8 +307,8 @@ object TruckOwnerRepo {
                             TAG, "Fetched updated auction bonus time: ${snapshot.data}!"
                         )
                         val liveBonusTimeInfo = BonusTime(
-                            StartTime = snapshot.getLong("StartTime")!!,
-                            EndTime = snapshot.getLong("EndTime")!!
+                            StartTime = snapshot.getLong(START_TIME)!!,
+                            EndTime = snapshot.getLong(END_TIME)!!
                         )
                         LiveBonusTimeInfo.value = liveBonusTimeInfo
                     }
@@ -295,84 +326,97 @@ object TruckOwnerRepo {
 
         //For testing only
 //        val userFolder = "DemoUserTO"
-
-        val rcFrontPath = "${TRUCK_RC}/${userFolder}/Front/rc_front.jpeg"
+        //upload rc images
+        val rcFrontPath = "${TRUCK_RC}/${userFolder}/${truckNo}/rc_front.jpeg"
         val rcFrontref = firebaseSt.reference.child(rcFrontPath)
         val baos1 = ByteArrayOutputStream()
         rcFront.compress(Bitmap.CompressFormat.JPEG, 50, baos1)
         val rcFrontData = baos1.toByteArray()
-        rcFrontref.putBytes(rcFrontData).addOnSuccessListener {
-            val frontRCURL = rcFrontref.downloadUrl.toString()
-            var backRCURL = ""
-            GlobalScope.launch(Dispatchers.IO) {
-                val job1 = async {
-                    val rcBackPath = "${TRUCK_RC}/${userFolder}/Back/rc_back.jpeg"
-                    val rcBackref = firebaseSt.reference.child(rcBackPath)
-                    val baos2 = ByteArrayOutputStream()
-                    rcBack.compress(Bitmap.CompressFormat.JPEG, 50, baos2)
-                    val rcBackData = baos2.toByteArray()
-                    rcBackref.putBytes(rcBackData).addOnSuccessListener {
-                        backRCURL = rcBackref.downloadUrl.toString()
-                    }.await()
-                }
-                job1.await()
+        rcFrontref.putBytes(rcFrontData).addOnSuccessListener { uploadFrontRCTask ->
+            rcFrontref.downloadUrl.addOnSuccessListener { uri ->
+                val frontRCURL = uri.toString()
+                Log.d(TAG, "url: ${frontRCURL}")
+                var backRCURL = ""
+                val rcBackPath = "${TRUCK_RC}/${userFolder}/${truckNo}/rc_back.jpeg"
+                val rcBackref = firebaseSt.reference.child(rcBackPath)
+                GlobalScope.launch(Dispatchers.IO) {
+                    val job1 = async {
+                        val baos2 = ByteArrayOutputStream()
+                        rcBack.compress(Bitmap.CompressFormat.JPEG, 50, baos2)
+                        val rcBackData = baos2.toByteArray()
+                        rcBackref.putBytes(rcBackData).addOnSuccessListener {uploadBackRCTask ->
+                            rcBackref.downloadUrl.addOnSuccessListener { uri ->
+                                backRCURL = uri.toString()
+                            }
+                        }.await()
+                    }
+                    job1.await()
 
-                delay(2000)
+                    delay(2000)
 
-                val job2 = async {
-                    //add req doc to TRUCK_REQUESTS collection
-                    val dataToUpload = hashMapOf(
-                        "FirstName" to truckOwnerLiveData.FirstName,
-                        "LastName" to truckOwnerLiveData.LastName,
-                        "OwnerUId" to auth.uid,
-                        "TruckNo" to truckNo,
-                        "TruckRC" to truckRC,
-                        "RequestType" to "Add",
-                        "RequestStatus" to null,
-                        "Timestamp" to FieldValue.serverTimestamp(),
-                        "FrontRCURL" to frontRCURL,
-                        "BackRCURL" to backRCURL
-                    )
-                    firestoreDb
-                        .collection(TRUCK_REQUESTS)
-                        .document(truckNo)
-                        .set(dataToUpload)
+                    val job3 = async {
+                        //add req doc to TRUCK_REQUESTS collection
+                        val dataToUpload = hashMapOf(
+                            FIRSTNAME to truckOwnerLiveData.FirstName,
+                            LASTNAME to truckOwnerLiveData.LastName,
+                            OWNER_UID to auth.uid,
+                            TRUCK_NUMBER to truckNo,
+                            TRUCK_RC to truckRC,
+                            REQUEST_TYPE to ADD,
+                            REQUEST_STATUS to null,
+                            TIMESTAMP to FieldValue.serverTimestamp(),
+                            FRONT_RC_URL to frontRCURL,
+                            BACK_RC_URL to backRCURL
+                        )
+                        firestoreDb
+                            .collection(TRUCK_REQUESTS)
+                            .document(truckNo)
+                            .set(dataToUpload)
+                    }
+                    job3.await()
                 }
-                job2.await()
             }
+//            val frontRCURL = uploadFrontRCTask.task.result.toString()
+
         }
-
-        /**
-         * truckNo,
-         * firstName,
-         * lastName,
-         * ownerUId,
-         * requestType,
-         * truckRC,
-         * frontRCURL,
-         * backRCURL,
-         * requestStatus: null,
-         * timestamp,
-         */
-
     }
 
     suspend fun sendRemoveTruckReq(
         truckNo: String
     ) {
         GlobalScope.launch(Dispatchers.IO) {
+            var frontRCURL = ""
+            var backRCURL = ""
+            var truckRC = ""
+            val job1 = async {
+                firestoreDb
+                    .collection(LIVE_TRUCK_DATA_LIST)
+                    .document(truckNo)
+                    .get()
+                    .addOnSuccessListener {
+                        frontRCURL = it.get(FRONT_RC_URL).toString()
+                        backRCURL = it.get(BACK_RC_URL).toString()
+                        truckRC = it.get(TRUCK_RC).toString()
+                    }.await()
+            }
+            job1.await()
             val job = async {
-                //add req doc to TRUCK_REQUESTS collection
                 val dataToUpload = hashMapOf(
-                    "TruckNo" to truckNo,
-                    "RequestType" to "Remove",
-                    "RequestStatus" to null,
-                    "Timestamp" to FieldValue.serverTimestamp(),
+                    FIRSTNAME to truckOwnerLiveData.FirstName,
+                    LASTNAME to truckOwnerLiveData.LastName,
+                    OWNER_UID to auth.uid,
+                    TRUCK_NUMBER to truckNo,
+                    TRUCK_RC to truckRC,
+                    REQUEST_TYPE to REMOVE,
+                    REQUEST_STATUS to null,
+                    TIMESTAMP to FieldValue.serverTimestamp(),
+                    FRONT_RC_URL to frontRCURL,
+                    BACK_RC_URL to backRCURL
                 )
                 firestoreDb
                     .collection(TRUCK_REQUESTS)
                     .document(truckNo)
-                    .update(dataToUpload)
+                    .set(dataToUpload)
             }
             job.await()
         }

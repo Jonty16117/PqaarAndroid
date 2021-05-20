@@ -6,10 +6,12 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.pqaar.app.model.PropRoutesListItem
 import com.pqaar.app.model.MandiRoutesHistoryItem
 import com.pqaar.app.utils.DbPaths.MANDI_ROUTES_LIST
 import com.pqaar.app.utils.DbPaths.USER_DATA
+import com.pqaar.app.utils.DbPaths.USER_MANDI
 import com.pqaar.app.utils.TimeConversions.CurrDateTimeInMillis
 import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
@@ -39,13 +41,15 @@ object MandiAdminRepo {
         firestoreDb.collection(USER_DATA)
             .document(firebaseAuth.uid.toString()).get()
             .addOnSuccessListener {
-                result = it.data!![MANDI].toString()
-                Log.d(TAG,"Fetched user's mandi successfully!")
+                result = it.data!![USER_MANDI].toString()
+                Log.d(TAG, "Fetched user's mandi successfully!")
             }.addOnFailureListener {
                 Log.d(TAG, "Fetching user's mandi failed!")
             }.await()
         _MANDI = result
         MANDI.postValue(result)
+        Log.d(TAG, "user's mandi: ${_MANDI}")
+
 
         // For testing only
 //        _MANDI = "Abohar"
@@ -99,10 +103,11 @@ object MandiAdminRepo {
                         routesEntry.Timestamp = it.value.toString().toLong()
                     }
                     else -> {
-                        routes.add(Pair(
-                            it.key.toString(),
-                            it.value.toString().toInt()
-                        )
+                        routes.add(
+                            Pair(
+                                it.key.toString(),
+                                it.value.toString().toInt()
+                            )
                         )
                     }
                 }
@@ -128,31 +133,36 @@ object MandiAdminRepo {
             val executionTime = measureTimeMillis {
                 val ref = firestoreDb.collection(MANDI_ROUTES_LIST).document(_MANDI)
                 val job1 = async {
-                    val currRoutesField = mandiRoutesListLiveHistory[0]
                     // If the last live routes entry table was empty, then delete it
-                    if (currRoutesField.Routes.size == 0) {
-                        Log.d(TAG, "Deleting: ${currRoutesField}!")
-                        val dataToDelete = hashMapOf<String, Any>(
-                            currRoutesField.Timestamp.toString() to FieldValue.delete()
-                        )
-                        ref.update(dataToDelete).addOnSuccessListener {
-                            Log.d(TAG, "Empty routes list table deleted: ${dataToDelete}!")
-                        }.addOnFailureListener {
-                            Log.d(TAG, "Failed to delete empty entry!")
-                        }.await()
-                    } else {
-                        val dataToUpdate = HashMap<String, Any>()
-                        dataToUpdate["Status"] = "Past"
-                        dataToUpdate["Timestamp"] = currRoutesField.Timestamp
-                        currRoutesField.Routes.forEach {
-                            dataToUpdate[it.first] = it.second
-                        }
-
-                        ref.update(currRoutesField.Timestamp.toString(), dataToUpdate)
-                            .addOnSuccessListener {
-                                Log.d(TAG, "Status set to 'Past' for previous " +
-                                        "routes field entry!")
+                    if (mandiRoutesListLiveHistory.size > 0) {
+                        val currRoutesField = mandiRoutesListLiveHistory[0]
+                        if (currRoutesField.Routes.size == 0) {
+                            Log.d(TAG, "Deleting: ${currRoutesField}!")
+                            val dataToDelete = hashMapOf<String, Any>(
+                                currRoutesField.Timestamp.toString() to FieldValue.delete()
+                            )
+                            ref.update(dataToDelete).addOnSuccessListener {
+                                Log.d(TAG, "Empty routes list table deleted: ${dataToDelete}!")
+                            }.addOnFailureListener {
+                                Log.d(TAG, "Failed to delete empty entry!")
                             }.await()
+                        } else {
+                            //else change its status from live to past
+                            val dataToUpdate = HashMap<String, Any>()
+                            dataToUpdate["Status"] = "Past"
+                            dataToUpdate["Timestamp"] = currRoutesField.Timestamp
+                            currRoutesField.Routes.forEach {
+                                dataToUpdate[it.first] = it.second
+                            }
+
+                            ref.update(currRoutesField.Timestamp.toString(), dataToUpdate)
+                                .addOnSuccessListener {
+                                    Log.d(
+                                        TAG, "Status set to 'Past' for previous " +
+                                                "routes field entry!"
+                                    )
+                                }.await()
+                        }
                     }
                 }
                 job1.await()
@@ -169,28 +179,33 @@ object MandiAdminRepo {
      * 2 seconds before calling this again.
      */
     suspend fun addRoute(propRoutesList: ArrayList<PropRoutesListItem>) {
-        initNewRoutesTable()
-        Log.d(TAG, "Entered in addRoute with route: ${propRoutesList}")
-        val ref = firestoreDb.collection(MANDI_ROUTES_LIST).document(_MANDI)
-        val currRoutesField = MandiRoutesHistoryItem()
-        Log.d(TAG, "Route to update: ${currRoutesField}")
-        val dataToUpdate = HashMap<String, Any>()
-        dataToUpdate["Status"] = "Live"
-        dataToUpdate["Timestamp"] = CurrDateTimeInMillis()
-        currRoutesField.Routes.forEach {
-            dataToUpdate[it.first] = it.second
-        }
-        propRoutesList.forEach {
-            dataToUpdate[it.des] = it.req.toInt()
-        }
-
-        val updates = hashMapOf<String, Any>(
-            currRoutesField.Timestamp.toString() to dataToUpdate)
-        ref.update(updates)
-            .addOnSuccessListener {
-                Log.d(TAG, "Adding route: ${currRoutesField.Timestamp.toString()}")
-                Log.d(TAG, "Route added successfully: ${dataToUpdate}")
+        //wait for initNewRoutesTable to finish and then proceed next
+        GlobalScope.launch(Dispatchers.IO) {
+            val job1 = async {
+                initNewRoutesTable()
             }
-            .await()
+            job1.await()
+            val job2 = async {
+                Log.d(TAG, "Entered in addRoute with route: ${propRoutesList}")
+                val ref = firestoreDb.collection(MANDI_ROUTES_LIST).document(_MANDI)
+                val dataToUpdate = HashMap<String, HashMap<String, Any>>()
+                val currTimestamp = CurrDateTimeInMillis().toString()
+                val innerDataToUpdate = HashMap<String, Any>()
+                innerDataToUpdate["Status"] = "Live"
+                innerDataToUpdate["Timestamp"] = currTimestamp
+                Log.d(TAG, "total routes: ${propRoutesList.size}")
+                propRoutesList.forEach {
+                    innerDataToUpdate[it.des] = it.req.toInt()
+                }
+
+                dataToUpdate[currTimestamp] = innerDataToUpdate
+                ref.set(dataToUpdate, SetOptions.merge())
+                    .addOnSuccessListener {
+                        Log.d(TAG, "Route added successfully: ${dataToUpdate}")
+                    }
+                    .await()
+            }
+            job2.await()
+        }
     }
 }

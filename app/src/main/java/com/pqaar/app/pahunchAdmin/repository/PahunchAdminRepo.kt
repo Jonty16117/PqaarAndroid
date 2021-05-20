@@ -212,8 +212,9 @@ object PahunchAdminRepo {
                             val status = truckDocument.get("Status").toString()
                             val timestamp = truckDocument.get("Timestamp").toString()
                             val auctionId = truckDocument.get("AuctionId").toString().toLong()
-                            val owner = (truckDocument.get("Owner") as List<*>)
-                                .zipWithNext { a, b -> Pair(a.toString(), b.toString()) }[0]
+                            val ownerFirstName = truckDocument.get("OwnerFirstName").toString()
+                            val ownerLastName = truckDocument.get("OwnerLastName").toString()
+                            val owner = Pair(ownerFirstName, ownerLastName)
                             val liveTruckDataItem = LiveTruckDataItem()
                             liveTruckDataItem.TruckNo = truckNo
                             liveTruckDataItem.Active = isActive
