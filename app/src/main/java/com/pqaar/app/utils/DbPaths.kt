@@ -96,4 +96,5 @@ object DbPaths {
     const val DEL_IN_PROG = "DelInProg"
     const val DEL_PASS = "DelPass"
     const val DEL_FAIL = "DelFail"
+
 }
