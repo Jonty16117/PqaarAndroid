@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -34,6 +35,9 @@ public final class FragmentOtpVerificationBinding implements ViewBinding {
   public final ImageView imageView4;
 
   @NonNull
+  public final ProgressBar progressBar4;
+
+  @NonNull
   public final ScrollView scrollView2;
 
   @NonNull
@@ -47,13 +51,14 @@ public final class FragmentOtpVerificationBinding implements ViewBinding {
 
   private FragmentOtpVerificationBinding(@NonNull ScrollView rootView, @NonNull Button btnVerifyOtp,
       @NonNull Button button, @NonNull ImageView imageView2, @NonNull ImageView imageView4,
-      @NonNull ScrollView scrollView2, @NonNull EditText textInputOtp, @NonNull TextView titleText,
-      @NonNull TextView titleText7) {
+      @NonNull ProgressBar progressBar4, @NonNull ScrollView scrollView2,
+      @NonNull EditText textInputOtp, @NonNull TextView titleText, @NonNull TextView titleText7) {
     this.rootView = rootView;
     this.btnVerifyOtp = btnVerifyOtp;
     this.button = button;
     this.imageView2 = imageView2;
     this.imageView4 = imageView4;
+    this.progressBar4 = progressBar4;
     this.scrollView2 = scrollView2;
     this.textInputOtp = textInputOtp;
     this.titleText = titleText;
@@ -111,6 +116,12 @@ public final class FragmentOtpVerificationBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.progressBar4;
+      ProgressBar progressBar4 = rootView.findViewById(id);
+      if (progressBar4 == null) {
+        break missingId;
+      }
+
       ScrollView scrollView2 = (ScrollView) rootView;
 
       id = R.id.textInputOtp;
@@ -132,7 +143,7 @@ public final class FragmentOtpVerificationBinding implements ViewBinding {
       }
 
       return new FragmentOtpVerificationBinding((ScrollView) rootView, btnVerifyOtp, button,
-          imageView2, imageView4, scrollView2, textInputOtp, titleText, titleText7);
+          imageView2, imageView4, progressBar4, scrollView2, textInputOtp, titleText, titleText7);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

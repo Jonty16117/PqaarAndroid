@@ -72,16 +72,16 @@
         "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\live_auction_item.xml"
     },
     {
-        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_truck_owner_dashboard_test.xml",
-        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\activity_truck_owner_dashboard_test.xml"
-    },
-    {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\activity_splash_screen.xml",
         "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\activity_splash_screen.xml"
     },
     {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\fragment_first.xml",
         "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\fragment_first.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\prop_mandi_routes_sub_item.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\prop_mandi_routes_sub_item.xml"
     },
     {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\history_truck_item.xml",
@@ -114,6 +114,10 @@
     {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\incoming_truck_request_item.xml",
         "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\incoming_truck_request_item.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\prop_mandi_routes_header_item.xml",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\prop_mandi_routes_header_item.xml"
     },
     {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\incremental\\mergeDebugResources\\stripped.dir\\layout\\fragment_add_routes_alert_dialog_box.xml",

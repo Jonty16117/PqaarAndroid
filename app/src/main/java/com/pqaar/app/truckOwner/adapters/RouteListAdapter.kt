@@ -302,15 +302,13 @@ class RouteListAdapter(
                 rate.text = rateText
                 progressBar.progress = ((route.Got.toFloat() / route.Req.toFloat()) * 100).toInt()
 
-
-                val isInMainAuctionTime =
-                    (CurrDateTimeInMillis() >= auctionStartTime) && (CurrDateTimeInMillis() < auctionEndTime)
-                val isRouteAvailable = route.Got < route.Req
-                val isEligibleUnderBonusTime = (CurrDateTimeInMillis() >= auctionBonusStartTime) &&
-                        (CurrDateTimeInMillis() < auctionBonusEndTime)
-
-                if ((isInMainAuctionTime || isEligibleUnderBonusTime) && isRouteAvailable) {
-                    itemView.setOnClickListener {
+                itemView.setOnClickListener {
+                    val isInMainAuctionTime =
+                        (CurrDateTimeInMillis() >= auctionStartTime) && (CurrDateTimeInMillis() < auctionEndTime)
+                    val isRouteAvailable = route.Got < route.Req
+                    val isEligibleUnderBonusTime = (CurrDateTimeInMillis() >= auctionBonusStartTime) &&
+                            (CurrDateTimeInMillis() < auctionBonusEndTime)
+                    if ((isInMainAuctionTime || isEligibleUnderBonusTime) && isRouteAvailable) {
                         onClickListener.onClick(it)
                     }
                 }

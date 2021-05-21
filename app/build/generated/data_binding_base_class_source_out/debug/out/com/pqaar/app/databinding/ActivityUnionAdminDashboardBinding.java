@@ -5,66 +5,127 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ScrollView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.motion.widget.MotionLayout;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.Guideline;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import com.pqaar.app.R;
+import com.pqaar.app.utils.BottomSheetViewPager;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
 
 public final class ActivityUnionAdminDashboardBinding implements ViewBinding {
   @NonNull
-  private final ScrollView rootView;
+  private final CoordinatorLayout rootView;
 
   @NonNull
-  public final Button closeAuc;
+  public final Button button;
 
   @NonNull
-  public final Button initAuc;
+  public final View divider13;
 
   @NonNull
-  public final Button monitorAuc;
+  public final Guideline guideline4;
 
   @NonNull
-  public final TextView textView14;
+  public final Guideline guideline5;
 
   @NonNull
-  public final TextView textView15;
+  public final Guideline guideline9;
 
   @NonNull
-  public final TextView textView16;
+  public final CardView header;
 
   @NonNull
-  public final TextView textView19;
+  public final RecyclerView historyRecyclerView;
 
   @NonNull
-  public final TextView textView20;
+  public final Button menu;
 
   @NonNull
-  public final TextView textView21;
+  public final MotionLayout motionLayout;
 
-  private ActivityUnionAdminDashboardBinding(@NonNull ScrollView rootView, @NonNull Button closeAuc,
-      @NonNull Button initAuc, @NonNull Button monitorAuc, @NonNull TextView textView14,
-      @NonNull TextView textView15, @NonNull TextView textView16, @NonNull TextView textView19,
-      @NonNull TextView textView20, @NonNull TextView textView21) {
+  @NonNull
+  public final TextView myTrucks;
+
+  @NonNull
+  public final ProgressBar progressBar3;
+
+  @NonNull
+  public final ConstraintLayout recyclerView;
+
+  @NonNull
+  public final TextView titleText;
+
+  @NonNull
+  public final TextView titleText2;
+
+  @NonNull
+  public final TextView titleText3;
+
+  @NonNull
+  public final TextView titleText4;
+
+  @NonNull
+  public final TextView titleText5;
+
+  @NonNull
+  public final TextView titleText6;
+
+  @NonNull
+  public final TextView titleText8;
+
+  @NonNull
+  public final TextView titleText9;
+
+  @NonNull
+  public final BottomSheetViewPager viewPager;
+
+  private ActivityUnionAdminDashboardBinding(@NonNull CoordinatorLayout rootView,
+      @NonNull Button button, @NonNull View divider13, @NonNull Guideline guideline4,
+      @NonNull Guideline guideline5, @NonNull Guideline guideline9, @NonNull CardView header,
+      @NonNull RecyclerView historyRecyclerView, @NonNull Button menu,
+      @NonNull MotionLayout motionLayout, @NonNull TextView myTrucks,
+      @NonNull ProgressBar progressBar3, @NonNull ConstraintLayout recyclerView,
+      @NonNull TextView titleText, @NonNull TextView titleText2, @NonNull TextView titleText3,
+      @NonNull TextView titleText4, @NonNull TextView titleText5, @NonNull TextView titleText6,
+      @NonNull TextView titleText8, @NonNull TextView titleText9,
+      @NonNull BottomSheetViewPager viewPager) {
     this.rootView = rootView;
-    this.closeAuc = closeAuc;
-    this.initAuc = initAuc;
-    this.monitorAuc = monitorAuc;
-    this.textView14 = textView14;
-    this.textView15 = textView15;
-    this.textView16 = textView16;
-    this.textView19 = textView19;
-    this.textView20 = textView20;
-    this.textView21 = textView21;
+    this.button = button;
+    this.divider13 = divider13;
+    this.guideline4 = guideline4;
+    this.guideline5 = guideline5;
+    this.guideline9 = guideline9;
+    this.header = header;
+    this.historyRecyclerView = historyRecyclerView;
+    this.menu = menu;
+    this.motionLayout = motionLayout;
+    this.myTrucks = myTrucks;
+    this.progressBar3 = progressBar3;
+    this.recyclerView = recyclerView;
+    this.titleText = titleText;
+    this.titleText2 = titleText2;
+    this.titleText3 = titleText3;
+    this.titleText4 = titleText4;
+    this.titleText5 = titleText5;
+    this.titleText6 = titleText6;
+    this.titleText8 = titleText8;
+    this.titleText9 = titleText9;
+    this.viewPager = viewPager;
   }
 
   @Override
   @NonNull
-  public ScrollView getRoot() {
+  public CoordinatorLayout getRoot() {
     return rootView;
   }
 
@@ -89,62 +150,136 @@ public final class ActivityUnionAdminDashboardBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.closeAuc;
-      Button closeAuc = rootView.findViewById(id);
-      if (closeAuc == null) {
+      id = R.id.button;
+      Button button = rootView.findViewById(id);
+      if (button == null) {
         break missingId;
       }
 
-      id = R.id.initAuc;
-      Button initAuc = rootView.findViewById(id);
-      if (initAuc == null) {
+      id = R.id.divider13;
+      View divider13 = rootView.findViewById(id);
+      if (divider13 == null) {
         break missingId;
       }
 
-      id = R.id.monitorAuc;
-      Button monitorAuc = rootView.findViewById(id);
-      if (monitorAuc == null) {
+      id = R.id.guideline4;
+      Guideline guideline4 = rootView.findViewById(id);
+      if (guideline4 == null) {
         break missingId;
       }
 
-      id = R.id.textView14;
-      TextView textView14 = rootView.findViewById(id);
-      if (textView14 == null) {
+      id = R.id.guideline5;
+      Guideline guideline5 = rootView.findViewById(id);
+      if (guideline5 == null) {
         break missingId;
       }
 
-      id = R.id.textView15;
-      TextView textView15 = rootView.findViewById(id);
-      if (textView15 == null) {
+      id = R.id.guideline9;
+      Guideline guideline9 = rootView.findViewById(id);
+      if (guideline9 == null) {
         break missingId;
       }
 
-      id = R.id.textView16;
-      TextView textView16 = rootView.findViewById(id);
-      if (textView16 == null) {
+      id = R.id.header;
+      CardView header = rootView.findViewById(id);
+      if (header == null) {
         break missingId;
       }
 
-      id = R.id.textView19;
-      TextView textView19 = rootView.findViewById(id);
-      if (textView19 == null) {
+      id = R.id.historyRecyclerView;
+      RecyclerView historyRecyclerView = rootView.findViewById(id);
+      if (historyRecyclerView == null) {
         break missingId;
       }
 
-      id = R.id.textView20;
-      TextView textView20 = rootView.findViewById(id);
-      if (textView20 == null) {
+      id = R.id.menu;
+      Button menu = rootView.findViewById(id);
+      if (menu == null) {
         break missingId;
       }
 
-      id = R.id.textView21;
-      TextView textView21 = rootView.findViewById(id);
-      if (textView21 == null) {
+      id = R.id.motion_layout;
+      MotionLayout motionLayout = rootView.findViewById(id);
+      if (motionLayout == null) {
         break missingId;
       }
 
-      return new ActivityUnionAdminDashboardBinding((ScrollView) rootView, closeAuc, initAuc,
-          monitorAuc, textView14, textView15, textView16, textView19, textView20, textView21);
+      id = R.id.my_trucks;
+      TextView myTrucks = rootView.findViewById(id);
+      if (myTrucks == null) {
+        break missingId;
+      }
+
+      id = R.id.progressBar3;
+      ProgressBar progressBar3 = rootView.findViewById(id);
+      if (progressBar3 == null) {
+        break missingId;
+      }
+
+      id = R.id.recyclerView;
+      ConstraintLayout recyclerView = rootView.findViewById(id);
+      if (recyclerView == null) {
+        break missingId;
+      }
+
+      id = R.id.title_text;
+      TextView titleText = rootView.findViewById(id);
+      if (titleText == null) {
+        break missingId;
+      }
+
+      id = R.id.title_text2;
+      TextView titleText2 = rootView.findViewById(id);
+      if (titleText2 == null) {
+        break missingId;
+      }
+
+      id = R.id.title_text3;
+      TextView titleText3 = rootView.findViewById(id);
+      if (titleText3 == null) {
+        break missingId;
+      }
+
+      id = R.id.title_text4;
+      TextView titleText4 = rootView.findViewById(id);
+      if (titleText4 == null) {
+        break missingId;
+      }
+
+      id = R.id.title_text5;
+      TextView titleText5 = rootView.findViewById(id);
+      if (titleText5 == null) {
+        break missingId;
+      }
+
+      id = R.id.title_text6;
+      TextView titleText6 = rootView.findViewById(id);
+      if (titleText6 == null) {
+        break missingId;
+      }
+
+      id = R.id.title_text8;
+      TextView titleText8 = rootView.findViewById(id);
+      if (titleText8 == null) {
+        break missingId;
+      }
+
+      id = R.id.title_text9;
+      TextView titleText9 = rootView.findViewById(id);
+      if (titleText9 == null) {
+        break missingId;
+      }
+
+      id = R.id.view_pager;
+      BottomSheetViewPager viewPager = rootView.findViewById(id);
+      if (viewPager == null) {
+        break missingId;
+      }
+
+      return new ActivityUnionAdminDashboardBinding((CoordinatorLayout) rootView, button, divider13,
+          guideline4, guideline5, guideline9, header, historyRecyclerView, menu, motionLayout,
+          myTrucks, progressBar3, recyclerView, titleText, titleText2, titleText3, titleText4,
+          titleText5, titleText6, titleText8, titleText9, viewPager);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

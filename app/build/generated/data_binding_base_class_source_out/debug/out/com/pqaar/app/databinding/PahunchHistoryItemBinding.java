@@ -72,6 +72,12 @@ public final class PahunchHistoryItemBinding implements ViewBinding {
   public final TextView textView46;
 
   @NonNull
+  public final TextView textView50;
+
+  @NonNull
+  public final TextView textView51;
+
+  @NonNull
   public final TextView truckNo;
 
   private PahunchHistoryItemBinding(@NonNull CardView rootView, @NonNull CardView cardview,
@@ -80,7 +86,8 @@ public final class PahunchHistoryItemBinding implements ViewBinding {
       @NonNull ImageView imageView14, @NonNull TextView textView2, @NonNull TextView textView3,
       @NonNull TextView textView39, @NonNull TextView textView40, @NonNull TextView textView41,
       @NonNull TextView textView42, @NonNull TextView textView43, @NonNull TextView textView44,
-      @NonNull TextView textView45, @NonNull TextView textView46, @NonNull TextView truckNo) {
+      @NonNull TextView textView45, @NonNull TextView textView46, @NonNull TextView textView50,
+      @NonNull TextView textView51, @NonNull TextView truckNo) {
     this.rootView = rootView;
     this.cardview = cardview;
     this.guideline17 = guideline17;
@@ -99,6 +106,8 @@ public final class PahunchHistoryItemBinding implements ViewBinding {
     this.textView44 = textView44;
     this.textView45 = textView45;
     this.textView46 = textView46;
+    this.textView50 = textView50;
+    this.textView51 = textView51;
     this.truckNo = truckNo;
   }
 
@@ -227,6 +236,18 @@ public final class PahunchHistoryItemBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.textView50;
+      TextView textView50 = rootView.findViewById(id);
+      if (textView50 == null) {
+        break missingId;
+      }
+
+      id = R.id.textView51;
+      TextView textView51 = rootView.findViewById(id);
+      if (textView51 == null) {
+        break missingId;
+      }
+
       id = R.id.truck_no;
       TextView truckNo = rootView.findViewById(id);
       if (truckNo == null) {
@@ -236,7 +257,7 @@ public final class PahunchHistoryItemBinding implements ViewBinding {
       return new PahunchHistoryItemBinding((CardView) rootView, cardview, guideline17, guideline18,
           guideline19, guideline8, imageView12, imageView14, textView2, textView3, textView39,
           textView40, textView41, textView42, textView43, textView44, textView45, textView46,
-          truckNo);
+          textView50, textView51, truckNo);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

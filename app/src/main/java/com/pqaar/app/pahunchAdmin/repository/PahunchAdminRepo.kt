@@ -59,7 +59,7 @@ object PahunchAdminRepo {
                 pahunchTicket["PahunchAdminUId"] = auth.uid.toString()
                 pahunchTicket["Source"] = truck.Route.first
                 pahunchTicket["Status"] = "Accepted"
-                pahunchTicket["Timestamp"] = FieldValue.serverTimestamp()
+                pahunchTicket["Timestamp"] = CurrDateTimeInMillis()
                 pahunchTicket["TruckNo"] = truck.TruckNo
                 firestoreDb.collection(PAHUNCH_ADMIN_RECORDS).add(pahunchTicket)
                     .addOnSuccessListener {
@@ -106,7 +106,7 @@ object PahunchAdminRepo {
                 pahunchTicket["PahunchAdminUId"] = auth.uid.toString()
                 pahunchTicket["Source"] = truck.Route.first
                 pahunchTicket["Status"] = "Rejected"
-                pahunchTicket["Timestamp"] = FieldValue.serverTimestamp()
+                pahunchTicket["Timestamp"] = CurrDateTimeInMillis()
                 pahunchTicket["TruckNo"] = truck.TruckNo
                 firestoreDb.collection(PAHUNCH_ADMIN_RECORDS).add(pahunchTicket)
                     .addOnSuccessListener {
@@ -167,7 +167,7 @@ object PahunchAdminRepo {
                     val delInfo = pahunchSnapshot.get("DeliveryInfo").toString()
                     val truckNo = pahunchSnapshot.get("TruckNo").toString()
                     val status = pahunchSnapshot.get("Status").toString()
-                    val timestamp = pahunchSnapshot.getTimestamp("Timestamp")!!.seconds * 1000
+                    val timestamp = pahunchSnapshot.get("Timestamp").toString().toLong()
                     val auctionId = pahunchSnapshot.get("AuctionId").toString().toLong()
                     val pahunchTicket = PahunchTicket(
                         Source = src,

@@ -1019,6 +1019,10 @@ color bright_foreground_inverse_material_dark
 color bright_foreground_inverse_material_light
 color bright_foreground_material_dark
 color bright_foreground_material_light
+color browser_actions_bg_grey
+color browser_actions_divider_color
+color browser_actions_text_color
+color browser_actions_title_color
 color button_material_dark
 color button_material_light
 color c1
@@ -1316,6 +1320,8 @@ dimen abc_text_size_title_material_toolbar
 dimen action_bar_size
 dimen app_bar_height
 dimen appcompat_dialog_background_inset
+dimen browser_actions_context_menu_max_width
+dimen browser_actions_context_menu_min_padding
 dimen cardview_compat_inset_shadow
 dimen cardview_default_elevation
 dimen cardview_default_radius
@@ -1824,6 +1830,7 @@ drawable ic_back_unfocused
 drawable ic_bottomsheet_indicator
 drawable ic_circle_dark
 drawable ic_clock_black_24dp
+drawable ic_close_dark
 drawable ic_cross_focused
 drawable ic_cross_unfocused
 drawable ic_del_in_progress_dark
@@ -1844,6 +1851,7 @@ drawable ic_mtrl_checked_circle
 drawable ic_mtrl_chip_checked_black
 drawable ic_mtrl_chip_checked_circle
 drawable ic_mtrl_chip_close_circle
+drawable ic_pahuch_ticket_bg_white
 drawable ic_pencil_dark
 drawable ic_phone_focused
 drawable ic_phone_unfocused
@@ -2008,12 +2016,14 @@ id bottom
 id bottom_container
 id bottom_sheet
 id bounce
-id btnForgotPassword
-id btnLoginWithPhone
-id btnRegisterWithEmail
-id btnRegisterWithPhone
+id browser_actions_header_text
+id browser_actions_menu_item_icon
+id browser_actions_menu_item_text
+id browser_actions_menu_items
+id browser_actions_menu_view
+id btnLogin
+id btnRegister
 id btnVerifyOtp
-id btnlogin
 id btnregister
 id button
 id button2
@@ -2046,7 +2056,6 @@ id clear_text
 id clip_horizontal
 id clip_vertical
 id clockwise
-id closeAuc
 id collapseActionView
 id confirm_button
 id constraintLayout
@@ -2085,7 +2094,6 @@ id disableHome
 id disablePostScroll
 id disableScroll
 id disjoint
-id divider
 id divider10
 id divider11
 id divider12
@@ -2093,8 +2101,6 @@ id divider13
 id divider14
 id divider2
 id divider3
-id divider4
-id divider5
 id divider6
 id divider7
 id divider8
@@ -2150,10 +2156,14 @@ id guideline12
 id guideline13
 id guideline14
 id guideline15
+id guideline16
 id guideline17
 id guideline18
 id guideline19
 id guideline2
+id guideline20
+id guideline21
+id guideline22
 id guideline3
 id guideline4
 id guideline5
@@ -2166,6 +2176,7 @@ id header
 id header1
 id header2
 id header3
+id header4
 id header_title
 id hideable
 id history
@@ -2195,7 +2206,6 @@ id imageView7
 id imageView8
 id imageView9
 id info
-id initAuc
 id invisible
 id inward
 id italic
@@ -2241,7 +2251,6 @@ id menu
 id message
 id middle
 id mini
-id monitorAuc
 id month_grid
 id month_navigation_bar
 id month_navigation_fragment_toggle
@@ -2296,6 +2305,7 @@ id outer_parent
 id outline
 id outward
 id packed
+id pahunchAdmin
 id parallax
 id parent
 id parentPanel
@@ -2321,7 +2331,6 @@ id radio
 id radioBtnMandiAdmin
 id radioBtnPahunchAdmin
 id radioBtnTruckOwner
-id radioBtnUnionAdmin
 id radioGroup
 id ratio
 id rectangles
@@ -2414,12 +2423,9 @@ id text2
 id textEnd
 id textInputEmail
 id textInputOtp
-id textInputPassword
-id textInputPassword2
 id textInputPhone
 id textInputRcNo
 id textInputTruckNo
-id textInputUserId
 id textInputUsername
 id textInputUsername2
 id textSpacerNoButtons
@@ -2438,8 +2444,6 @@ id textView17
 id textView18
 id textView19
 id textView2
-id textView20
-id textView21
 id textView22
 id textView23
 id textView24
@@ -2471,6 +2475,8 @@ id textView47
 id textView48
 id textView49
 id textView5
+id textView50
+id textView51
 id textView6
 id textView7
 id textView8
@@ -2520,7 +2526,6 @@ id trucks_added_count
 id unassigned
 id unchecked
 id uniform
-id unionAdmin
 id unlabeled
 id unlocked
 id up
@@ -2612,6 +2617,8 @@ layout activity_pahunch_admin_dashboard
 layout activity_splash_screen
 layout activity_truck_owner_dashboard
 layout activity_union_admin_dashboard
+layout browser_actions_context_menu_page
+layout browser_actions_context_menu_row
 layout close_bid_alert_dialog_box
 layout content_pahunch_admin_dashboard
 layout custom_dialog
@@ -2711,6 +2718,8 @@ layout notification_template_media_custom
 layout notification_template_part_chronometer
 layout notification_template_part_time
 layout pahunch_history_item
+layout prop_mandi_routes_header_item
+layout prop_mandi_routes_sub_item
 layout route_item
 layout select_dialog_item_material
 layout select_dialog_multichoice_material
@@ -2734,6 +2743,7 @@ layout text_view_without_line_height
 layout truck_delivery_alert_dialog_box
 layout truck_item
 menu menu_manage_trucks_test
+menu menu_mandi_admin_dashboard
 menu menu_pahunch_admin_dashboard
 menu menu_truck_owner_dashboard
 mipmap ic_launcher

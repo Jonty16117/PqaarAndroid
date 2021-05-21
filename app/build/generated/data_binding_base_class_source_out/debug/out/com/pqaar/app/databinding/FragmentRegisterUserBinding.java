@@ -25,19 +25,10 @@ public final class FragmentRegisterUserBinding implements ViewBinding {
   private final ScrollView rootView;
 
   @NonNull
-  public final Button btnRegisterWithEmail;
-
-  @NonNull
-  public final Button btnRegisterWithPhone;
+  public final Button btnRegister;
 
   @NonNull
   public final Button button;
-
-  @NonNull
-  public final View divider4;
-
-  @NonNull
-  public final View divider5;
 
   @NonNull
   public final ImageView imageView2;
@@ -47,6 +38,9 @@ public final class FragmentRegisterUserBinding implements ViewBinding {
 
   @NonNull
   public final RadioButton mandiAdmin;
+
+  @NonNull
+  public final RadioButton pahunchAdmin;
 
   @NonNull
   public final ProgressBar progressBar;
@@ -59,12 +53,6 @@ public final class FragmentRegisterUserBinding implements ViewBinding {
 
   @NonNull
   public final EditText textInputEmail;
-
-  @NonNull
-  public final EditText textInputPassword;
-
-  @NonNull
-  public final EditText textInputPassword2;
 
   @NonNull
   public final EditText textInputPhone;
@@ -82,42 +70,32 @@ public final class FragmentRegisterUserBinding implements ViewBinding {
   public final RadioButton truckOwner;
 
   @NonNull
-  public final RadioButton unionAdmin;
-
-  @NonNull
   public final TextView warning;
 
-  private FragmentRegisterUserBinding(@NonNull ScrollView rootView,
-      @NonNull Button btnRegisterWithEmail, @NonNull Button btnRegisterWithPhone,
-      @NonNull Button button, @NonNull View divider4, @NonNull View divider5,
-      @NonNull ImageView imageView2, @NonNull ImageView imageView4, @NonNull RadioButton mandiAdmin,
+  private FragmentRegisterUserBinding(@NonNull ScrollView rootView, @NonNull Button btnRegister,
+      @NonNull Button button, @NonNull ImageView imageView2, @NonNull ImageView imageView4,
+      @NonNull RadioButton mandiAdmin, @NonNull RadioButton pahunchAdmin,
       @NonNull ProgressBar progressBar, @NonNull RadioGroup radioGroup,
       @NonNull ScrollView scrollView2, @NonNull EditText textInputEmail,
-      @NonNull EditText textInputPassword, @NonNull EditText textInputPassword2,
       @NonNull EditText textInputPhone, @NonNull EditText textInputUsername,
       @NonNull EditText textInputUsername2, @NonNull TextView titleText,
-      @NonNull RadioButton truckOwner, @NonNull RadioButton unionAdmin, @NonNull TextView warning) {
+      @NonNull RadioButton truckOwner, @NonNull TextView warning) {
     this.rootView = rootView;
-    this.btnRegisterWithEmail = btnRegisterWithEmail;
-    this.btnRegisterWithPhone = btnRegisterWithPhone;
+    this.btnRegister = btnRegister;
     this.button = button;
-    this.divider4 = divider4;
-    this.divider5 = divider5;
     this.imageView2 = imageView2;
     this.imageView4 = imageView4;
     this.mandiAdmin = mandiAdmin;
+    this.pahunchAdmin = pahunchAdmin;
     this.progressBar = progressBar;
     this.radioGroup = radioGroup;
     this.scrollView2 = scrollView2;
     this.textInputEmail = textInputEmail;
-    this.textInputPassword = textInputPassword;
-    this.textInputPassword2 = textInputPassword2;
     this.textInputPhone = textInputPhone;
     this.textInputUsername = textInputUsername;
     this.textInputUsername2 = textInputUsername2;
     this.titleText = titleText;
     this.truckOwner = truckOwner;
-    this.unionAdmin = unionAdmin;
     this.warning = warning;
   }
 
@@ -148,33 +126,15 @@ public final class FragmentRegisterUserBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.btnRegisterWithEmail;
-      Button btnRegisterWithEmail = rootView.findViewById(id);
-      if (btnRegisterWithEmail == null) {
-        break missingId;
-      }
-
-      id = R.id.btnRegisterWithPhone;
-      Button btnRegisterWithPhone = rootView.findViewById(id);
-      if (btnRegisterWithPhone == null) {
+      id = R.id.btnRegister;
+      Button btnRegister = rootView.findViewById(id);
+      if (btnRegister == null) {
         break missingId;
       }
 
       id = R.id.button;
       Button button = rootView.findViewById(id);
       if (button == null) {
-        break missingId;
-      }
-
-      id = R.id.divider4;
-      View divider4 = rootView.findViewById(id);
-      if (divider4 == null) {
-        break missingId;
-      }
-
-      id = R.id.divider5;
-      View divider5 = rootView.findViewById(id);
-      if (divider5 == null) {
         break missingId;
       }
 
@@ -196,6 +156,12 @@ public final class FragmentRegisterUserBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.pahunchAdmin;
+      RadioButton pahunchAdmin = rootView.findViewById(id);
+      if (pahunchAdmin == null) {
+        break missingId;
+      }
+
       id = R.id.progressBar;
       ProgressBar progressBar = rootView.findViewById(id);
       if (progressBar == null) {
@@ -213,18 +179,6 @@ public final class FragmentRegisterUserBinding implements ViewBinding {
       id = R.id.textInputEmail;
       EditText textInputEmail = rootView.findViewById(id);
       if (textInputEmail == null) {
-        break missingId;
-      }
-
-      id = R.id.textInputPassword;
-      EditText textInputPassword = rootView.findViewById(id);
-      if (textInputPassword == null) {
-        break missingId;
-      }
-
-      id = R.id.textInputPassword2;
-      EditText textInputPassword2 = rootView.findViewById(id);
-      if (textInputPassword2 == null) {
         break missingId;
       }
 
@@ -258,23 +212,16 @@ public final class FragmentRegisterUserBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.unionAdmin;
-      RadioButton unionAdmin = rootView.findViewById(id);
-      if (unionAdmin == null) {
-        break missingId;
-      }
-
       id = R.id.warning;
       TextView warning = rootView.findViewById(id);
       if (warning == null) {
         break missingId;
       }
 
-      return new FragmentRegisterUserBinding((ScrollView) rootView, btnRegisterWithEmail,
-          btnRegisterWithPhone, button, divider4, divider5, imageView2, imageView4, mandiAdmin,
-          progressBar, radioGroup, scrollView2, textInputEmail, textInputPassword,
-          textInputPassword2, textInputPhone, textInputUsername, textInputUsername2, titleText,
-          truckOwner, unionAdmin, warning);
+      return new FragmentRegisterUserBinding((ScrollView) rootView, btnRegister, button, imageView2,
+          imageView4, mandiAdmin, pahunchAdmin, progressBar, radioGroup, scrollView2,
+          textInputEmail, textInputPhone, textInputUsername, textInputUsername2, titleText,
+          truckOwner, warning);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

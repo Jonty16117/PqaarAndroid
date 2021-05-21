@@ -9,7 +9,7 @@ import java.util.*
 @SuppressLint("SimpleDateFormat")
 object TimeConversions {
     @Throws(ParseException::class)
-    fun TimestampToMillis(timestamp: String): Long {
+    private fun TimestampToMillis(timestamp: String): Long {
         val sdf = SimpleDateFormat("dd-MM-yyyy hh:mm:ss")
         val date = sdf.parse(timestamp)
         val calendar = Calendar.getInstance()
@@ -23,9 +23,12 @@ object TimeConversions {
         return (simple.format(result)).toString()
     }
 
-    fun CurrDateTimeInMillis(): Long {
+    /*fun CurrDateTimeInMillis(): Long {
         return TimestampToMillis(
             SimpleDateFormat("dd-MM-yyyy hh:mm:ss")
-                .format(Calendar.getInstance().time))
+                .format(Calendar.getInstance().time))*/
+
+    fun CurrDateTimeInMillis(): Long {
+        return System.currentTimeMillis()
     }
 }

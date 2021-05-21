@@ -86,11 +86,14 @@ class AuctionListAdapter(
                     nextUnlock.isVisible = false
                     textViewTimer.isVisible = false
                 } else {
+
+//                    currtime = 1621562101000
+//                    startime = 1621601280000
                     //if the current item is unlocked
                     Log.d(TAG, "curr time: ${MillisToTimestamp(CurrDateTimeInMillis())}, " +
                             "truck start time: ${MillisToTimestamp(liveAuctionListItem.StartTime!!)}")
                     if(CurrDateTimeInMillis() >= liveAuctionListItem.StartTime!!) {
-
+                        Log.d(TAG, "Unlocked")
                         status.text = "Unlocked"
                         unlocked.isVisible = true
                         locked.isVisible = false
@@ -98,14 +101,21 @@ class AuctionListAdapter(
                         accepted.isVisible = false
                         textViewTimer.isVisible = false
                     } else {
+                        Log.d(TAG, "Locked")
+
                         status.text = "Locked"
                         locked.isVisible = true
                         unlocked.isVisible = false
                         nextUnlock.isVisible = false
                         accepted.isVisible = false
+                        textViewTimer.isVisible = true
+
 
                         var min: Long
                         var sec: Long
+                        Log.d(TAG, "StartTime of ${liveAuctionListItem.TruckNo}: ${liveAuctionListItem.StartTime}")
+                        Log.d(TAG, "Timer of ${liveAuctionListItem.StartTime!! -CurrDateTimeInMillis()}")
+                        Log.d(TAG, "curr time in milis ${CurrDateTimeInMillis()}")
                         val timer = object : CountDownTimer(
                             (liveAuctionListItem.StartTime!! - CurrDateTimeInMillis()),
                             1000) {
@@ -115,8 +125,9 @@ class AuctionListAdapter(
                                 textViewTimer.text = "${min.toString().padStart(2, '0')}:" +
                                         sec.toString().padStart(2, '0')
                             }
-
+//                            1621601320000
                             override fun onFinish() {
+                                Log.d(TAG, "unlocked ${liveAuctionListItem.TruckNo}")
                                 status.text = "Unlocked"
                                 unlocked.isVisible = true
                                 locked.isVisible = false

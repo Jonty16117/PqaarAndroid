@@ -212,7 +212,7 @@ object TruckOwnerRepo {
     }
 
     suspend fun closeBid(truckNo: String, src: String, des: String) {
-        val dataToUpdate = hashMapOf<String, Any>(SOURCE to src, DESTINATION to des)
+        val dataToUpdate = hashMapOf<String, Any>(SRC to src, DES to des)
         val currListNo = liveTruckDataList[truckNo]!!.CurrentListNo
         firestoreDb.collection(LIVE_AUCTION_LIST)
             .document(currListNo)
@@ -244,11 +244,12 @@ object TruckOwnerRepo {
                         liveTruckDataItem.CurrentListNo =
                             truckDocument.get(CURRENT_LIST_NO).toString()
                         liveTruckDataItem.Status = truckDocument.get(STATUS).toString()
-                        val timestamp =
+                        /*val timestamp =
                             truckDocument.get(TIMESTAMP) as com.google.firebase.Timestamp
-                        val millis = (timestamp.seconds * 1000)
-                        Log.d(TAG, "truck timestamp in millis: ${millis}")
-                        liveTruckDataItem.Timestamp = millis.toString()
+                        val millis = (timestamp.seconds * 1000)*/
+//                        Log.d(TAG, "truck timestamp in millis: ${millis}")
+                        val timestamp = truckDocument.get(TIMESTAMP)
+                        liveTruckDataItem.Timestamp = timestamp.toString()
                         val firstName = truckDocument.get(OWNER_FIRST_NAME).toString()
                         val lastName = truckDocument.get(OWNER_LAST_NAME).toString()
                         liveTruckDataItem.Owner = Pair(firstName, lastName)

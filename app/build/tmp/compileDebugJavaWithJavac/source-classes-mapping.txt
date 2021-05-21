@@ -1,3 +1,5 @@
+com/pqaar/app/databinding/PropMandiRoutesHeaderItemBinding.java
+ com.pqaar.app.databinding.PropMandiRoutesHeaderItemBinding
 com/pqaar/app/databinding/ActivityPahunchAdminDashboardBinding.java
  com.pqaar.app.databinding.ActivityPahunchAdminDashboardBinding
 com/pqaar/app/databinding/FragmentTruckRequestsBinding.java
@@ -40,6 +42,8 @@ com/pqaar/app/databinding/TruckDeliveryAlertDialogBoxBinding.java
  com.pqaar.app.databinding.TruckDeliveryAlertDialogBoxBinding
 com/pqaar/app/databinding/FragmentLiveRoutesListBinding.java
  com.pqaar.app.databinding.FragmentLiveRoutesListBinding
+com/pqaar/app/databinding/PropMandiRoutesSubItemBinding.java
+ com.pqaar.app.databinding.PropMandiRoutesSubItemBinding
 com/pqaar/app/databinding/DashboardBottomSheetBinding.java
  com.pqaar.app.databinding.DashboardBottomSheetBinding
 com/pqaar/app/DataBindingTriggerClass.java

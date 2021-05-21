@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,7 +40,7 @@ public final class ActivityMandiAdminDashboardBinding implements ViewBinding {
   public final RecyclerView historyList;
 
   @NonNull
-  public final ImageView imageView2;
+  public final Button menu;
 
   @NonNull
   public final MotionLayout motionLayout;
@@ -63,7 +62,7 @@ public final class ActivityMandiAdminDashboardBinding implements ViewBinding {
 
   private ActivityMandiAdminDashboardBinding(@NonNull CoordinatorLayout rootView,
       @NonNull Button button, @NonNull View divider6, @NonNull CardView header,
-      @NonNull TextView history, @NonNull RecyclerView historyList, @NonNull ImageView imageView2,
+      @NonNull TextView history, @NonNull RecyclerView historyList, @NonNull Button menu,
       @NonNull MotionLayout motionLayout, @NonNull ConstraintLayout recyclerView,
       @NonNull TextView titleText, @NonNull TextView titleText10, @NonNull TextView titleText2,
       @NonNull BottomSheetViewPager viewPager) {
@@ -73,7 +72,7 @@ public final class ActivityMandiAdminDashboardBinding implements ViewBinding {
     this.header = header;
     this.history = history;
     this.historyList = historyList;
-    this.imageView2 = imageView2;
+    this.menu = menu;
     this.motionLayout = motionLayout;
     this.recyclerView = recyclerView;
     this.titleText = titleText;
@@ -139,9 +138,9 @@ public final class ActivityMandiAdminDashboardBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.imageView2;
-      ImageView imageView2 = rootView.findViewById(id);
-      if (imageView2 == null) {
+      id = R.id.menu;
+      Button menu = rootView.findViewById(id);
+      if (menu == null) {
         break missingId;
       }
 
@@ -182,8 +181,8 @@ public final class ActivityMandiAdminDashboardBinding implements ViewBinding {
       }
 
       return new ActivityMandiAdminDashboardBinding((CoordinatorLayout) rootView, button, divider6,
-          header, history, historyList, imageView2, motionLayout, recyclerView, titleText,
-          titleText10, titleText2, viewPager);
+          header, history, historyList, menu, motionLayout, recyclerView, titleText, titleText10,
+          titleText2, viewPager);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

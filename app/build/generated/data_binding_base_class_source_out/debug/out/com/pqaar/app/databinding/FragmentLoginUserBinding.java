@@ -24,22 +24,13 @@ public final class FragmentLoginUserBinding implements ViewBinding {
   private final ScrollView rootView;
 
   @NonNull
-  public final Button btnForgotPassword;
-
-  @NonNull
-  public final Button btnLoginWithPhone;
-
-  @NonNull
-  public final Button btnlogin;
+  public final Button btnLogin;
 
   @NonNull
   public final Button btnregister;
 
   @NonNull
   public final Button button;
-
-  @NonNull
-  public final View divider;
 
   @NonNull
   public final View divider2;
@@ -63,22 +54,13 @@ public final class FragmentLoginUserBinding implements ViewBinding {
   public final RadioButton radioBtnTruckOwner;
 
   @NonNull
-  public final RadioButton radioBtnUnionAdmin;
-
-  @NonNull
   public final RadioGroup radioGroup;
 
   @NonNull
   public final ScrollView scrollView2;
 
   @NonNull
-  public final EditText textInputPassword;
-
-  @NonNull
   public final EditText textInputPhone;
-
-  @NonNull
-  public final EditText textInputUserId;
 
   @NonNull
   public final TextView textView3;
@@ -86,22 +68,17 @@ public final class FragmentLoginUserBinding implements ViewBinding {
   @NonNull
   public final TextView titleText;
 
-  private FragmentLoginUserBinding(@NonNull ScrollView rootView, @NonNull Button btnForgotPassword,
-      @NonNull Button btnLoginWithPhone, @NonNull Button btnlogin, @NonNull Button btnregister,
-      @NonNull Button button, @NonNull View divider, @NonNull View divider2, @NonNull View divider3,
-      @NonNull ImageView imageView2, @NonNull ImageView imageView4,
+  private FragmentLoginUserBinding(@NonNull ScrollView rootView, @NonNull Button btnLogin,
+      @NonNull Button btnregister, @NonNull Button button, @NonNull View divider2,
+      @NonNull View divider3, @NonNull ImageView imageView2, @NonNull ImageView imageView4,
       @NonNull RadioButton radioBtnMandiAdmin, @NonNull RadioButton radioBtnPahunchAdmin,
-      @NonNull RadioButton radioBtnTruckOwner, @NonNull RadioButton radioBtnUnionAdmin,
-      @NonNull RadioGroup radioGroup, @NonNull ScrollView scrollView2,
-      @NonNull EditText textInputPassword, @NonNull EditText textInputPhone,
-      @NonNull EditText textInputUserId, @NonNull TextView textView3, @NonNull TextView titleText) {
+      @NonNull RadioButton radioBtnTruckOwner, @NonNull RadioGroup radioGroup,
+      @NonNull ScrollView scrollView2, @NonNull EditText textInputPhone,
+      @NonNull TextView textView3, @NonNull TextView titleText) {
     this.rootView = rootView;
-    this.btnForgotPassword = btnForgotPassword;
-    this.btnLoginWithPhone = btnLoginWithPhone;
-    this.btnlogin = btnlogin;
+    this.btnLogin = btnLogin;
     this.btnregister = btnregister;
     this.button = button;
-    this.divider = divider;
     this.divider2 = divider2;
     this.divider3 = divider3;
     this.imageView2 = imageView2;
@@ -109,12 +86,9 @@ public final class FragmentLoginUserBinding implements ViewBinding {
     this.radioBtnMandiAdmin = radioBtnMandiAdmin;
     this.radioBtnPahunchAdmin = radioBtnPahunchAdmin;
     this.radioBtnTruckOwner = radioBtnTruckOwner;
-    this.radioBtnUnionAdmin = radioBtnUnionAdmin;
     this.radioGroup = radioGroup;
     this.scrollView2 = scrollView2;
-    this.textInputPassword = textInputPassword;
     this.textInputPhone = textInputPhone;
-    this.textInputUserId = textInputUserId;
     this.textView3 = textView3;
     this.titleText = titleText;
   }
@@ -146,21 +120,9 @@ public final class FragmentLoginUserBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.btnForgotPassword;
-      Button btnForgotPassword = rootView.findViewById(id);
-      if (btnForgotPassword == null) {
-        break missingId;
-      }
-
-      id = R.id.btnLoginWithPhone;
-      Button btnLoginWithPhone = rootView.findViewById(id);
-      if (btnLoginWithPhone == null) {
-        break missingId;
-      }
-
-      id = R.id.btnlogin;
-      Button btnlogin = rootView.findViewById(id);
-      if (btnlogin == null) {
+      id = R.id.btnLogin;
+      Button btnLogin = rootView.findViewById(id);
+      if (btnLogin == null) {
         break missingId;
       }
 
@@ -173,12 +135,6 @@ public final class FragmentLoginUserBinding implements ViewBinding {
       id = R.id.button;
       Button button = rootView.findViewById(id);
       if (button == null) {
-        break missingId;
-      }
-
-      id = R.id.divider;
-      View divider = rootView.findViewById(id);
-      if (divider == null) {
         break missingId;
       }
 
@@ -224,12 +180,6 @@ public final class FragmentLoginUserBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.radioBtnUnionAdmin;
-      RadioButton radioBtnUnionAdmin = rootView.findViewById(id);
-      if (radioBtnUnionAdmin == null) {
-        break missingId;
-      }
-
       id = R.id.radioGroup;
       RadioGroup radioGroup = rootView.findViewById(id);
       if (radioGroup == null) {
@@ -238,21 +188,9 @@ public final class FragmentLoginUserBinding implements ViewBinding {
 
       ScrollView scrollView2 = (ScrollView) rootView;
 
-      id = R.id.textInputPassword;
-      EditText textInputPassword = rootView.findViewById(id);
-      if (textInputPassword == null) {
-        break missingId;
-      }
-
       id = R.id.textInputPhone;
       EditText textInputPhone = rootView.findViewById(id);
       if (textInputPhone == null) {
-        break missingId;
-      }
-
-      id = R.id.textInputUserId;
-      EditText textInputUserId = rootView.findViewById(id);
-      if (textInputUserId == null) {
         break missingId;
       }
 
@@ -268,11 +206,9 @@ public final class FragmentLoginUserBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentLoginUserBinding((ScrollView) rootView, btnForgotPassword,
-          btnLoginWithPhone, btnlogin, btnregister, button, divider, divider2, divider3, imageView2,
-          imageView4, radioBtnMandiAdmin, radioBtnPahunchAdmin, radioBtnTruckOwner,
-          radioBtnUnionAdmin, radioGroup, scrollView2, textInputPassword, textInputPhone,
-          textInputUserId, textView3, titleText);
+      return new FragmentLoginUserBinding((ScrollView) rootView, btnLogin, btnregister, button,
+          divider2, divider3, imageView2, imageView4, radioBtnMandiAdmin, radioBtnPahunchAdmin,
+          radioBtnTruckOwner, radioGroup, scrollView2, textInputPhone, textView3, titleText);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

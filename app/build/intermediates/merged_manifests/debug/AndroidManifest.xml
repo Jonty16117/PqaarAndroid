@@ -26,7 +26,7 @@
         android:theme="@style/AppThemeLight" >
         <activity android:name="com.pqaar.app.truckOwner.view.ManageTrucksTest" />
         <activity android:name="com.pqaar.app.mandiAdmin.view.MandiAdminDashboard" />
-        <activity android:name="com.pqaar.app.unionAdmin.view.UnionAdminDashboard" />
+        <!-- <activity android:name=".unionAdmin.view.UnionAdminDashboard" /> -->
         <activity android:name="com.pqaar.app.truckOwner.view.TruckOwnerDashboard" />
         <activity android:name="com.pqaar.app.pahunchAdmin.view.PahunchAdminDashboard" />
         <activity
@@ -48,6 +48,12 @@
             android:directBootAware="true"
             android:exported="false" >
             <meta-data
+                android:name="com.google.firebase.components:com.google.firebase.auth.ktx.FirebaseAuthKtxRegistrar"
+                android:value="com.google.firebase.components.ComponentRegistrar" />
+            <meta-data
+                android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
+                android:value="com.google.firebase.components.ComponentRegistrar" />
+            <meta-data
                 android:name="com.google.firebase.components:com.google.firebase.firestore.ktx.FirebaseFirestoreKtxRegistrar"
                 android:value="com.google.firebase.components.ComponentRegistrar" />
             <meta-data
@@ -55,12 +61,6 @@
                 android:value="com.google.firebase.components.ComponentRegistrar" />
             <meta-data
                 android:name="com.google.firebase.components:com.google.firebase.storage.ktx.FirebaseStorageKtxRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.firebase.auth.ktx.FirebaseAuthKtxRegistrar"
-                android:value="com.google.firebase.components.ComponentRegistrar" />
-            <meta-data
-                android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
                 android:value="com.google.firebase.components.ComponentRegistrar" />
             <meta-data
                 android:name="com.google.firebase.components:com.google.firebase.firestore.FirestoreRegistrar"

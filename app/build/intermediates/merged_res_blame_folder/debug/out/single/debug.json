@@ -1,11 +1,11 @@
 [
     {
-        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\drawable_custom_ic_rc.xml.flat",
-        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\drawable\\custom_ic_rc.xml"
-    },
-    {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\drawable_wave_background.png.flat",
         "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\drawable\\wave_background.png"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\drawable_custom_ic_rc.xml.flat",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\drawable\\custom_ic_rc.xml"
     },
     {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\drawable_custom_tab_bg.xml.flat",
@@ -22,6 +22,10 @@
     {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_delete_in_progress.xml.flat",
         "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\drawable\\ic_delete_in_progress.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_close_dark.xml.flat",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\drawable\\ic_close_dark.xml"
     },
     {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_route_req_dark.xml.flat",
@@ -48,24 +52,24 @@
         "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher_round.png"
     },
     {
-        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\layout_fragment_login_user.xml.flat",
-        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\fragment_login_user.xml"
-    },
-    {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\drawable_custom_recents_green.xml.flat",
         "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\drawable\\custom_recents_green.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\layout_fragment_login_user.xml.flat",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\fragment_login_user.xml"
     },
     {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_add_route_dark.xml.flat",
         "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\drawable\\ic_add_route_dark.xml"
     },
     {
-        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\drawable_bg_dark.png.flat",
-        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\drawable\\bg_dark.png"
-    },
-    {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-anydpi-v26_ic_logo_text.xml.flat",
         "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\mipmap-anydpi-v26\\ic_logo_text.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\drawable_bg_dark.png.flat",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\drawable\\bg_dark.png"
     },
     {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-mdpi_ic_logo_text.png.flat",
@@ -202,6 +206,10 @@
     {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_cross_focused.xml.flat",
         "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\drawable\\ic_cross_focused.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\layout_prop_mandi_routes_sub_item.xml.flat",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\prop_mandi_routes_sub_item.xml"
     },
     {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_circle_dark.xml.flat",
@@ -384,6 +392,10 @@
         "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher_foreground.png"
     },
     {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\layout_prop_mandi_routes_header_item.xml.flat",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\prop_mandi_routes_header_item.xml"
+    },
+    {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-hdpi_ic_logo_text_foreground.png.flat",
         "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\mipmap-hdpi\\ic_logo_text_foreground.png"
     },
@@ -394,6 +406,10 @@
     {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-xxxhdpi_ic_waves_foreground.png.flat",
         "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_waves_foreground.png"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_pahuch_ticket_bg_white.xml.flat",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\drawable\\ic_pahuch_ticket_bg_white.xml"
     },
     {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_launcher_background.xml.flat",
@@ -486,6 +502,10 @@
     {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\layout_close_bid_alert_dialog_box.xml.flat",
         "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\layout\\close_bid_alert_dialog_box.xml"
+    },
+    {
+        "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\menu_menu_mandi_admin_dashboard.xml.flat",
+        "source": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\src\\main\\res\\menu\\menu_mandi_admin_dashboard.xml"
     },
     {
         "merged": "C:\\Users\\Jonty\\AndroidStudioProjects\\Pqaar\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-xhdpi_ic_launcher.png.flat",

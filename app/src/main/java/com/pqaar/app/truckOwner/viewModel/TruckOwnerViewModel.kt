@@ -23,6 +23,7 @@ import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.fetchTruckOwner
 import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.sendAddTruckReq
 import com.pqaar.app.truckOwner.repository.TruckOwnerRepo.sendRemoveTruckReq
 import com.pqaar.app.utils.TimeConversions.CurrDateTimeInMillis
+import com.pqaar.app.utils.TimeConversions.MillisToTimestamp
 import kotlinx.coroutines.*
 import kotlin.system.measureTimeMillis
 
@@ -43,6 +44,10 @@ class TruckOwnerViewModel : ViewModel() {
         //it.ending is ending time of the auction
         val auctionStartTime = it.first
         val auctionEndTime = it.second
+
+        Log.d(TAG, "auction start time from local time: ${MillisToTimestamp(it.first)}")
+        Log.d(TAG, "curr time in millis: ${CurrDateTimeInMillis()}")
+        Log.d(TAG, "curr time in string: ${MillisToTimestamp(CurrDateTimeInMillis())}")
 
         //means that the auction is scheduled
         if (CurrDateTimeInMillis() < it.first) {
